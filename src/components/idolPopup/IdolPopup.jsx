@@ -4,260 +4,331 @@ export const IdolPopup = ({ idolData, onClose }) => {
   console.log("idol data", idolData);
 
   return (
-    <div>
-      <div className="popup-container">
-        <div className="popup-box px-3 py-2 m-5">
-          <p className="h1 mb-5 mt-3 title">Applicant & Idol Details</p>
-          <p
-            className="close__btn"
-            style={{
-              position: "absolute",
-              right: "30px",
-              top: "20px",
-              fontSize: "44px",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-            onClick={onClose}
-          >
-            &times;
-          </p>
-          <div className="popup-innerbox">
-            <div className="row">
-              <div className="col-xl-7 mx-4">
-                <div className="view-form-section my-3">
-                  <img
-                    className="view-form-img me-5"
-                    id="img"
-                    src={idolData.applicantImage}
-                    alt="User Icon"
-                  />
-                  <div className="div1">
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Applicant Name:</strong>
-                      <p> {idolData.applicantName}</p>
-                    </div>
-                    <div className="d-flex  justify-content-between">
-                      <strong className="me-4">Applicant Address:</strong>
-                      <p> {idolData.applicantAddress}</p>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Mobile No:</strong>
-                      <p>{idolData.applicantPhNum}</p>
-                    </div>
-                  </div>
-                </div>
+    <div className="idol-form-popup-container">
+      <div className="idol-form-popup-box my-5 mx-5 px-5 py-4">
+        <div className="idol-popup-close-btn" onClick={onClose}>
+          &times;
+        </div>
+        <p className="h1 text-center mb-5 mt-4 text-success">
+          Applicant & Idol Details
+        </p>
 
-                <div className="view-form-section view-form-section2 my-3">
-                  <img
-                    className="view-form-img me-5"
-                    src={idolData.idolImage}
-                    alt="Idol Icon"
-                  />
-                  <div className="div2">
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Idol ID:</strong>
-                      <p>{idolData.idol_id}</p>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Type:</strong>
-                      <p>{idolData.typeOfInstaller}</p>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Location of Idol:</strong>
-                      <p> {idolData.placeOfInstallation}</p>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Date of Installation:</strong>
-                      <p>
-                        {" "}
-                        {new Date(idolData.setupDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Height:</strong>
-                      <p>{idolData.height}</p>
-                    </div>
-                    <div className="d-flex justify-content-between">
-                      <strong className="me-4">Date of Immersion:</strong>
-                      <p>
-                        {new Date(idolData.immersionDate).toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 my-3">
-                  <div className="d-flex justify-content-evenly">
-                    <strong>Mother Village:</strong>
-                    <p> {idolData.motherVillage}</p>
-                  </div>
-                  <div className="d-flex justify-content-evenly">
-                    <strong>Hamlet Village:</strong>
-                    <p> {idolData.hamletVillage}</p>
-                  </div>
-                  <div className="d-flex justify-content-evenly">
-                    <strong>License:</strong>
-                    <p>{idolData.licence}</p>
-                  </div>
-                </div>
-                <h3 className="my-4 text-start">Route</h3>
-                <div className="view-form-details my-3">
-                  <div className="d-flex justify-content-evenly">
-                    <strong>Starting point:</strong>
-                    <p> {idolData.startingPoint}</p>
-                  </div>
-                  <div className="d-flex justify-content-evenly">
-                    <strong>Place of Immersion:</strong>
-                    <p> {idolData.placeOfImmersion}</p>
-                  </div>
-                  <div className="d-flex justify-content-evenly">
-                    <strong>Procession Route:</strong>
-                    <p> {idolData.route}</p>
-                  </div>
-                </div>
-                <h3 className="my-4 text-start">Place/Properties</h3>
-                <div className="d-flex justify-content-evenly">
-                  <strong>Type:</strong>
-                  <p>{idolData.property.type}</p>
-                </div>
-                <div className="d-flex justify-content-evenly">
-                  <strong>Description:</strong>
-                  <p>{idolData.property.description}</p>
-                </div>
-
-                <h3 className="my-4 text-start">Shed Type</h3>
-                <div className="d-flex justify-content-evenly">
-                  <strong>Type:</strong>
-                  <p> {idolData.shed.type}</p>
-                </div>
-                <div className="d-flex justify-content-evenly">
-                  <strong>Description:</strong>
-                  <p> {idolData.shed.description}</p>
-                </div>
-              </div>
-
-              <div className="col-xl-4 mx-4">
-                <h3 className="my-4">Transport</h3>
-                <div className="ms-5">
-                  <div className="d-flex justify-content-between">
-                    <strong>Type of Vehicle:</strong>
-                    <p> {idolData.modeOfTransport.vehicleType}</p>
-                  </div>
-                  <div className="d-flex justify-content-between ">
-                    <strong>Driver Name:</strong>
-                    <p>{idolData.modeOfTransport.driverName}</p>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <strong>Driver License:</strong>
-                    <p> {idolData.modeOfTransport.driverLicense}</p>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <strong className="me-5">Description:</strong>
-                    <p> {idolData.modeOfTransport.vehicleDescription}</p>
-                  </div>
-                  <div className="d-flex justify-content-between">
-                    <strong>Procession By:</strong>
-                    <p> {idolData.processionBy}</p>
-                  </div>
-                </div>
-
-                <h3 className="my-4 ">Permissions/Facility</h3>
-                <div className="ms-5">
-                  <div className="d-flex justify-content-around">
-                    <strong>Police Permission:</strong>
-                    <p> {idolData.permission.police ? "Yes" : "No"}</p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>Fire Service Permission:</strong>
-                    <p> {idolData.permission.fireService ? "Yes" : "No"}</p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>TNEB Permission:</strong>
-                    <p> {idolData.permission.TNEB ? "Yes" : "No"}</p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>Electrical Equipment:</strong>
-                    <p>
-                      {" "}
-                      {idolData.facility.electricalEquipment ? "Yes" : "No"}
-                    </p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>Lighting Facility:</strong>
-                    <p> {idolData.facility.lightingFacility ? "Yes" : "No"}</p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>CCTV Facility:</strong>
-                    <p> {idolData.facility.CCTVFacility ? "Yes" : "No"}</p>
-                  </div>
-                </div>
-
-                <h3 className="my-4">Immersion - Safety Measures</h3>
-                <div className="ms-5">
-                  <div className="d-flex justify-content-around">
-                    <strong>Barricade:</strong>
-                    <p>{idolData.immersionSafety.barricade ? "Yes" : "No"}</p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>Lighting Facility:</strong>
-                    <p> {idolData.immersionSafety.lighting ? "Yes" : "No"}</p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>Safety Measures by Fire Service:</strong>
-                    <p>
-                      {" "}
-                      {idolData.immersionSafety.safetyByFireService
-                        ? "Yes"
-                        : "No"}
-                    </p>
-                  </div>
-                  <div className="d-flex justify-content-around">
-                    <strong>PA System:</strong>
-                    <p>{idolData.immersionSafety.PASystem ? "Yes" : "No"}</p>
-                  </div>
-                </div>
-
-                <h3 className="my-4 text-start">Volunteers Details</h3>
-                <div className="my-4 table-responsive-xl">
-                  <table className="table table-light table-hover table-striped">
-                    <thead>
-                      <tr>
-                        <th className="view-form-table-head">Volunteer No</th>
-                        <th className="view-form-table-head">Name</th>
-                        <th className="view-form-table-head">Address</th>
-                        <th className="view-form-table-head">Mobile No</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {idolData.volunteers.map((volunteer, index) => (
-                        <tr key={index}>
-                          <td className="view-form-table-col">{index + 1}</td>
-                          <td className="view-form-table-col">
-                            {volunteer.name}
-                          </td>
-                          <td className="view-form-table-col">
-                            {volunteer.address}
-                          </td>
-                          <td className="view-form-table-col">
-                            {volunteer.mobileNo}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+        <div className="my-4 mt-5">
+          <p className="h2 mb-4">Applicant Details</p>
+          <div className="idol-form-content-box">
+            <img
+              src={idolData.applicantImage}
+              className="idol-form-img img-fluid"
+              alt="User Icon"
+            />
+            <div className="idol-form-content-innerbox ms-5">
+              <table className="idol-form-content-list-div">
+                <tr>
+                  <td className="h5 pe-3">Name : </td>
+                  <td>{idolData.applicantName}</td>
+                </tr>
+              </table>
+              <table className="idol-form-content-list-div my-5">
+                <tr>
+                  <td className="h5 pe-3">Address:</td>
+                  <td> {idolData.applicantAddress}</td>
+                </tr>
+              </table>
+              <table className="idol-form-content-list-div">
+                <tr>
+                  <td className="h5 pe-3">Mobile No : </td>
+                  <td> {idolData.applicantPhNum}</td>
+                </tr>
+              </table>
             </div>
           </div>
+        </div>
 
-          <a
-            href={idolData.idolApplication}
-            className="text-light text-decoration-none fs-5"
-          >
-            <button className="mt-1 p-2 bg-success text-light">
-              View Application
-            </button>
-          </a>
+        <div className="my-4">
+          <p className="h2 mb-4">Idol Details</p>
+          <div className="idol-form-content-box">
+            <img
+              className="idol-form-img img-fluid"
+              src={idolData.idolImage}
+              alt="Idol Icon"
+            />
+            <div className="idol-form-content-innerbox ms-5">
+              <table className="idol-form-content-list-div my-2">
+                <tr>
+                  <td className="h5 pe-3">Idol ID :</td>
+                  <td>{idolData.idol_id}</td>
+                </tr>
+              </table>
+              <table className="idol-form-content-list-div my-2">
+                <tr>
+                  <td className="h5 pe-3">Station Name : </td>
+                  <td> {idolData.stationName}</td>
+                </tr>
+              </table>
+
+              <table className="idol-form-content-list-div my-3">
+                <tr>
+                  <td className="h5 pe-3">Mother Village : </td>
+                  <td>{idolData.motherVillage}</td>
+                </tr>
+              </table>
+
+              <table className="idol-form-content-list-div my-2">
+                <tr>
+                  <td className="h5 pe-3">Hamlet Village : </td>
+                  <td> {idolData.hamletVillage}</td>
+                </tr>
+              </table>
+              <table className="idol-form-content-list-div my-2">
+                <tr>
+                  <td className="h5 pe-3">Location of Idol : </td>
+                  <td> {idolData.placeOfInstallation}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <table className="idol-form-content-innerbox my-3">
+          <tr>
+            <td className="h5 pe-5">Type Of Installer</td>
+            <td>{idolData.typeOfInstaller}</td>
+          </tr>
+          {idolData.typeOfInstaller === "organization" && (
+            <tr>
+              <td className="h5 pe-5">Organization Name</td>
+              <td>{idolData.organizationName}</td>
+            </tr>
+          )}
+          <tr>
+            <td className="h5 pe-5">Date of Installation : </td>
+            <td>{new Date(idolData.setupDate).toLocaleDateString()}</td>
+          </tr>
+        </table>
+        <table className="idol-form-content-innerbox my-3">
+          <tr>
+            <td className="h5 pe-5">Height : </td>
+            <td>{idolData.height}</td>
+          </tr>
+        </table>
+        <table className="idol-form-content-innerbox my-3">
+          <tr>
+            <td className="h5 pe-5">Date of Immersion : </td>
+            <td> {new Date(idolData.immersionDate).toLocaleDateString()}</td>
+          </tr>
+        </table>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Place/Properties</p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">Type</td>
+                <td>{idolData.property.type}</td>
+              </tr>
+              <tr className="text-center">
+                <td className="h5">description</td>
+                <td>{idolData.property.description}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Shed Type</p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">Type</td>
+                <td>{idolData.shed.type}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Description</td>
+                <td>{idolData.shed.description}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">License/Permissions/Facility</p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">License</td>
+                <td>{idolData.licence ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Police Permission</td>
+                <td>{idolData.permission.police ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Fire Service Permission</td>
+                <td>{idolData.permission.fireService ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">TNEB Permission</td>
+                <td>{idolData.permission.TNEB ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Electrical Equipment</td>
+                <td>{idolData.facility.electricalEquipment ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Lighting Facility</td>
+                <td>{idolData.facility.lightingFacility ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">CCTV Facility</td>
+                <td>{idolData.facility.CCTVFacility ? "YES" : "NO"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Volunteer Details</p>
+          <div className="table-responsive-lg">
+            <table className="table table-light table-striped table-bordered my-4">
+              <thead>
+                <tr className="text-center">
+                  <th>Volunteer No</th>
+                  <th>Name</th>
+                  <th>Address</th>
+                  <th>Mobile No</th>
+                </tr>
+              </thead>
+              <tbody>
+                {idolData.volunteers.map((volunteer, index) => (
+                  <tr key={index} className="text-center">
+                    <td>{index + 1}</td>
+                    <td>{volunteer.name}</td>
+                    <td>{volunteer.address}</td>
+                    <td>{volunteer.mobileNo}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Transportation Details</p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">Driver Name</td>
+                <td>{idolData.modeOfTransport.driverName}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Driver License</td>
+                <td>{idolData.modeOfTransport.driverLicense}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Vehicle Type</td>
+                <td>{idolData.modeOfTransport.vehicleType}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Vehicle Description</td>
+                <td>{idolData.modeOfTransport.vehicleDescription}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Procession By</td>
+                <td>{idolData.processionBy}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Sensitivity </p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">Route Sensitivity</td>
+                <td>{idolData.sensitivity}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">
+                  Presence of Mosque/Church in Procession Route
+                </td>
+                <td>{idolData.isChruchMosque ? "YES" : "NO"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Route </p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">Starting Point</td>
+                <td>{idolData.placeOfInstallation}</td>
+              </tr>
+              <tr className="text-center">
+                <td className="h5">Default Junction</td>{" "}
+                <td>{idolData?.startJunctionPoint?.place}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Intermediate Junctions</td>
+                <td>
+                  {idolData.intermediateJunctionPoints
+                    .map((data) => data.place)
+                    .join("-")}
+                </td>
+              </tr>
+              <tr className="text-center">
+                <td className="h5">Place of Immersion</td>
+                <td>{idolData?.placeOfImmersion}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div className="idol-form-content-table my-5">
+          <p className="h2 my-3">Immersion-Safety Measures</p>
+          <table className="table table-light table-striped table-bordered my-4">
+            <tbody>
+              <tr className="text-center">
+                <td className="h5">Barricade</td>
+                <td>{idolData.immersionSafety.barricade ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Lighting Facility</td>
+                <td>{idolData.immersionSafety.lighting ? "YES" : "NO"}</td>
+              </tr>
+
+              <tr className="text-center">
+                <td className="h5">Safety Measures by Fire Service</td>
+                <td>
+                  {idolData.immersionSafety.safetyByFireService ? "YES" : "NO"}
+                </td>
+              </tr>
+              <tr className="text-center">
+                <td className="h5">PA System</td>
+                <td>{idolData.immersionSafety.PASystem ? "YES" : "NO"}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="view-form-btn text-center">
+          <button className="btn btn-dark py-2 px-4 my-3">
+            View Applicant Form
+          </button>
         </div>
       </div>
     </div>

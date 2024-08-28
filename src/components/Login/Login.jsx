@@ -4,6 +4,7 @@ import "./login_style.css";
 import axios from "axios";
 import Loading from "../loading/loading";
 import API_BASE_URL from "../../../apiConfig";
+import loginBg from "/loginBG.png";
 
 function Login({ loginUser }) {
   const [username, setUsername] = useState("");
@@ -80,11 +81,11 @@ function Login({ loginUser }) {
   return (
     <div className="login-container">
       {showLoading && <Loading />}
-      <div className="bg-light rounded p-5 px-5">
-        <h2 className="text-center mb-3">{loginUser} Login</h2>
+      <div className=" login-box p-4 p-md-5">
+        <p className="text-center h1 display-4 mb-4">{loginUser} Login</p>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username" className="form-label fs-5">
+          <div className="form-group mb-4">
+            <label htmlFor="username" className="form-label h5">
               Username
             </label>
             <input
@@ -92,12 +93,13 @@ function Login({ loginUser }) {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="form-control mb-3 form-control-md fs-5"
+              className="form-control form-control-lg"
+              placeholder="Enter your username"
               required
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="password" className="form-label fs-5">
+          <div className="form-group mb-4">
+            <label htmlFor="password" className="form-label h5">
               Password
             </label>
             <input
@@ -105,15 +107,22 @@ function Login({ loginUser }) {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="form-control fs-5"
+              className="form-control form-control-lg"
+              placeholder="Enter your password"
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary mt-4 w-100">
-            Login
-          </button>
+          <div className="loginbtn-div text-center">
+            <button
+              type="submit"
+              id="loginbtn"
+              className="btn btn-dark font-weight-bold  btn-lg fs-4"
+            >
+              Login <span className="login_btn_line"></span>
+            </button>
+          </div>
           {errorMessage && (
-            <p className="text-center mt-4 fs-5 text-danger">{errorMessage}</p>
+            <p className="text-center mt-3 text-danger">{errorMessage}</p>
           )}
         </form>
       </div>

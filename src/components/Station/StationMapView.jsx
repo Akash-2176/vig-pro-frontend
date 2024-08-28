@@ -1,25 +1,33 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine";
 import pinimg from "/mappin.png";
+import "./map.css";
 
 const customIcon = L.icon({
-  iconUrl: pinimg, // Replace with the URL to your custom icon image
-  iconSize: [64, 64], // Size of the icon
-  iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
-  popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+  iconUrl: pinimg,
+  iconSize: [64, 64],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
 });
 
 const StationMapView = ({ station, onBackNav }) => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markersRef = useRef([]);
-
+  const routingControlRef = useRef(null);
+  const junctionToEndRouteRef = useRef(null);
   const allIdols = station.stationIdol;
+  const [filters, setFilters] = useState({
+    type: "",
+    sensitivity: "",
+    dateOfImmersion: "",
+  });
 
   useEffect(() => {
     if (!mapInstance.current) {
-      // Set default map center and zoom
+      // Initialize the map
       mapInstance.current = L.map(mapRef.current).setView(
         [11.225, 78.1652],
         12
@@ -55,36 +63,169 @@ const StationMapView = ({ station, onBackNav }) => {
       ).addTo(mapInstance.current);
     }
 
-    // Clean up markers on re-render
-    markersRef.current.forEach((marker) =>
+    // Clean up previous markers
+    markersRef.current.forEach(({ marker }) =>
       mapInstance.current.removeLayer(marker)
     );
     markersRef.current = [];
 
+    // Add new markers
     allIdols.forEach((idol) => {
       if (idol.startCoords) {
-        console.log(idol);
         const { lat, lon } = idol.startCoords;
         const marker = L.marker([lat, lon], { icon: customIcon })
           .bindPopup(
             `<b>${idol.idol_id}</b><br>Hamletvillage: ${idol.hamletVillage}`
           )
           .addTo(mapInstance.current);
-        markersRef.current.push(marker); // Store marker references for cleanup
+        markersRef.current.push({ marker, data: idol });
       }
     });
 
-    // Add markers for each village
-    // Object.keys(villages).forEach((district) => {
-    //   villages[district].forEach((village) => {
-    //     const { lat, log } = village.coords;
-    //     const marker = L.marker([lat, log], { icon: customIcon })
-    //       .bindPopup(`<b>${village.place}</b><br>District: ${district}`)
-    //       .addTo(mapInstance.current);
-    //     markersRef.current.push(marker); // Store marker references for cleanup
-    //   });
-    // });
+    const showRoute = (idol) => {
+      const startPoint = L.latLng(idol.startCoords.lat, idol.startCoords.lon);
+      const junctionPoint = L.latLng(
+        idol.startJunctionPoint.coords.lat,
+        idol.startJunctionPoint.coords.lon
+      );
+      const endPoint = L.latLng(idol.endCoords.lat, idol.endCoords.lon);
+      const intermediatePoint = idol.intermediateJunctionPoints.map((point) =>
+        L.latLng(point.coords.lat, point.coords.lon)
+      );
+
+      markersRef.current.forEach(({ marker }) => {
+        if (marker.getLatLng().equals(startPoint)) {
+          marker.addTo(mapInstance.current);
+        } else {
+          marker.remove();
+        }
+      });
+
+      if (routingControlRef.current) {
+        routingControlRef.current.remove();
+        routingControlRef.current = null;
+      }
+
+      if (junctionToEndRouteRef.current) {
+        junctionToEndRouteRef.current.remove();
+        junctionToEndRouteRef.current = null;
+      }
+
+      const startPointData = markersRef.current.find(({ marker }) =>
+        marker.getLatLng().equals(startPoint)
+      ).data;
+
+      let routeColor = "blue";
+      switch (startPointData.sensitivity) {
+        case "HyperSensitive":
+          routeColor = "red";
+          break;
+        case "Sensitive":
+          routeColor = "orange";
+          break;
+        case "NonSensitive":
+          routeColor = "green";
+          break;
+        default:
+          routeColor = "blue";
+      }
+
+      routingControlRef.current = L.Routing.control({
+        waypoints: [startPoint, junctionPoint],
+        routeWhileDragging: false,
+        showAlternatives: true,
+        altLineOptions: {
+          styles: [{ color: "blue", opacity: 0.7, weight: 5 }],
+        },
+        createMarker: () => null,
+        draggableWaypoints: false,
+        addWaypoints: false,
+      }).addTo(mapInstance.current);
+
+      routingControlRef.current.on("routesfound", (e) => {
+        const routes = e.routes;
+        if (routes && routes.length > 0) {
+          if (junctionToEndRouteRef.current) {
+            junctionToEndRouteRef.current.remove();
+          }
+
+          junctionToEndRouteRef.current = L.Routing.control({
+            waypoints: [junctionPoint, ...intermediatePoint, endPoint],
+            routeWhileDragging: false,
+            lineOptions: {
+              styles: [{ color: routeColor, opacity: 1, weight: 5 }],
+            },
+            createMarker: () => null,
+            draggableWaypoints: false,
+            addWaypoints: false,
+          }).addTo(mapInstance.current);
+        }
+      });
+    };
+
+    const restoreMarkers = () => {
+      if (routingControlRef.current) {
+        routingControlRef.current.remove();
+        routingControlRef.current = null;
+      }
+      if (junctionToEndRouteRef.current) {
+        junctionToEndRouteRef.current.remove();
+        junctionToEndRouteRef.current = null;
+      }
+
+      markersRef.current.forEach(({ marker }) => {
+        marker.addTo(mapInstance.current);
+      });
+    };
+
+    markersRef.current.forEach(({ marker, data }) => {
+      marker.on("click", () => showRoute(data));
+    });
+
+    mapInstance.current.on("click", (e) => {
+      if (!e.latlng || !routingControlRef.current) return;
+
+      const routeLayer = routingControlRef.current.getPlan()._routes;
+      let clickedOnRoute = false;
+
+      if (routeLayer && routeLayer.length > 0) {
+        clickedOnRoute = routeLayer.some((route) => {
+          return route.coordinates.some((coord) => {
+            const dist = e.latlng.distanceTo(L.latLng(coord.lat, coord.lng));
+            return dist < 10; // Adjust threshold as needed
+          });
+        });
+      }
+
+      if (!clickedOnRoute) {
+        restoreMarkers();
+      }
+    });
+
+    return () => {
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+      }
+    };
   }, [station]);
+  useEffect(() => {
+    markersRef.current.forEach(({ marker, data }) => {
+      const matchesType = filters.type ? data.type === filters.type : true;
+      const matchesSensitivity = filters.sensitivity
+        ? data.sensitivity === filters.sensitivity
+        : true;
+      const matchesDate = filters.dateOfImmersion
+        ? data.dateOfImmersion === filters.dateOfImmersion
+        : true;
+
+      if (matchesType && matchesSensitivity && matchesDate) {
+        marker.addTo(mapInstance.current); // Show marker
+      } else {
+        marker.remove(); // Hide marker
+      }
+    });
+  }, [filters]);
 
   return (
     <>
@@ -99,6 +240,40 @@ const StationMapView = ({ station, onBackNav }) => {
         <button className="btn btn-dark ms-2 me-2" onClick={onBackNav}>
           Back
         </button>
+      </div>
+      <div style={{ marginBottom: "10px" }}>
+        <select
+          onChange={(e) => setFilters({ ...filters, type: e.target.value })}
+        >
+          <option value="">Select Type</option>
+          <option value="Private">Private</option>
+          <option value="Private in public place">
+            Private in public place
+          </option>
+          <option value="Organization in public place">
+            Organization in public place
+          </option>
+        </select>
+        <select
+          onChange={(e) =>
+            setFilters({ ...filters, sensitivity: e.target.value })
+          }
+        >
+          <option value="">Select Sensitivity</option>
+          <option value="HyperSensitive">HyperSensitive</option>
+          <option value="Sensitive">Sensitive</option>
+          <option value="NonSensitive">NonSensitive</option>
+        </select>
+        <select
+          onChange={(e) =>
+            setFilters({ ...filters, dateOfImmersion: e.target.value })
+          }
+        >
+          <option value="">Select Date of Immersion</option>
+          <option value="07/09/2024">07/09/2024</option>
+          <option value="08/09/2024">08/09/2024</option>
+          <option value="09/09/2024">09/09/2024</option>
+        </select>
       </div>
       <div id="map" ref={mapRef} style={{ height: "100vh", width: "100%" }} />
     </>

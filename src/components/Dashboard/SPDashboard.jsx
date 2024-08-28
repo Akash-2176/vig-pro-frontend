@@ -8,6 +8,7 @@ import SPListDashboard from "../SP/SPListDashboard";
 import SPMainDashboard from "../SP/SPMainDashboard";
 import SPMapView from "../SP/SPMapView";
 import HomeDashboard from "../HomeDashboard/HomeDashboard";
+import "./SPDashboard_style.css";
 
 export default function SPDashboard() {
   const navigate = useNavigate();

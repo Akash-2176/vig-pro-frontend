@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import pinimg from "/mappin.png";
+import "./map.css";
 
 const customIcon = L.icon({
   iconUrl: pinimg, // Replace with the URL to your custom icon image
@@ -19,6 +20,7 @@ const DSPMapView = ({ DSP, onBackNav }) => {
 
   const allIdols = DSP.stationIds.flatMap((station) => station.stationIdol);
   console.log(allIdols);
+
   useEffect(() => {
     if (!mapInstance.current) {
       // Set default map center and zoom
@@ -76,6 +78,76 @@ const DSPMapView = ({ DSP, onBackNav }) => {
       }
     });
 
+    const showRoute = (idol) => {
+      if (routingControlRef.current) {
+        routingControlRef.current.remove(); // Remove existing route if any
+      }
+
+      const startPoint = L.latLng(idol.startCoords.lat, idol.startCoords.lon);
+      const junctionPoint = L.latLng(
+        idol.startJunctionPoint.coords.lat,
+        idol.startJunctionPoint.coords.lon
+      );
+      const endPoint = L.latLng(idol.endCoords.lat, idol.endCoords.lon);
+      const intermediatePoint = idol.intermediateJunctionPoints.map((point) =>
+        L.latLng(point.coords.lat, point.coords.lon)
+      );
+
+      console.log(startPoint, junctionPoint, endPoint, intermediatePoint);
+      // console.log(junctionPoint, ...intermediatePoint, endPoint);
+
+      // Add a route from the starting point to the junction
+      routingControlRef.current = L.Routing.control({
+        waypoints: [startPoint, junctionPoint],
+        routeWhileDragging: false, // Disable dragging of route
+        showAlternatives: true,
+        altLineOptions: {
+          styles: [{ color: "blue", opacity: 0.7, weight: 5 }],
+        },
+        createMarker: function () {
+          return null;
+        }, // Disable waypoint markers
+        draggableWaypoints: false, // Disable dragging of waypoints
+        addWaypoints: false, // Disable adding waypoints by clicking
+      }).addTo(mapInstance.current);
+
+      routingControlRef.current.on("routesfound", function (e) {
+        const routes = e.routes;
+        if (routes && routes.length > 0) {
+          // Fetch the route from junction to the endpoint via intermediate waypoints
+          L.Routing.control({
+            waypoints: [junctionPoint, ...intermediatePoint, endPoint],
+            routeWhileDragging: false, // Disable dragging of route
+            lineOptions: {
+              styles: [{ color: "red", opacity: 0.7, weight: 5 }],
+            },
+            createMarker: function () {
+              return null;
+            }, // Disable waypoint markers
+            draggableWaypoints: false, // Disable dragging of waypoints
+            addWaypoints: false, // Disable adding waypoints by clicking
+          }).addTo(mapInstance.current);
+
+          // Hide the route list
+          const controlContainer = document.querySelector(
+            ".leaflet-routing-container"
+          );
+          if (controlContainer) {
+            controlContainer.style.display = "none";
+          }
+        }
+      });
+    };
+
+    allIdols.forEach((idol) => {
+      if (idol.startCoords)
+        L.marker(L.latLng(idol.startCoords.lat, idol.startCoords.lon), {
+          icon: customIcon,
+        })
+          .addTo(mapInstance.current)
+          .on("click", () => showRoute(idol));
+    });
+
     // Add markers for each village
     // Object.keys(villages).forEach((district) => {
     //   villages[district].forEach((village) => {
@@ -87,7 +159,6 @@ const DSPMapView = ({ DSP, onBackNav }) => {
     //   });
     // });
   }, [DSP]);
-
   return (
     <>
       <div

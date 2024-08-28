@@ -22,7 +22,7 @@
 }
 #dsp-filters {
   display: flex !important;
-  justify-content: space-between !important;
+  justify-content: space-around !important;
 }
 .select-Btn {
   display: flex !important;
@@ -32,19 +32,19 @@
 .viewDiv {
   font-family: poppins;
 }
-select {
+#dsp-filters select {
   border: 2px solid #002147 !important;
   font-size: 1.1rem !important;
   font-weight: 500 !important;
 }
-th {
+.dsp-table th {
   font-size: 1.2rem !important;
 }
-td {
+.dsp-table td {
   font-size: 1.1rem !important;
 }
-td,
-th {
+.dsp-table td,
+.dsp-table th {
   text-align: center !important;
   border: 1px solid black !important;
 }

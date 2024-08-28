@@ -17,12 +17,15 @@ export default function SPListDashboard({ SP, handleLogout, onBackNav }) {
         </header>
         <div className="text-end mx-5">
           <button
-            className="btn btn-dark text-light ms-2 me-2"
+            className="btn btn-success fs-5 text-light ms-2 me-2"
             onClick={onBackNav}
           >
             Back
           </button>
-          <button className="btn my-4  btn-danger ms-2" onClick={handleLogout}>
+          <button
+            className="btn my-4 fs-5 btn-danger ms-2"
+            onClick={handleLogout}
+          >
             Logout
           </button>
         </div>

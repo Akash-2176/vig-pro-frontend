@@ -4,7 +4,58 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-image: url("/loginBG.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 }
 
 .login-box {
+  width: 550px;
+  background: rgba(255, 255, 255, 0.13);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10.8px);
+  -webkit-backdrop-filter: blur(10.8px);
+  border: 1px solid rgba(255, 255, 255, 0.53);
+}
+#loginbtn {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px !important;
+  color: #ffffff;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: 0.5s;
+  margin-top: 40px;
+  letter-spacing: 10px !important;
+}
+#loginbtn:hover {
+  background: #f8f8ff;
+  color: #100c08 !important;
+  border-radius: 5px;
+}
+.login_btn_line {
+  position: absolute;
+  display: block;
+}
+
+@keyframes btn-anim1 {
+  0% {
+    left: -100%;
+  }
+
+  50%,
+  100% {
+    left: 100%;
+  }
+}
+.login_btn_line:nth-child(1) {
+  bottom: 2px;
+  left: -100%;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #03f40f);
+  animation: btn-anim1 2s linear infinite;
 }

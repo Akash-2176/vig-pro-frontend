@@ -78,6 +78,76 @@ export default function StationDashboard() {
     setDashview("dashboard");
   };
 
+  // const allIdols = station.stationIdol;
+  // // starts
+  // const noOfApplication = allIdols.length;
+  // const stationIdolCounts = allIdols.reduce(
+  //   (counts, idol) => {
+  //     if (idol.isImmersed) {
+  //       counts.immersed += 1;
+  //     } else {
+  //       counts.notImmersed += 1;
+  //     }
+  //     return counts;
+  //   },
+  //   { immersed: 0, notImmersed: 0 } // Initial count values
+  // );
+
+  // console.log(noOfApplication, stationIdolCounts);
+
+  // const noOfImmersed = stationIdolCounts.immersed;
+  // const noOfNotImmersed = stationIdolCounts.notImmersed;
+
+  // const counts = allIdols.reduce(
+  //   (acc, idol) => {
+  //     switch (idol.typeOfInstaller) {
+  //       case "Public":
+  //         acc.public += 1;
+  //         break;
+  //       case "Private":
+  //         acc.private += 1;
+  //         break;
+  //       case "Organization":
+  //         acc.organization += 1;
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //     return acc;
+  //   },
+  //   { public: 0, private: 0, organization: 0 }
+  // );
+  // const stats = {
+  //   Sensitive: {
+  //     totalRegistered: 0,
+  //     totalImmersed: 0,
+  //     totalNotImmersed: 0,
+  //   },
+  //   NonSensitive: {
+  //     totalRegistered: 0,
+  //     totalImmersed: 0,
+  //     totalNotImmersed: 0,
+  //   },
+  //   "Hyper-Sensitive": {
+  //     totalRegistered: 0,
+  //     totalImmersed: 0,
+  //     totalNotImmersed: 0,
+  //   },
+  // };
+
+  // allIdols.forEach((idol) => {
+  //   const { sensitivity, isImmersed } = idol;
+
+  //   if (sensitivity && stats[sensitivity]) {
+  //     stats[sensitivity].totalRegistered += 1;
+  //     if (isImmersed) {
+  //       stats[sensitivity].totalImmersed += 1;
+  //     } else {
+  //       stats[sensitivity].totalNotImmersed += 1;
+  //     }
+  //   }
+  // });
+
   // Correctly defining the dashboardview function
   const dashboardview = () => {
     switch (dashview) {
@@ -85,6 +155,7 @@ export default function StationDashboard() {
         // return <StationMainDashboard setDashview={setDashview} />;
         return (
           <HomeDashboard
+            station={station}
             handleLogout={handleLogout}
             setDashview={setDashview}
           />

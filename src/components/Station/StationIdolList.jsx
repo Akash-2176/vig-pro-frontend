@@ -4,16 +4,22 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./StationIdolList.css";
 import axios from "axios";
 import { IdolPopup } from "../idolPopup/idolPopup";
+import EditPopup from "../EditForm/EditPopup";
 
 function StationIdolList({ station, setStation }) {
   const [filterStatus, setFilterStatus] = useState("all");
   const [showIdolPopup, setShowIdolPopup] = useState(false);
   const [idolData, setIdolData] = useState(null);
+  const [editIdolData, setEditIdolData] = useState(null);
+  const [showEditPopup, setShowEditPopup] = useState(false);
+
   useEffect(() => {
     // No need to maintain a separate `tableData` state if `station.stationIdol` is updated directly
   }, [station]);
 
-  const handleComplete = async (idol_id) => {
+  const handleComplete = async (idol_id, event) => {
+    event.stopPropagation();
+
     // Show confirmation dialog
     const confirmAction = window.confirm(
       "Are you sure you want to mark this idol as complete?"
@@ -21,13 +27,11 @@ function StationIdolList({ station, setStation }) {
     if (!confirmAction) {
       return; // Exit the function if the user cancels the action
     }
-
     try {
       // Send the patch request to update the idol's status
       const response = await axios.patch(
         `http://localhost:3000/api/stations/${station.stationId}/idol/${idol_id}/immersed`
       );
-
       // Check if the request was successful
       console.log(response.data);
 
@@ -51,6 +55,80 @@ function StationIdolList({ station, setStation }) {
     }
   };
 
+  const handleEdit = async (idolData, event) => {
+    event.stopPropagation();
+    setEditIdolData(idolData);
+    setShowEditPopup(true);
+    // handleEditPopup();
+  };
+
+  const handleDelete = async (idol_id, event) => {
+    event.stopPropagation();
+
+    const confirmAction = window.confirm(
+      `Are you sure you want to Delete this idol ${idol_id}?`
+    );
+    if (!confirmAction) {
+      return; // Exit the function if the user cancels the action
+    }
+    try {
+      // Send the patch request to update the idol's status
+      const response = await axios.delete(
+        `http://localhost:3000/api/stations/${station.stationId}/${idol_id}/deleteIdol`
+      );
+      console.log(response.data);
+
+      if (response.status === 200) {
+        // Delete the station's idol data after a successful patch request
+        setStation((prevStation) => ({
+          ...prevStation,
+          stationIdol: prevStation.stationIdol.filter(
+            (item) => item.idol_id !== idol_id
+          ),
+        }));
+      }
+    } catch (error) {
+      console.error("Failed to delete idol status:", error);
+    }
+  };
+
+  // const handleEditPopup = async (newIdolData) => {
+  //   // Show confirmation dialog
+  //   const confirmAction = window.confirm(
+  //     "Are you sure you want to Edit this idol ?"
+  //   );
+  //   if (!confirmAction) {
+  //     return; // Exit the function if the user cancels the action
+  //   }
+  //   try {
+  //     // Send the patch request to update the idol's status
+  //     const response = await axios.post(
+  //       `http://localhost:3000/api/stations/${station.stationId}/idol/${idol_id}/immersed`,
+  //       newIdolData
+  //     );
+  //     // Check if the request was successful
+  //     console.log(response.data);
+
+  //     if (response.status === 200) {
+  //       // Update the station's idol data after a successful patch request
+  //       const updatedIdols = station.stationIdol.map((item) => {
+  //         if (item.idol_id === idol_id) {
+  //           return { ...item, isImmersed: true }; // Update the isImmersed flag
+  //         }
+  //         return item;
+  //       });
+
+  //       // Update the station state with the new idols
+  //       setStation((prevStation) => ({
+  //         ...prevStation,
+  //         stationIdol: updatedIdols,
+  //       }));
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to update idol status:", error);
+  //   }
+  // };
+
   const handleFilter = (status) => {
     setFilterStatus(status);
   };
@@ -72,6 +150,11 @@ function StationIdolList({ station, setStation }) {
     setShowIdolPopup(false);
   };
 
+  // handle Open popup
+  const handleCloseUpdatePopup = function () {
+    setShowEditPopup(false);
+  };
+
   return (
     <div className="App">
       {showIdolPopup && (
@@ -79,6 +162,19 @@ function StationIdolList({ station, setStation }) {
           <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
         </div>
       )}
+
+      <div>
+        <EditPopup
+          idolData={editIdolData}
+          onClose={handleCloseUpdatePopup}
+          station={station}
+          setStation={setStation}
+          onShow={showEditPopup}
+          // onEditForm={handleOpenUpdateForm}
+          // onEditFile={handleOpenUpdateFile}
+        />
+      </div>
+
       <div
         className="filter-buttons row m-5 btn-group btn-group-toggle w-100"
         role="group"
@@ -95,7 +191,7 @@ function StationIdolList({ station, setStation }) {
             onClick={() => handleFilter("all")}
           />
           <label
-            className="btn btn-outline-success w-100 flex-fill"
+            className="btn btn-outline-primary w-100 flex-fill"
             htmlFor="filter-button1"
           >
             All
@@ -111,10 +207,10 @@ function StationIdolList({ station, setStation }) {
             onClick={() => handleFilter("COMPLETE")}
           />
           <label
-            className="btn btn-outline-success w-100 flex-fill"
+            className="btn btn-outline-primary w-100 flex-fill"
             htmlFor="filter-button2"
           >
-            Complete
+            Immersion Complete
           </label>
         </div>
         <div className="col-sm-2 my-2">
@@ -127,45 +223,62 @@ function StationIdolList({ station, setStation }) {
             onClick={() => handleFilter("INCOMPLETE")}
           />
           <label
-            className="btn btn-outline-success w-100 flex-fill"
+            className="btn btn-outline-primary w-100 flex-fill"
             htmlFor="filter-button3"
           >
-            Incomplete
+            Immersion Incomplete
           </label>
         </div>
       </div>
-
-      <div className="tableDiv m-5">
+      <div className="tableDiv m-5 table-responsive-xl">
         <table className="table table-light table-striped table-hover table-bordered">
           <thead>
-            <tr>
+            <tr className="text-center">
+              <th>S.No</th>
               <th>Idol ID</th>
-              <th>Location of installation</th>
-              <th>Place of immersion</th>
-              <th>Setup Date</th>
+              <th>Location of Installation</th>
+              <th>Place of Immersion</th>
+              <th>Date of Immersion</th>
+              <th>Type</th>
+              <th>Sensitive</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((item) => (
+            {filteredData.map((item, index) => (
               <tr key={item.idol_id} onClick={() => handleOpenIdolInfo(item)}>
+                <td>{index + 1}</td>
                 <td>{item.idol_id}</td>
                 <td>{item.placeOfInstallation}</td>
                 <td>{item.placeOfImmersion}</td>
                 <td>{new Date(item.setupDate).toLocaleDateString()}</td>
+                <td>{item.typeOfInstaller}</td>
+                <td>{item.sensitivity}</td>
                 <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
-                <td>
+                <td className="d-flex">
                   {item.isImmersed ? (
                     <span>Completed</span>
                   ) : (
                     <button
-                      className="btn btn-danger"
-                      onClick={() => handleComplete(item.idol_id)}
+                      className="btn btn-warning"
+                      onClick={(event) => handleComplete(item.idol_id, event)}
                     >
                       Complete
                     </button>
                   )}
+                  <button
+                    className="btn btn-success mx-2"
+                    onClick={(event) => handleEdit(item, event)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    onClick={(event) => handleDelete(item.idol_id, event)}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

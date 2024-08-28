@@ -25,20 +25,23 @@ export default function StationListDashboard({
           <img src={banner} id="nav_banner"></img>
         </div>
 
-        <div className="text-end mt-3 pe-4">
-          <button
-            className="btn btn-success"
-            onClick={() => setShowAddIdol(true)}
-          >
-            Add Idol
-          </button>
-          <button className="btn btn-dark ms-2 me-2" onClick={onBackNav}>
-            Back
-          </button>
-
-          <button className="btn btn-danger" onClick={handleLogout}>
-            Logout
-          </button>
+        <div className="d-flex justify-content-between">
+          <div className="ms-3   mt-3 pe-4">
+            <button className="btn btn-dark  ms-2 me-2" onClick={onBackNav}>
+              Back
+            </button>
+          </div>
+          <div className="mt-3 pe-4">
+            <button
+              className="btn btn-success mx-3"
+              onClick={() => setShowAddIdol(true)}
+            >
+              Add Idol
+            </button>{" "}
+            <button className="btn btn-danger" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
       </header>
 

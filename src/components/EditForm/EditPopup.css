@@ -1,0 +1,12 @@
+.edit__form__container__popup {
+  position: absolute;
+  top: 0;
+  z-index: 100;
+  background: rgba(245, 245, 245, 0.763);
+  width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+}
+
+.edit__form__popup__box {
+}

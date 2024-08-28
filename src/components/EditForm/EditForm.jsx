@@ -1,106 +1,78 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./form_style.css";
+import "./form_Style.css";
 import API_BASE_URL from "../../../apiConfig";
 import Loading from "../loading/loading";
 // import station from "../../../smpstation.json";
+import "./EditForm.css";
 
-const Form = ({ stationId, onClose, onAddIdol, station }) => {
+const EditForm = ({
+  onClose,
+  onback,
+  onAddIdol,
+  station,
+  setStation,
+  idolData,
+}) => {
   // const previdolid = stationidol[-1].idol_id;
-  // const stationId = "ST127";
+  const stationId = station.stationId;
   const [formType, setFormType] = useState(0);
   const [propertyType, setPropertyType] = useState("");
-  const [applicationFile, setApplicationFile] = useState(null);
-  const [applicantImage, setApplicantImage] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
   const [showLoading, setShowLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [messagecolor, setMessagecolor] = useState("");
   const [isOthers, setIsOthers] = useState(false);
   const [junctions, setJunctions] = useState([{ place: "", coords: "" }]);
-  const [formData, setFormData] = useState({
-    permission: {
-      police: false,
-      fireService: false,
-      TNEB: false,
-    },
-    facility: {
-      electricalEquipment: false,
-      lightingFacility: false,
-      CCTVFacility: false,
-    },
-    property: {
-      type: "",
-      description: "",
-    },
-    shed: {
-      type: "",
-      description: "",
-    },
-    volunteers: [
-      { name: "", mobileNo: "", address: "" },
-      { name: "", mobileNo: "", address: "" },
-      { name: "", mobileNo: "", address: "" },
-      { name: "", mobileNo: "", address: "" },
-      { name: "", mobileNo: "", address: "" },
-      { name: "", mobileNo: "", address: "" },
-    ],
-  });
+  const [formData, setFormData] = useState({});
+  const [hamletVillages, setHamletVillages] = useState([]);
 
+  // const idolData = station.stationIdol.find((e) => e.idol_id === idolId);
   const stationDetails = station.motherVillage;
-  const organizationOptions = station.defaultOrganization;
-  // const organizationOptions = ["1", "2", "3"]; //dummy
   const startPoints = station.defaultStartPoints.map((e) => e.place);
   const JunctionPoints = station.defaultJunctionPoints.map((e) => e);
-  const IntermediateJunctionPoints =
-    station.defaultIntermediateJunctionPoints.map((e) => e);
+  const IntermediateJunctionPoints = idolData.intermediateJunctionPoints.map(
+    (e) => e
+  );
+
+  useEffect(() => {
+    if (idolData) {
+      const formatDate = (mongoDate) =>
+        mongoDate?.$date
+          ? new Date(mongoDate.$date).toISOString().split("T")[0]
+          : "";
+
+      setFormData({
+        ...idolData,
+        setupDate: formatDate(idolData.setupDate),
+        immersionDate: formatDate(idolData.immersionDate),
+      });
+
+      const motherVillageName = idolData.motherVillage; // This should be a string
+      if (motherVillageName && stationDetails[motherVillageName]) {
+        const selectedVillages = stationDetails[motherVillageName].map(
+          (e) => e.place
+        );
+        setHamletVillages(selectedVillages);
+      }
+      if (IntermediateJunctionPoints) {
+        setJunctions(IntermediateJunctionPoints);
+      }
+    }
+  }, [idolData, stationDetails]);
+
+  // console.log(stationDetails);
 
   const endPoints = station.defaultEndPoints.map((e) => e.place);
 
   const motherVillages = Object.keys(stationDetails);
-
-  const [hamletVillages, setHamletVillages] = useState([]);
-
-  const getIdolId = () => {
-    let idolIDs = [];
-    let idolID;
-    const type =
-      formData.typeOfInstaller === "private"
-        ? "PR"
-        : formData.typeOfInstaller === "public"
-        ? "PU"
-        : "ORG";
-    if (station.stationIdol.length > 0) {
-      idolIDs = station.stationIdol.map((val) => val.idol_id);
-      idolIDs = idolIDs.map((id) => parseInt(id.match(/\d+$/), 10));
-
-      let maxIdolId = Math.max(...idolIDs);
-
-      idolID =
-        station.defaultIdolId +
-        "_" +
-        type +
-        "_" +
-        String(maxIdolId + 1).padStart(3, "0");
-    } else {
-      idolID = station.defaultIdolId + "_" + type + "_001";
-    }
-
-    return idolID;
-  };
 
   const handleChange = (e) => {
     const { name, value, type, files, id } = e.target;
 
     setFormData((prevState) => ({
       ...prevState,
-      [name]:
-        type === "file"
-          ? files[0]
-          : type === "number"
-          ? parseInt(value, 10)
-          : value,
+      [name]: type === "number" ? parseInt(value, 10) : value,
     }));
 
     if (id === "motherVillage") {
@@ -109,7 +81,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
         setHamletVillages(
           selectedHamletVillages.map((village) => village.place)
         );
-        console.log(selectedHamletVillages);
       } else {
         console.error("Expected an array but got:", selectedHamletVillages);
       }
@@ -119,7 +90,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     } else if (id === "idolLocation") {
       setIsOthers(false);
     }
-
     if (id === "hamletVillage") {
       const selectedHamlet = stationDetails[formData.motherVillage].find(
         (village) => village.place === value
@@ -160,14 +130,15 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
       [name]: value,
     }));
   };
-
   const handleJunctionChange = (index, e) => {
     const selectedOption = IntermediateJunctionPoints.find(
       (option) => option.place === e.target.value
     );
-    const updatedJunctions = [...junctions];
-    updatedJunctions[index] = selectedOption;
-    setJunctions(updatedJunctions);
+    setJunctions((prevJunctions) =>
+      prevJunctions.map((junction, i) =>
+        i === index ? selectedOption : junction
+      )
+    );
   };
 
   const handleAddJunction = () => {
@@ -327,41 +298,21 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     const intermediatejun = junctions?.map((junction) => junction);
 
     if (selectedEnd && selectedStart) {
-      const nextIdolId = getIdolId();
       console.log(selectedEnd, selectedStart);
 
       setUpdatedFormData({
         ...formData,
-        idol_id: nextIdolId,
         endCoords: selectedEnd.coords,
         startCoords: selectedStart.coords,
         intermediateJunctionPoints: intermediatejun,
-        stationName: station.stationLocation,
-        stationDivision: station.stationDivision,
-        stationDistrict: station.stationDistrict,
       });
     } else {
-      throw new Error("Location Details are not filled Properly..");
       console.log("Selected location not found under the station");
     }
   };
 
   useEffect(() => {
     if (updatedFormData) {
-      const filedata = new FormData();
-
-      if (applicationFile) {
-        filedata.append("idolApplication", applicationFile);
-      }
-
-      if (imageFile) {
-        filedata.append("idolImage", imageFile);
-      }
-
-      if (applicantImage) {
-        filedata.append("applicantImage", applicantImage);
-      }
-
       if (isOthers) {
         setFormData((prevState) => ({
           ...prevState,
@@ -371,32 +322,25 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
       const postData = async () => {
         try {
-          const response = await axios.post(
-            `${API_BASE_URL}/stations/${stationId}/addidol`,
+          const response = await axios.put(
+            `${API_BASE_URL}/stations/${stationId}/${idolData.idol_id}/updateidol`,
             updatedFormData
           );
-
-          console.log("Data sent successfully: " + response.data);
-          const idolId = response.data;
-          setMessagecolor("primary");
-          setMessage("File uploading....");
-
-          const fileResponse = await axios.post(
-            `${API_BASE_URL}/stations/${stationId}/${idolId}/addfiles`,
-            filedata,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
-
-          console.log(
-            "Application file sent successfully: " + fileResponse.data.idol
-          );
-          onAddIdol(fileResponse.data.idol);
-          setMessagecolor("primary");
-          setMessage("Success Idol Added..!");
+          setMessagecolor("warning");
+          setMessage("updating....");
+          console.log("Data sent successfully: " + response.data.idol);
+          const newidol = response.data.idol;
+          setStation((prevStation) => {
+            const updatedIdols = prevStation.stationIdol.map((idol) =>
+              idol.idol_id === newidol.idol_id ? newidol : idol
+            );
+            return {
+              ...prevStation,
+              stationIdol: updatedIdols,
+            };
+          });
+          setMessagecolor("success");
+          setMessage("update success..");
           setTimeout(() => onClose(), 3000);
         } catch (error) {
           setMessagecolor("danger");
@@ -404,11 +348,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
           console.log("Error: " + error);
         } finally {
           setShowLoading(false);
-          console.log("clientside ", updatedFormData);
-        }
-
-        for (let pair of filedata.entries()) {
-          console.log(`${pair[0]}: ${pair[1]}`);
+          console.log(updatedFormData);
         }
       };
 
@@ -420,6 +360,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     <div className="main my-5">
       {showLoading && <Loading />}
       <div className="form-container">
+        <div className="form__back__btn btn backBtn" onClick={onback}>
+          &larr;
+        </div>
         <div className="form__close__btn btn" onClick={onClose}>
           &times;
         </div>
@@ -442,53 +385,13 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
             </p>
           </div>
         )}
-        <form className="form h6 mx-4">
+        <form className="form h6 mx-4" onSubmit={handleSubmit}>
           {formType === 0 && (
             <div>
-              <div className="form-group">
-                <label htmlFor="image">Upload Application File</label>
-                <input
-                  type="file"
-                  id="image"
-                  placeholder="choose file"
-                  name="idolApplication"
-                  className="form-control"
-                  onChange={(e) => setApplicationFile(e.target.files[0])}
-                />
-                {applicationFile && (
-                  <div>
-                    <p>Selected file: {applicationFile.name}</p>
-                    <p>File type: {applicationFile.type}</p>
-                    <p>
-                      File size: {(applicationFile.size / 1024).toFixed(2)} KB
-                    </p>
-                  </div>
-                )}
-              </div>
               <div>
                 <label htmlFor="Applicant details " className="h5">
                   Applicant Details
                 </label>
-                <div className="form-group">
-                  <label htmlFor="image">Upload applicant image</label>
-                  <input
-                    type="file"
-                    id="image"
-                    placeholder="choose file"
-                    name="applicantImage"
-                    className="form-control"
-                    onChange={(e) => setApplicantImage(e.target.files[0])}
-                  />
-                  {applicantImage && (
-                    <div>
-                      <p>Selected file: {applicantImage.name}</p>
-                      <p>File type: {applicantImage.type}</p>
-                      <p>
-                        File size: {(applicantImage.size / 1024).toFixed(2)} KB
-                      </p>
-                    </div>
-                  )}
-                </div>
               </div>
 
               <div className="form-group">
@@ -552,37 +455,20 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     </option>
                   </select>
                 </div>
-                {formData.typeOfInstaller === "organization" && (
-                  // <div className="form-group">
-                  //   <label htmlFor="Organization"> Organization Name</label>
-                  //   <input
-                  //     type="text"
-                  //     id="Organization"
-                  //     name="organizationName"
-                  //     className="form-control"
-                  //     placeholder="Enter Organization name"
-                  //     value={formData.organizationName || ""}
-                  //     onChange={handleChange}
-                  //   />
-
-                  // </div>
-                  <select
-                    className="form-control"
-                    onChange={handleChange}
-                    id="Organization"
-                    value={formData.organizationName || ""}
-                    name="organizationName"
-                  >
-                    <option value="">Select an option</option>
-                    {organizationOptions.map((value, index) => (
-                      <option key={index}>{value}</option>
-                    ))}
-                  </select>
-                )}
               </div>
+              <br />
 
               <div className="form-group">
                 <label htmlFor="Mother_Village">Mother Village</label>
+                {/* <input
+                  type="text"
+                  id="motherVillage"
+                  name="motherVillage"
+                  className="form-control"
+                  placeholder="Enter Mother village"
+                  value={formData.motherVillage? formData.motherVillage: ""}
+                  onChange={handleChange}
+                /> */}
                 <select
                   className="form-control"
                   name="motherVillage"
@@ -616,7 +502,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   ))}
                 </select>
               </div>
-
               {formData.typeOfInstaller === "private" ? (
                 <div className="form-group">
                   <label htmlFor="Location">Location of Idol</label>
@@ -627,7 +512,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     className="form-control"
                     placeholder="Enter the Location"
                     value={`${formData.hamletVillage}`}
-                    onChange={() => console.log("private changed")}
+                    onChange={handleChange}
                     readOnly
                   />
                 </div>
@@ -1107,6 +992,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     id="commonoption"
                     name="shed.type"
                     onChange={handleChange1}
+                    value={formData.shed.type ? formData.shed.type : ""}
                   >
                     <option value="">Select shed type</option>
                     <option value="Flammable">Flammable</option>
@@ -1209,23 +1095,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
           {formType === 2 && (
             <div>
               <div className="form-group">
-                <label htmlFor="image">Upload Idol Image</label>
-                <input
-                  type="file"
-                  id="image"
-                  name="idolImage"
-                  className="form-control"
-                  onChange={(e) => setImageFile(e.target.files[0])}
-                />
-              </div>
-              {imageFile && (
-                <div>
-                  <p>Selected file: {imageFile.name}</p>
-                  <p>File type: {imageFile.type}</p>
-                  <p>File size: {(imageFile.size / 1024).toFixed(2)} KB</p>
-                </div>
-              )}
-              <div className="form-group">
                 <label htmlFor="date" className="h5">
                   Date of Immersion
                 </label>
@@ -1235,7 +1104,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   name="immersionDate"
                   className="form-control"
                   placeholder="Enter the Date"
-                  value={formData.date}
+                  value={formData.immersionDate}
                   onChange={handleChange2}
                 />
               </div>
@@ -1250,7 +1119,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     <select
                       name="modeOfTransport.vehicleType"
                       className="form-control subForecastOption"
-                      value={formData.vehicleType}
+                      value={formData.modeOfTransport.vehicleType}
                       onChange={handleChange2}
                       id="transport"
                     >
@@ -1272,7 +1141,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         className="form-control"
                         name="modeOfTransport.vehicleDescription"
                         placeholder="Enter Vehicle make and model"
-                        value={formData.vehicleDescription}
+                        value={formData.modeOfTransport.vehicleDescription}
                         onChange={handleChange2}
                         id="transport"
                       />
@@ -1284,7 +1153,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         className="form-control"
                         name="modeOfTransport.driverLicense"
                         placeholder="Enter Driver's License number"
-                        value={formData.driverLicense}
+                        value={formData.modeOfTransport.driverLicense}
                         onChange={handleChange2}
                         id="transport"
                       />
@@ -1296,7 +1165,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         className="form-control"
                         name="modeOfTransport.driverName"
                         placeholder="Enter Driver's name"
-                        value={formData.driverName}
+                        value={formData.modeOfTransport.driverName}
                         onChange={handleChange2}
                         id="transport"
                       />
@@ -1314,6 +1183,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                           id="individual"
                           value="individual"
                           onChange={handleChange2}
+                          checked={
+                            formData.processionBy === "individual"
+                              ? true
+                              : false
+                          }
                         />
                         <label className="btn btn-light" htmlFor="individual">
                           Individual
@@ -1327,6 +1201,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                           id="group"
                           value="group"
                           onChange={handleChange2}
+                          checked={
+                            formData.processionBy === "group" ? true : false
+                          }
                         />
                         <label className="btn btn-light" htmlFor="group">
                           Group
@@ -1336,7 +1213,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   </div>
                 </div>
               </div>
-              <br />
 
               <div className="form-group row mt-1">
                 <label className="h5">Sensitivity</label>
@@ -1352,7 +1228,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       name="sensitivity"
                     >
                       <option value="">Select Option</option>
-                      <option value="Nonsensitive">Insensitve</option>
+                      <option value="Insensitive">Insensitve</option>
                       <option value="Sensitive">Sensitive</option>
                       <option value="Hyper-Sensitive">Hyper-Sensitive</option>
                     </select>
@@ -1471,8 +1347,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     <select
                       className="form-control"
                       id="DefaultJunctionPoint"
-                      name="defaultJunctionPoint"
-                      value={formData.defaultJunctionPoint}
+                      name="startJunctionPoint"
+                      value={formData.startJunctionPoint || ""}
                       onChange={handleChange2}
                     >
                       <option value="" disabled>
@@ -1576,6 +1452,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="barricadeYes"
                         value="yes"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.barricade === true
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="barricadeYes">
                         Yes
@@ -1589,6 +1470,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="barricadeNo"
                         value="no"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.barricade === false
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="barricadeNo">
                         No
@@ -1608,6 +1494,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="lightingYes"
                         value="yes"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.lighting === true
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="lightingYes">
                         Yes
@@ -1621,6 +1512,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="lightingNo"
                         value="no"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.lighting === false
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="lightingNo">
                         No
@@ -1642,6 +1538,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="safetyYes"
                         value="yes"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.safetyByFireService === true
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="safetyYes">
                         Yes
@@ -1655,6 +1556,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="safetyNo"
                         value="no"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.safetyByFireService === false
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="safetyNo">
                         No
@@ -1674,6 +1580,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="PAYes"
                         value="yes"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.PASystem === true
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="PAYes">
                         Yes
@@ -1687,6 +1598,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="PANo"
                         value="no"
                         onChange={handleChange2}
+                        checked={
+                          formData.immersionSafety.PASystem === false
+                            ? true
+                            : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="PANo">
                         No
@@ -1703,10 +1619,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 >
                   Previous
                 </button>
-                <button
-                  className="form-submit-btn nextBtn"
-                  onClick={handleSubmit}
-                >
+                <button className="form-submit-btn nextBtn" type="submit">
                   Submit
                 </button>
               </div>
@@ -1724,90 +1637,66 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
   );
 };
 
-export default Form;
+export default EditForm;
 
-// applicantImage: image object
-// applicantName: String
-// applicantNumber: Number
-// applicantAddress: string
+// <div className="form-group">
+//                   <label htmlFor="image">Upload applicant image</label>
+//                   <input
+//                     type="file"
+//                     id="image"
+//                     placeholder="choose file"
+//                     name="applicantImage"
+//                     className="form-control"
+//                     onChange={(e) => setApplicantImage(e.target.files[0])}
+//                   />
+//                   {applicantImage && (
+//                     <div>
+//                       <p>Selected file: {applicantImage.name}</p>
+//                       <p>File type: {applicantImage.type}</p>
+//                       <p>
+//                         File size: {(applicantImage.size / 1024).toFixed(2)} KB
+//                       </p>
+//                     </div>
+//                   )}
+//                 </div>
 
-//isChurchMosque : yes/no
-//sensitivity: String
+{
+  /* <div className="form-group">
+                <label htmlFor="image">Upload Application File</label>
+                <input
+                  type="file"
+                  id="image"
+                  placeholder="choose file"
+                  name="idolApplication"
+                  className="form-control"
+                  onChange={(e) => setApplicationFile(e.target.files[0])}
+                />
+                {applicationFile && (
+                  <div>
+                    <p>Selected file: {applicationFile.name}</p>
+                    <p>File type: {applicationFile.type}</p>
+                    <p>
+                      File size: {(applicationFile.size / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                )}
+              </div> */
+}
 
-// <div>
-//       <label className="h5">Route Details</label>
-//       <div className="row d-flex align-items-center mt-1">
-//         {/* Starting Point (non-editable) */}
-//         <div className="col-md-3">
-//           <label>Starting Point</label>
-//           <input
-//             className="form-control"
-//             value="formData.placeOfInstallation" // Replace with the actual starting point name
-//             readOnly
-//           />
-//         </div>
-
-//   {/* Dynamic Junction Points with Dropdowns */}
-//   {junctions.map((junction, index) => (
-//     <div
-//       className="row d-flex align-items-center mt-2"
-//       key={index}
-//     >
-//       <div className="col-md-4">
-//         <select
-//           className="form-control"
-//           value={junction.place}
-//           onChange={(e) => handleJunctionChange(index, e)}
-//         >
-//           <option value="" disabled>
-//             Select Junction
-//           </option>
-//           {IntermediateJunctionPoints.map((option, idx) => (
-//             <option key={idx} value={option.place}>
-//               {option.place}
-//             </option>
-//           ))}
-//         </select>
-//       </div>
-//       <div className="col-md-4">
-//         <input
-//           className="form-control"
-//           name="coords"
-//           value={junction.coords}
-//           placeholder="Junction Coords"
-//           readOnly
-//         />
-//       </div>
-//       <div className="col-md-2">
-//         <button
-//           className="btn btn-light"
-//           type="button"
-//           onClick={() => handleRemoveJunction(index)}
-//         >
-//           Remove
-//         </button>
-//       </div>
-//     </div>
-//   ))}
-
-//   {/* Ending Point (non-editable) */}
-//   <div className="col-md-3">
-//     <label>Ending Point</label>
+//   <div className="form-group">
+//     <label htmlFor="image">Upload Idol Image</label>
 //     <input
+//       type="file"
+//       id="image"
+//       name="idolImage"
 //       className="form-control"
-//       value="formData.placeOfImmersion" // Replace with the actual ending point name
-//       readOnly
+//       onChange={(e) => setImageFile(e.target.files[0])}
 //     />
 //   </div>
-// </div>
-
-//   <div className="d-flex w-100 g-2 mt-3">
-//     <button
-//       className="btn btn-light"
-//       type="button"
-//       onClick={handleAddJunction}
-//     >
-//       Add Junction
-//     </button>
-//   </div>
-// </div>
+//   {imageFile && (
+//     <div>
+//       <p>Selected file: {imageFile.name}</p>
+//       <p>File type: {imageFile.type}</p>
+//       <p>File size: {(imageFile.size / 1024).toFixed(2)} KB</p>
+//     </div>
+//   )}

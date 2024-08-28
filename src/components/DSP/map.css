@@ -1,0 +1,14 @@
+/* .leaflet-routing-container .leaflet-routing-alt {
+  font-size: 14px;
+  color: #333;
+}
+
+.leaflet-routing-container .leaflet-routing-alt .leaflet-routing-instructions {
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+} */
+
+.leaflet-routing-container {
+  display: none !important;
+}

@@ -18,12 +18,27 @@
   letter-spacing: 2px;
 }
 
-#nav_banner {
-  height: 120px;
+.home_dashboard_img {
+  width: 350px;
+  height: 350px;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-#policeLogo {
-  height: 90px;
+.home_dashboard_img img {
+  /* width: 100%; */
+  width: 300px;
+  height: 300px;
+}
+
+#homepage-nav_banner {
+  height: 85px !important;
+}
+
+#homepage-policeLogo {
+  height: 70px !important ;
 }
 .card {
   display: flex;
@@ -52,13 +67,17 @@
 }
 
 .card:nth-child(1) img {
-  height: 273px !important;
+  /* height: 273px !important; */
 }
 .card-img-section {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: center; */
+}
+#homeview_img3 {
+  height: 70% !important;
+  width: 70% !important;
 }
 
 .card-content {
@@ -70,7 +89,34 @@
   background-color: #1b1b1b;
   color: white;
 }
+#registration-popup-container {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(17px);
+  -webkit-backdrop-filter: blur(17px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
 
+.modal-body .table {
+  font-family: Poppins, sans-serif;
+  font-size: 14px;
+}
+
+.modal-body .table th,
+.modal-body .table td {
+  text-align: center;
+}
+.table-total-number {
+  font-weight: bold;
+  color: red !important;
+}
 @media (max-width: 768px) {
   .card {
     height: auto;

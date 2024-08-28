@@ -1,120 +1,182 @@
 import { useState } from "react";
+import { IdolPopup } from "../idolPopup/idolPopup";
 
 function SPTableComponent({ SP }) {
   console.log(SP);
 
-  const [selectedPlace, setSelectedPlace] = useState("");
-  const [selectedSubPlace, setSelectedSubPlace] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("");
+  const [showIdolPopup, setShowIdolPopup] = useState(false);
+  const [idolData, setIdolData] = useState(null);
+  const [selectedDivision, setSelectedDivision] = useState(null);
+  const [selectedPoliceStation, setSelectedPoliceStation] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedSensitive, setSelectedSensitive] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
+
+  const handleDivisionSelect = (event) => {
+    setSelectedDivision(event.target.value);
+  };
+
+  const handlePoliceStationSelect = (event) => {
+    setSelectedPoliceStation(event.target.value);
+  };
+
+  const handleTypeSelect = (event) => {
+    setSelectedType(event.target.value);
+  };
+
+  const handleSensitiveSelect = (event) => {
+    setSelectedSensitive(event.target.value);
+  };
+
+  const handleStatusSelect = (event) => {
+    setSelectedStatus(event.target.value);
+  };
+
+  const handleDateSelect = (event) => {
+    const selectedDate = event.target.value;
+    setSelectedDate(selectedDate);
+  };
 
   // Get all idols
   const SPgetALLStationIdol = function (SPdata) {
     return SPdata.dspIds.flatMap((dsp) =>
-      dsp.stationIds.flatMap((station) => station.stationIdol)
+      dsp.stationIds.flatMap((station) =>
+        station.stationIdol.map((idol) => ({
+          idol: idol,
+          stationLocation: station.stationLocation,
+          stationDivision: station.stationDivision,
+        }))
+      )
     );
   };
 
-  const DSPgetALLStationIdol = function (DSPdata) {
-    return subdiv.stationIds.flatMap((station) =>
-      station.stationIdol.map((idol) => ({
-        ...idol,
-        stationLocation: station.stationLocation, // Attach station location to each idol
-      }))
-    );
-  };
+  // const DSPgetAllStationIdol = function (DSPdata) {
+  //   return DSPdata.stationIds.flatMap((station) =>
+  //     station.stationIdol.map((idol) => ({
+  //       ...idol,
+  //       stationLocation: station.stationLocation, // Attach station location to each idol
+  //     }))
+  //   );
+  // };
 
   const allIdols = SPgetALLStationIdol(SP);
-  let filteredData = [];
-  let subdiv = [];
-  if (selectedPlace === "" && selectedSubPlace === "") filteredData = allIdols;
-  if (selectedPlace) {
-    if (selectedSubPlace === "") {
-      subdiv = SP.dspIds.find((dsp) => dsp.dspDivision === selectedPlace);
-      filteredData = DSPgetALLStationIdol(subdiv);
-      console.log("subdiv", subdiv);
-    } else {
-      console.log("subdiv", subdiv);
-      const station = subdiv.stationIds.find((station) => {
-        station.stationLocation === selectedSubPlace;
-      });
-      filteredData = station.stationIdol;
-    }
-  }
 
-  if (statusFilter == "Complete")
-    filteredData = filteredData.map((data) => data.isImmersed);
+  let filteredData = allIdols;
+  let station = SP.dspIds.flatMap((dsp) =>
+    dsp.stationIds.map((station) => station)
+  );
+  let Dates = filteredData.map(
+    (e) =>
+      e.immersionDate && new Date(e.immersionDate).toISOString().split("T")[0]
+  );
+  const dates = Dates.filter((value, index) => Dates.indexOf(value) === index);
 
-  if (statusFilter == "Incomplete")
-    filteredData = filteredData.map((data) => !data.isImmersed);
+  let StationDivision = filteredData.map((e) => e.stationDivision);
 
-  // typeOfInstaller
+  const stationDivisions = StationDivision.filter(
+    (value, index) => StationDivision.indexOf(value) === index
+  );
 
-  if (typeFilter === "private")
-    filteredData = filteredData.map(
-      (data) => data.typeOfInstaller == "private"
+  filteredData = filteredData.filter((item) => {
+    console.log(selectedType);
+
+    const typeMatch = !selectedType || item.typeOfInstaller === selectedType;
+
+    const sensitiveMatch =
+      !selectedSensitive || item.sensitivity === selectedSensitive;
+    const statusMatch =
+      !selectedStatus ||
+      (selectedStatus === "Complete" && item.isImmersed) ||
+      (selectedStatus === "Incomplete" && !item.isImmersed);
+    const dateMatch =
+      !selectedDate || dates.find((e) => e === selectedDate) === selectedDate;
+    const policeStationMatch =
+      !selectedPoliceStation || item.stationLocation === selectedPoliceStation;
+    const stationDiviosionMatch =
+      !selectedDivision || item.stationDivision === selectedDivision;
+
+    console.log(item.stationLocation);
+
+    return (
+      typeMatch &&
+      sensitiveMatch &&
+      statusMatch &&
+      dateMatch &&
+      policeStationMatch &&
+      stationDiviosionMatch
     );
-  if (typeFilter === "public")
-    filteredData = filteredData.map((data) => data.typeOfInstaller == "public");
-  if (typeFilter === "organization")
-    filteredData = filteredData.map(
-      (data) => data.typeOfInstaller == "organization"
-    );
+  });
 
-  const handleStatusFilter = (event) => {
-    setStatusFilter(event.target.value);
-    console.log(event.target.value);
-  };
-  const handleTypeFilter = (event) => {
-    setTypeFilter(event.target.value);
-  };
+  const numberOfIdols = filteredData.length;
+  const numberOfImmersedIdols = filteredData.filter(
+    (e) => e.isImmersed === true
+  ).length;
+  const numberOfNonImmersedIdols = filteredData.filter(
+    (e) => e.isImmersed === false
+  ).length;
+  const numberOfPrivateIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "private"
+  ).length;
+  const numberOfPublicIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "public"
+  ).length;
+  const numberOfOrganizationIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "organization"
+  ).length;
 
-  const handleDateChange = (event) => {
-    setSelectedDate(event.target.value);
-  };
-
-  const handlePlaceChange = (event) => {
-    setSelectedPlace(event.target.value);
-    setSelectedSubPlace(""); // Clear sub-place when place changes
-  };
-
-  const handleSubPlaceChange = (event) => {
-    setSelectedSubPlace(event.target.value);
+  const handleOpenIdolInfo = (idol) => {
+    setIdolData(idol);
+    setShowIdolPopup(true);
   };
 
-  // const filteredData = allIdols.filter((item) => {
-  //   const matchesStatus =
-  //     statusFilter === "all" ||
-  //     (statusFilter === "COMPLETE" && item.isImmersed) ||
-  //     (statusFilter === "INCOMPLETE" && !item.isImmersed);
-  //   const matchesDate =
-  //     !selectedDate ||
-  //     new Date(item.immersionDate).toLocaleDateString() ===
-  //       new Date(selectedDate).toLocaleDateString();
-  //   return matchesStatus && matchesDate;
-  // });
-
-  const headerText = selectedPlace ? `${selectedPlace}` : "";
+  const handleCloseIdolPopup = () => {
+    setShowIdolPopup(false);
+  };
 
   return (
     <div className="mx-5 my-2 viewDiv">
-      <p className="h1 text-center mb-3">{headerText} Station</p>
+      <div className="container mt-4">
+        <table>
+          <tr>
+            <td>total idols</td>
+            <td>Immersed idols</td>
+            <td>Non Immersed idols</td>
+            <td>Private idols</td>
+            <td>Public idols</td>
+            <td>Organization idols</td>
+          </tr>
+          <tr>
+            <td>{numberOfIdols}</td>
+            <td>{numberOfImmersedIdols}</td>
+            <td>{numberOfNonImmersedIdols}</td>
+            <td>{numberOfPrivateIdols}</td>
+            <td>{numberOfPublicIdols}</td>
+            <td>{numberOfOrganizationIdols}</td>
+          </tr>
+        </table>
+      </div>
+      {showIdolPopup && (
+        <div>
+          <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
+        </div>
+      )}
+      <p className="h1 text-center mb-3"> Station</p>
       <div className="row mb-5" id="sp-filters">
         <div className="col-lg-3 my-2">
-          <label htmlFor="placeSelect" className="me-sm-2 mb-2">
-            Sub Division :
+          <label htmlFor="divisionSelect" className="me-sm-2 mb-2">
+            Sub Division
           </label>
           <select
-            id="placeSelect"
+            id="divisionSelect"
             className="form-select"
-            value={selectedPlace}
-            onChange={handlePlaceChange}
+            value={selectedDivision}
+            onChange={handleDivisionSelect}
           >
-            <option value="">Select Sub Division</option>
-            {SP.dspIds.map((subdiv) => (
-              <option key={subdiv._id} value={subdiv.dspDivision}>
-                {subdiv.dspDivision}
+            <option value="">All Divisions</option>
+            {stationDivisions.map((policeStation) => (
+              <option key={policeStation} value={policeStation}>
+                {policeStation}
               </option>
             ))}
           </select>
@@ -127,150 +189,114 @@ function SPTableComponent({ SP }) {
           <select
             id="subPlaceSelect"
             className="form-select"
-            value={selectedSubPlace}
-            onChange={handleSubPlaceChange}
+            value={selectedPoliceStation}
+            onChange={handlePoliceStationSelect}
           >
-            <option value="">Select Police Station</option>
-            {SP.dspIds
-              .find((dsp) => dsp.dspDivision === selectedPlace)
-              ?.stationIds.map((station) => (
-                <option key={station._id} value={station.stationId}>
-                  {station.stationLocation}
-                </option>
-              ))}
+            <option value="">All Police Station</option>
+            {station.map((policeStation) => (
+              <option
+                key={policeStation.stationLocation}
+                value={policeStation.stationLocation}
+              >
+                {policeStation.stationLocation}
+              </option>
+            ))}
           </select>
         </div>
-
-        <div className="col-lg-2 my-2">
-          <label htmlFor="statusSelect" className="me-sm-2 mb-2">
-            Status :
-          </label>
-          <select
-            id="statusSelect"
-            className="form-select"
-            value={statusFilter}
-            onChange={handleStatusFilter}
-          >
-            <option value="all">All</option>
-            <option value="complete">Complete</option>
-            <option value="incomplete">Incomplete</option>
-          </select>
-        </div>
-
-        <div className="col-lg-2 my-2">
+        <div className="col-lg-3 my-2">
           <label htmlFor="typeSelect" className="me-sm-2 mb-2">
             Type :
           </label>
           <select
             id="typeSelect"
             className="form-select"
-            value={typeFilter}
-            onChange={handleTypeFilter}
+            value={selectedType}
+            onChange={handleTypeSelect}
           >
-            <option value="all">All</option>
+            <option value="">All</option>
             <option value="private">Private</option>
             <option value="public">Public</option>
             <option value="organisation">Organisation</option>
           </select>
         </div>
+        <div className="col-lg-3 my-2">
+          <label htmlFor="sensitiveSelect" className="me-sm-2 mb-2">
+            Sensitivity:
+          </label>
+          <select
+            className="form-select"
+            onChange={handleSensitiveSelect}
+            id="sensitivity"
+            value={selectedSensitive}
+            name="sensitivity"
+          >
+            <option value="">Select Option</option>
+            <option value="Insensitive">Insensitive</option>
+            <option value="Sensitive">Sensitive</option>
+            <option value="Hyper-Sensitive">Hyper-Sensitive</option>
+          </select>
+        </div>
+        <div className="col-lg-3 my-2">
+          <label htmlFor="statusSelect" className="me-sm-2 mb-2">
+            Status :
+          </label>
+          <select
+            id="statusSelect"
+            className="form-select"
+            value={selectedStatus}
+            onChange={handleStatusSelect}
+          >
+            <option value="">All</option>
+            <option value="Complete">Complete</option>
+            <option value="Incomplete">Incomplete</option>
+          </select>
+        </div>
 
-        <div className="col-lg-2 my-2">
+        <div className="col-lg-3 my-2">
           <label htmlFor="dateInput" className="me-sm-2 mb-2">
             Date :
           </label>
-          <input
+          <select
             id="dateInput"
-            type="date"
-            className="form-control"
+            className="form-select"
             value={selectedDate}
-            onChange={handleDateChange}
-          />
+            onChange={handleDateSelect}
+          >
+            <option value="">Select date</option>
+            {dates.map((el, index) => (
+              <option key={index} value={el}>
+                {el}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
       <div className="table-responsive-lg">
-        <table className="table table-light table-striped table-hover">
+        <table className="table sp-table table-light table-striped table-hover">
           <thead>
             <tr>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                ID
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Idol ID
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Location of Installation
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Place of Immersion
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Type
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Date of immersion
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Status
-              </th>
+              <th>S.No</th>
+              <th>Idol ID</th>
+              <th> Location of Installation</th>
+              <th>Place of Immersion</th>
+              <th> Date of Immersion</th>
+              <th> Type</th>
+              <th>Sensitive</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
             {filteredData.length > 0 ? (
-              filteredData.map((item, i) => (
-                <tr key={item._id} style={{ borderBottom: "1px solid #ddd" }}>
-                  <td style={{ padding: "8px" }}>{i + 1}</td>
-                  <td style={{ padding: "8px" }}>{item.idol_id}</td>
-                  <td style={{ padding: "8px" }}>{item.hamletVillage}</td>
-                  <td style={{ padding: "8px" }}>{item.placeOfImmersion}</td>
-                  <td style={{ padding: "8px" }}>{item.typeOfInstaller} </td>
-                  <td style={{ padding: "8px" }}>
-                    {new Date(item.immersionDate).toLocaleDateString()}
-                  </td>
-                  <td style={{ padding: "8px" }}>
-                    {item.isImmersed ? "Complete" : "Incomplete"}
-                  </td>
+              filteredData.map((item, index) => (
+                <tr key={item._id} onClick={() => handleOpenIdolInfo(item)}>
+                  <td>{index + 1}</td>
+                  <td>{item.idol_id}</td>
+                  <td>{item.placeOfInstallation}</td>
+                  <td>{item.placeOfImmersion}</td>
+                  <td>{new Date(item.setupDate).toLocaleDateString()}</td>
+                  <td>{item.typeOfInstaller}</td>
+                  <td>{item.sensitivity}</td>
+                  <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
                 </tr>
               ))
             ) : (
