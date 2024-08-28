@@ -3,7 +3,8 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./form_style.css";
 import API_BASE_URL from "../../../apiConfig";
-import Loading from "../loading/loading";
+import Loading from "../loading/Loading";
+
 // import station from "../../../smpstation.json";
 
 const Form = ({ stationId, onClose, onAddIdol, station }) => {

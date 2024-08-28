@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 import API_BASE_URL from "../../../apiConfig";
-import Loading from "../loading/loading";
+import Loading from "../loading/Loading";
 import SPListDashboard from "../SP/SPListDashboard";
 import SPMainDashboard from "../SP/SPMainDashboard";
 import SPMapView from "../SP/SPMapView";

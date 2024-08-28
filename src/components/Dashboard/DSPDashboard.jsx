@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./dspdashboard_style.css";
 import axios from "axios";
-import Loading from "../loading/loading";
+import Loading from "../loading/Loading";
+
 import API_BASE_URL from "../../../apiConfig";
 import DSPListDashboard from "../DSP/DSPListDashboard";
 import DSPMainDashboard from "../DSP/DSPMainDashboard";
