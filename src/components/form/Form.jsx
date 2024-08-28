@@ -288,7 +288,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     });
   };
 
-  const handleAddVolunteer = () => {
+  const handleAddVolunteer = (e) => {
+    e.preventDefault();
     setFormData((prevState) => ({
       ...prevState,
       volunteers: [
@@ -298,7 +299,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     }));
   };
 
-  const handleRemoveVolunteer = () => {
+  const handleRemoveVolunteer = (e) => {
+    e.preventDefault();
     if (formData.volunteers.length > 6) {
       setFormData((prevState) => ({
         ...prevState,
@@ -1352,7 +1354,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       name="sensitivity"
                     >
                       <option value="">Select Option</option>
-                      <option value="Nonsensitive">Insensitve</option>
+                      <option value="Nonsensitive">Nonsensitve</option>
                       <option value="Sensitive">Sensitive</option>
                       <option value="Hyper-Sensitive">Hyper-Sensitive</option>
                     </select>

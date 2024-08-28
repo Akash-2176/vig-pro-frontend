@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import API_BASE_URL from "../../../apiConfig";
 import { useNavigate } from "react-router-dom";
-import Loading from "../loading/loading";
+import Loading from "../loading/Loading";
 import axios from "axios";
 import StationListDashboard from "../Station/StationListDashboard";
 import StationMainDashboard from "../Station/StationMainDashboard";
