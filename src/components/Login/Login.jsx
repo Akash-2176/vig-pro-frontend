@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./login_style.css";
 import axios from "axios";
-import Loading from "../loading/loading";
+import Loading from "../loading/Loading";
 import API_BASE_URL from "../../../apiConfig";
 import loginBg from "/loginBG.png";
 
