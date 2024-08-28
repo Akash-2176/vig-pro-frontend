@@ -1,7 +1,7 @@
 import logo from "/tnpolicelogo.png";
 import banner from "/banner.jpeg";
 import HomeView from "./HomeView";
-import "./homeDashboard.css";
+import "./homedashboard.css";
 import { useEffect, useState } from "react";
 
 export default function HomeDashboard({ station, setDashview, handleLogout }) {
