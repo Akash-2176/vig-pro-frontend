@@ -158,6 +158,7 @@ export default function StationDashboard() {
             station={station}
             handleLogout={handleLogout}
             setDashview={setDashview}
+            type={"Station"}
           />
         );
       case "dashboardlist":

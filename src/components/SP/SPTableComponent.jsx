@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { IdolPopup } from "../idolPopup/idolPopup";
+import StatusBarList from "../stats/statustablelist/StatusBarList";
 
 function SPTableComponent({ SP }) {
   console.log(SP);
@@ -44,12 +45,16 @@ function SPTableComponent({ SP }) {
       dsp.stationIds.flatMap((station) =>
         station.stationIdol.map((idol) => ({
           idol: idol,
-          stationLocation: station.stationLocation,
-          stationDivision: station.stationDivision,
+          // stationLocation: station.stationLocation,
+          // stationDivision: station.stationDivision,
         }))
       )
     );
   };
+
+  // console.log(
+
+  // );
 
   // const DSPgetAllStationIdol = function (DSPdata) {
   //   return DSPdata.stationIds.flatMap((station) =>
@@ -60,12 +65,21 @@ function SPTableComponent({ SP }) {
   //   );
   // };
 
-  const allIdols = SPgetALLStationIdol(SP);
+  // const allIdols = SPgetALLStationIdol(SP);
 
-  let filteredData = allIdols;
-  let station = SP.dspIds.flatMap((dsp) =>
-    dsp.stationIds.map((station) => station)
+  let filteredData = SP.dspIds.flatMap((dsp) =>
+    dsp.stationIds.flatMap((station) =>
+      station.stationIdol.map((idol) => ({
+        ...idol,
+        stationLocation: station.stationLocation,
+        stationDivision: station.stationDivision,
+      }))
+    )
   );
+
+  console.log(filteredData);
+
+  let station = SP.dspIds.flatMap((dsp) => dsp.stationIds);
   let Dates = filteredData.map(
     (e) =>
       e.immersionDate && new Date(e.immersionDate).toISOString().split("T")[0]
@@ -108,6 +122,15 @@ function SPTableComponent({ SP }) {
     );
   });
 
+  const handleOpenIdolInfo = (idol) => {
+    setIdolData(idol);
+    setShowIdolPopup(true);
+  };
+
+  const handleCloseIdolPopup = () => {
+    setShowIdolPopup(false);
+  };
+
   const numberOfIdols = filteredData.length;
   const numberOfImmersedIdols = filteredData.filter(
     (e) => e.isImmersed === true
@@ -124,38 +147,32 @@ function SPTableComponent({ SP }) {
   const numberOfOrganizationIdols = filteredData.filter(
     (e) => e.typeOfInstaller === "organization"
   ).length;
+  const numberOfSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Sensitive"
+  ).length;
+  const numberOfNonSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Nonsensitive"
+  ).length;
+  const numberOfHyperSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Hyper-Sensitive"
+  ).length;
 
-  const handleOpenIdolInfo = (idol) => {
-    setIdolData(idol);
-    setShowIdolPopup(true);
-  };
-
-  const handleCloseIdolPopup = () => {
-    setShowIdolPopup(false);
-  };
+  const StatusDataArray = [
+    numberOfIdols,
+    numberOfImmersedIdols,
+    numberOfNonImmersedIdols,
+    numberOfPrivateIdols,
+    numberOfPublicIdols,
+    numberOfOrganizationIdols,
+    numberOfSensitiveIdols,
+    numberOfNonSensitiveIdols,
+    numberOfHyperSensitiveIdols,
+  ];
+  console.log(filteredData);
 
   return (
     <div className="mx-5 my-2 viewDiv">
-      <div className="container mt-4">
-        <table>
-          <tr>
-            <td>total idols</td>
-            <td>Immersed idols</td>
-            <td>Non Immersed idols</td>
-            <td>Private idols</td>
-            <td>Public idols</td>
-            <td>Organization idols</td>
-          </tr>
-          <tr>
-            <td>{numberOfIdols}</td>
-            <td>{numberOfImmersedIdols}</td>
-            <td>{numberOfNonImmersedIdols}</td>
-            <td>{numberOfPrivateIdols}</td>
-            <td>{numberOfPublicIdols}</td>
-            <td>{numberOfOrganizationIdols}</td>
-          </tr>
-        </table>
-      </div>
+      <StatusBarList data={StatusDataArray} />
       {showIdolPopup && (
         <div>
           <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />

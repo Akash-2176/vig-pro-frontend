@@ -3,6 +3,7 @@ import card2Image from "/mapimg.png";
 import card3Image from "/registration_img.png";
 import Footer from "./Footer";
 import { useEffect, useState } from "react";
+import OverAllStatsPopup from "../stats/overAllStatsPopup/OverAllStatsPopup";
 
 const HomeView = ({ setDashview, stats }) => {
   let currentStats = null;
@@ -65,92 +66,11 @@ const HomeView = ({ setDashview, stats }) => {
       <Footer />
 
       {showModal && (
-        <div
-          id="registration-popup-container"
-          className={`modal fade show`}
-          tabIndex="-1"
-          style={{ display: showModal ? "block" : "none" }}
-          aria-labelledby="modalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="modalLabel">
-                  Registration Details
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={handleCloseModal}
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <p className=" mb-2">Total no of Registration :</p>
-                <p className="mb-2">Total no of Immersed Idols :</p>
-                <p className="mb-3">Total no of Not Immersed Idols :</p>
-                <table className="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Category</th>
-                      <th>Sensitive</th>
-                      <th>Insensitive</th>
-                      <th>Hyper-Sensitive</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Total Number of Idols Registered</td>
-                      <td className="table-total-number">30</td>
-                      <td className="table-total-number">40</td>
-                      <td className="table-total-number">30</td>
-                    </tr>
-                    <tr>
-                      <td>Total Number of Idols Immersed</td>
-                      <td className="table-total-number">15</td>
-                      <td className="table-total-number">20</td>
-                      <td className="table-total-number">15</td>
-                    </tr>
-                    <tr>
-                      <td>Total Number of Idols Not Immersed</td>
-                      <td className="table-total-number">15</td>
-                      <td className="table-total-number">20</td>
-                      <td className="table-total-number">15</td>
-                    </tr>
-                    <tr>
-                      <td>Private Idols</td>
-                      <td className="table-total-number" colSpan="3">
-                        25
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Public Idols</td>
-                      <td className="table-total-number" colSpan="3">
-                        15
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Organizational Idols</td>
-                      <td className="table-total-number" colSpan="3">
-                        8
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleCloseModal}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <OverAllStatsPopup
+          stats={stats}
+          showModal={showModal}
+          onClose={() => setShowModal(false)}
+        />
       )}
     </div>
   );

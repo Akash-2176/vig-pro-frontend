@@ -58,6 +58,8 @@ export default function DSPDashboard() {
           <HomeDashboard
             handleLogout={handleLogout}
             setDashview={setDashview}
+            type={"DSP"}
+            DSP={DSP}
           />
         );
       case "dashboardlist":
@@ -69,7 +71,7 @@ export default function DSPDashboard() {
           />
         );
       case "dashboardmap":
-        return <DSPMapView on DSP={DSP} onBackNav={handleHomeDashboard} />; // Placeholder for dashboardmap case
+        return <DSPMapView DSP={DSP} onBackNav={handleHomeDashboard} />; // Placeholder for dashboardmap case
       default:
         return <div>Unknown dashboard view</div>;
     }

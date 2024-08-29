@@ -4,10 +4,42 @@ import HomeView from "./HomeView";
 import "./homedashboard.css";
 import { useEffect, useState } from "react";
 
-export default function HomeDashboard({ station, setDashview, handleLogout }) {
-  console.log(station);
-  const { stats, setStats } = useState(null);
+export default function HomeDashboard({
+  station,
+  setDashview,
+  handleLogout,
+  type,
+  DSP,
+  SP,
+}) {
+  const [stats, setStats] = useState(null);
+
   useEffect(() => {
+    let allIdols = [];
+    if (type === "Station") {
+      console.log(type);
+
+      allIdols = station.stationIdol;
+    }
+    if (type === "DSP") {
+      console.log(type);
+
+      allIdols = DSP.stationIds.flatMap((station) => station.stationIdol);
+    }
+    if (type === "SP") {
+      console.log(type);
+
+      allIdols = SP.dspIds.flatMap((dsp) =>
+        dsp.stationIds.flatMap((station) =>
+          station.stationIdol.map((idol) => ({
+            ...idol,
+            stationLocation: station.stationLocation,
+            stationDivision: station.stationDivision,
+          }))
+        )
+      );
+    }
+    console.log(allIdols);
     const calculateAllStats = (allIdols) => {
       const stats = {
         totalRegistered: 0,
@@ -18,7 +50,7 @@ export default function HomeDashboard({ station, setDashview, handleLogout }) {
           totalImmersed: 0,
           totalNotImmersed: 0,
         },
-        Insensitive: {
+        Nonsensitive: {
           totalRegistered: 0,
           totalImmersed: 0,
           totalNotImmersed: 0,
@@ -28,11 +60,22 @@ export default function HomeDashboard({ station, setDashview, handleLogout }) {
           totalImmersed: 0,
           totalNotImmersed: 0,
         },
-        Private: 0,
-        Public: 0,
-        Organization: 0,
+        Private: {
+          totalRegistered: 0,
+          totalImmersed: 0,
+          totalNotImmersed: 0,
+        },
+        Public: {
+          totalRegistered: 0,
+          totalImmersed: 0,
+          totalNotImmersed: 0,
+        },
+        Organization: {
+          totalRegistered: 0,
+          totalImmersed: 0,
+          totalNotImmersed: 0,
+        },
       };
-
       allIdols.forEach((idol) => {
         const { sensitivity, isImmersed, typeOfInstaller } = idol;
 
@@ -54,21 +97,35 @@ export default function HomeDashboard({ station, setDashview, handleLogout }) {
           }
         }
 
-        // Increment installer type counts
+        // Increment installer type counts for public, private, and organization
         if (typeOfInstaller === "private") {
-          stats.Private += 1;
+          stats.Private.totalRegistered += 1;
+          if (isImmersed) {
+            stats.Private.totalImmersed += 1;
+          } else {
+            stats.Private.totalNotImmersed += 1;
+          }
         } else if (typeOfInstaller === "public") {
-          stats.Public += 1;
+          stats.Public.totalRegistered += 1;
+          if (isImmersed) {
+            stats.Public.totalImmersed += 1;
+          } else {
+            stats.Public.totalNotImmersed += 1;
+          }
         } else if (typeOfInstaller === "organization") {
-          stats.Organization += 1;
+          stats.Organization.totalRegistered += 1;
+          if (isImmersed) {
+            stats.Organization.totalImmersed += 1;
+          } else {
+            stats.Organization.totalNotImmersed += 1;
+          }
         }
       });
 
       return stats;
     };
-    // setStats(calculateAllStats(station.stationIdol));
-    // console.log(stats);
-  }, [station]);
+    setStats(() => calculateAllStats(allIdols));
+  }, [station, DSP, SP]);
 
   console.log(stats);
 
@@ -92,6 +149,7 @@ export default function HomeDashboard({ station, setDashview, handleLogout }) {
       <div>
         <h1 className="h1 text-center mt-2 mb-2">Home Page</h1>
         <HomeView setDashview={setDashview} stats={stats} />
+        {/* <HomeView setDashview={setDashview} stats={null} /> */}
       </div>
     </div>
   );

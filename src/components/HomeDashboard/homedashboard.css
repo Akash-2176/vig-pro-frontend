@@ -89,34 +89,7 @@
   background-color: #1b1b1b;
   color: white;
 }
-#registration-popup-container {
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  backdrop-filter: blur(17px);
-  -webkit-backdrop-filter: blur(17px);
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-}
-.modal-dialog {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
 
-.modal-body .table {
-  font-family: Poppins, sans-serif;
-  font-size: 14px;
-}
-
-.modal-body .table th,
-.modal-body .table td {
-  text-align: center;
-}
-.table-total-number {
-  font-weight: bold;
-  color: red !important;
-}
 @media (max-width: 768px) {
   .card {
     height: auto;

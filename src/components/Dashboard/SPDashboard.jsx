@@ -16,7 +16,7 @@ export default function SPDashboard() {
   const [SP, setSP] = useState(null);
   const [showLoading, setShowLoading] = useState(true);
   const [dashview, setDashview] = useState("dashboard");
-
+  const [allIdols, SetAllIdols] = useState([]);
   useEffect(() => {
     const storedCredentials = localStorage.getItem("sptoken");
     const credentialData = JSON.parse(storedCredentials);
@@ -59,6 +59,8 @@ export default function SPDashboard() {
           <HomeDashboard
             handleLogout={handleLogout}
             setDashview={setDashview}
+            type={"SP"}
+            SP={SP}
           />
         );
       case "dashboardlist":

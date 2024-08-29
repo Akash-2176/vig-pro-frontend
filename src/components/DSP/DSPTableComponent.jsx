@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { IdolPopup } from "../idolPopup/idolPopup";
+import StatusBarList from "../stats/statustablelist/StatusBarList";
 
 const DSPTableComponent = ({ DSP }) => {
   const [showIdolPopup, setShowIdolPopup] = useState(false);
@@ -81,6 +82,44 @@ const DSPTableComponent = ({ DSP }) => {
     );
   });
 
+  const numberOfIdols = filteredData.length;
+  const numberOfImmersedIdols = filteredData.filter(
+    (e) => e.isImmersed === true
+  ).length;
+  const numberOfNonImmersedIdols = filteredData.filter(
+    (e) => e.isImmersed === false
+  ).length;
+  const numberOfPrivateIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "private"
+  ).length;
+  const numberOfPublicIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "public"
+  ).length;
+  const numberOfOrganizationIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "organization"
+  ).length;
+  const numberOfSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Sensitive"
+  ).length;
+  const numberOfNonSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Nonsensitive"
+  ).length;
+  const numberOfHyperSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Hyper-Sensitive"
+  ).length;
+
+  const StatusDataArray = [
+    numberOfIdols,
+    numberOfImmersedIdols,
+    numberOfNonImmersedIdols,
+    numberOfPrivateIdols,
+    numberOfPublicIdols,
+    numberOfOrganizationIdols,
+    numberOfSensitiveIdols,
+    numberOfNonSensitiveIdols,
+    numberOfHyperSensitiveIdols,
+  ];
+
   console.log(filteredData);
 
   const handleOpenIdolInfo = (idol) => {
@@ -94,6 +133,7 @@ const DSPTableComponent = ({ DSP }) => {
 
   return (
     <div className="mx-5 my-2 viewDiv">
+      <StatusBarList data={StatusDataArray} />
       {showIdolPopup && (
         <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
       )}

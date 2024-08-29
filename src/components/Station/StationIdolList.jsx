@@ -5,6 +5,7 @@ import "./StationIdolList.css";
 import axios from "axios";
 import { IdolPopup } from "../idolPopup/idolPopup";
 import EditPopup from "../EditForm/EditPopup";
+import StatusBarList from "../stats/statustablelist/StatusBarList";
 
 function StationIdolList({ station, setStation }) {
   const [filterStatus, setFilterStatus] = useState("all");
@@ -154,6 +155,44 @@ function StationIdolList({ station, setStation }) {
   const handleCloseUpdatePopup = function () {
     setShowEditPopup(false);
   };
+
+  const numberOfIdols = filteredData.length;
+  const numberOfImmersedIdols = filteredData.filter(
+    (e) => e.isImmersed === true
+  ).length;
+  const numberOfNonImmersedIdols = filteredData.filter(
+    (e) => e.isImmersed === false
+  ).length;
+  const numberOfPrivateIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "private"
+  ).length;
+  const numberOfPublicIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "public"
+  ).length;
+  const numberOfOrganizationIdols = filteredData.filter(
+    (e) => e.typeOfInstaller === "organization"
+  ).length;
+  const numberOfSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Sensitive"
+  ).length;
+  const numberOfNonSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Nonsensitive"
+  ).length;
+  const numberOfHyperSensitiveIdols = filteredData.filter(
+    (e) => e.sensitivity === "Hyper-Sensitive"
+  ).length;
+
+  const StatusDataArray = [
+    numberOfIdols,
+    numberOfImmersedIdols,
+    numberOfNonImmersedIdols,
+    numberOfPrivateIdols,
+    numberOfPublicIdols,
+    numberOfOrganizationIdols,
+    numberOfSensitiveIdols,
+    numberOfNonSensitiveIdols,
+    numberOfHyperSensitiveIdols,
+  ];
 
   return (
     <div className="App">

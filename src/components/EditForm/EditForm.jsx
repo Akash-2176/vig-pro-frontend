@@ -5,7 +5,6 @@ import "./form_Style.css";
 import API_BASE_URL from "../../../apiConfig";
 import Loading from "../loading/Loading";
 
-// import station from "../../../smpstation.json";
 import "./EditForm.css";
 
 const EditForm = ({
@@ -27,7 +26,7 @@ const EditForm = ({
   const [junctions, setJunctions] = useState([{ place: "", coords: "" }]);
   const [formData, setFormData] = useState({});
   const [hamletVillages, setHamletVillages] = useState([]);
-
+  const organizationOptions = station.defaultOrganization;
   // const idolData = station.stationIdol.find((e) => e.idol_id === idolId);
   const stationDetails = station.motherVillage;
   const startPoints = station.defaultStartPoints.map((e) => e.place);
@@ -39,9 +38,7 @@ const EditForm = ({
   useEffect(() => {
     if (idolData) {
       const formatDate = (mongoDate) =>
-        mongoDate?.$date
-          ? new Date(mongoDate.$date).toISOString().split("T")[0]
-          : "";
+        mongoDate ? new Date(mongoDate).toISOString().split("T")[0] : "";
 
       setFormData({
         ...idolData,
@@ -142,7 +139,8 @@ const EditForm = ({
     );
   };
 
-  const handleAddJunction = () => {
+  const handleAddJunction = (e) => {
+    e.preventDefault();
     setJunctions([...junctions, { place: "", coords: "" }]);
   };
 
@@ -260,7 +258,8 @@ const EditForm = ({
     });
   };
 
-  const handleAddVolunteer = () => {
+  const handleAddVolunteer = (e) => {
+    e.preventDefault();
     setFormData((prevState) => ({
       ...prevState,
       volunteers: [
@@ -270,7 +269,8 @@ const EditForm = ({
     }));
   };
 
-  const handleRemoveVolunteer = () => {
+  const handleRemoveVolunteer = (e) => {
+    e.preventDefault();
     if (formData.volunteers.length > 6) {
       setFormData((prevState) => ({
         ...prevState,
@@ -456,20 +456,25 @@ const EditForm = ({
                     </option>
                   </select>
                 </div>
+                {formData.typeOfInstaller === "organization" && (
+                  <select
+                    className="form-control"
+                    onChange={handleChange}
+                    id="Organization"
+                    value={formData.organizationName || ""}
+                    name="organizationName"
+                  >
+                    <option value="">Select an option</option>
+                    {organizationOptions.map((value, index) => (
+                      <option key={index}>{value}</option>
+                    ))}
+                  </select>
+                )}
               </div>
               <br />
 
               <div className="form-group">
                 <label htmlFor="Mother_Village">Mother Village</label>
-                {/* <input
-                  type="text"
-                  id="motherVillage"
-                  name="motherVillage"
-                  className="form-control"
-                  placeholder="Enter Mother village"
-                  value={formData.motherVillage? formData.motherVillage: ""}
-                  onChange={handleChange}
-                /> */}
                 <select
                   className="form-control"
                   name="motherVillage"
@@ -520,19 +525,6 @@ const EditForm = ({
               ) : (
                 <div className="form-group">
                   <label htmlFor="Location">Location of Idol</label>
-                  {/* <input
-                    type="text"
-                    id="idolLocation"
-                    name="placeOfInstallation"
-                    className="form-control"
-                    placeholder="Enter the Location"
-                    value={
-                      formData.placeOfInstallation
-                        ? formData.placeOfInstallation
-                        : ""
-                    }
-                    onChange={handleChange}
-                  /> */}
                   <select
                     id="idolLocation"
                     name="placeOfInstallation"
@@ -1229,7 +1221,7 @@ const EditForm = ({
                       name="sensitivity"
                     >
                       <option value="">Select Option</option>
-                      <option value="Insensitive">Insensitve</option>
+                      <option value="Nonsensitive">Non-sensitve</option>
                       <option value="Sensitive">Sensitive</option>
                       <option value="Hyper-Sensitive">Hyper-Sensitive</option>
                     </select>
@@ -1407,7 +1399,7 @@ const EditForm = ({
                           <button
                             className="btn btn-light"
                             type="button"
-                            onClick={() => handleRemoveJunction(index)}
+                            onClick={(e) => handleRemoveJunction(index)}
                           >
                             &times;
                           </button>

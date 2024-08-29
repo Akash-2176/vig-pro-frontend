@@ -2,15 +2,18 @@ import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
-import pinimg from "/mappin.png";
+// import pinimg from "/mappin.png";
 import "./map.css";
+import blueMarker from "/mappin.png"; // Example: Marker for Private
+import greenMarker from "/pinimg1.png"; // Example: Marker for Public place
+import blackMarker from "/pinimg3.png";
 
-const customIcon = L.icon({
-  iconUrl: pinimg,
-  iconSize: [64, 64],
-  iconAnchor: [16, 32],
-  popupAnchor: [0, -32],
-});
+// const customIcon = L.icon({
+//   iconUrl: pinimg,
+//   iconSize: [64, 64],
+//   iconAnchor: [16, 32],
+//   popupAnchor: [0, -32],
+// });
 
 const StationMapView = ({ station, onBackNav }) => {
   const mapRef = useRef(null);
@@ -18,20 +21,22 @@ const StationMapView = ({ station, onBackNav }) => {
   const markersRef = useRef([]);
   const routingControlRef = useRef(null);
   const junctionToEndRouteRef = useRef(null);
-  const allIdols = station.stationIdol;
   const [filters, setFilters] = useState({
     type: "",
     sensitivity: "",
     dateOfImmersion: "",
   });
 
+  const allIdols = station.stationIdol;
+
   useEffect(() => {
     if (!mapInstance.current) {
+      let centerCoords = [11.225, 78.1652];
+      if (station.stationCoords)
+        centerCoords = [station.stationCoords.lat, station.stationCoords.lon];
+
       // Initialize the map
-      mapInstance.current = L.map(mapRef.current).setView(
-        [11.225, 78.1652],
-        12
-      );
+      mapInstance.current = L.map(mapRef.current).setView(centerCoords, 12);
 
       // Add Esri World Imagery Layer
       L.tileLayer(
@@ -63,6 +68,25 @@ const StationMapView = ({ station, onBackNav }) => {
       ).addTo(mapInstance.current);
     }
 
+    // Define the custom icons
+    const iconMap = {
+      private: L.icon({
+        iconUrl: blueMarker,
+        iconSize: [52, 52],
+        iconAnchor: [16, 32],
+      }),
+      public: L.icon({
+        iconUrl: greenMarker,
+        iconSize: [52, 52],
+        iconAnchor: [16, 32],
+      }),
+      organization: L.icon({
+        iconUrl: blackMarker,
+        iconSize: [52, 52],
+        iconAnchor: [16, 32],
+      }),
+    };
+
     // Clean up previous markers
     markersRef.current.forEach(({ marker }) =>
       mapInstance.current.removeLayer(marker)
@@ -72,10 +96,19 @@ const StationMapView = ({ station, onBackNav }) => {
     // Add new markers
     allIdols.forEach((idol) => {
       if (idol.startCoords) {
+        const icon = iconMap[idol.typeOfInstaller] || blackMarker;
         const { lat, lon } = idol.startCoords;
-        const marker = L.marker([lat, lon], { icon: customIcon })
+        const marker = L.marker([lat, lon], { icon: icon })
           .bindPopup(
-            `<b>${idol.idol_id}</b><br>Hamletvillage: ${idol.hamletVillage}`
+            `${idol.idol_id} <br>
+            <b>${idol.stationLocation}</b><br>  
+            Type : ${idol.typeOfInstaller} - ${
+              idol.typeOfInstaller === "organization"
+                ? `${idol.organizationName}`
+                : ""
+            } <br>
+              Sensitivity : ${idol.sensitivity}
+              <br>Hamletvillage: ${idol.hamletVillage}`
           )
           .addTo(mapInstance.current);
         markersRef.current.push({ marker, data: idol });
@@ -116,14 +149,14 @@ const StationMapView = ({ station, onBackNav }) => {
       ).data;
 
       let routeColor = "blue";
-      switch (startPointData.sensitivity) {
-        case "HyperSensitive":
+      switch (idol.sensitivity) {
+        case "Hyper-Sensitive":
           routeColor = "red";
           break;
         case "Sensitive":
           routeColor = "orange";
           break;
-        case "NonSensitive":
+        case "Nonsensitive":
           routeColor = "green";
           break;
         default:
@@ -209,23 +242,23 @@ const StationMapView = ({ station, onBackNav }) => {
       }
     };
   }, [station]);
-  useEffect(() => {
-    markersRef.current.forEach(({ marker, data }) => {
-      const matchesType = filters.type ? data.type === filters.type : true;
-      const matchesSensitivity = filters.sensitivity
-        ? data.sensitivity === filters.sensitivity
-        : true;
-      const matchesDate = filters.dateOfImmersion
-        ? data.dateOfImmersion === filters.dateOfImmersion
-        : true;
+  // useEffect(() => {
+  //   markersRef.current.forEach(({ marker, data }) => {
+  //     const matchesType = filters.type ? data.type === filters.type : true;
+  //     const matchesSensitivity = filters.sensitivity
+  //       ? data.sensitivity === filters.sensitivity
+  //       : true;
+  //     const matchesDate = filters.dateOfImmersion
+  //       ? data.dateOfImmersion === filters.dateOfImmersion
+  //       : true;
 
-      if (matchesType && matchesSensitivity && matchesDate) {
-        marker.addTo(mapInstance.current); // Show marker
-      } else {
-        marker.remove(); // Hide marker
-      }
-    });
-  }, [filters]);
+  //     if (matchesType && matchesSensitivity && matchesDate) {
+  //       marker.addTo(mapInstance.current); // Show marker
+  //     } else {
+  //       marker.remove(); // Hide marker
+  //     }
+  //   });
+  // }, [filters]);
 
   return (
     <>
@@ -241,7 +274,7 @@ const StationMapView = ({ station, onBackNav }) => {
           Back
         </button>
       </div>
-      <div style={{ marginBottom: "10px" }}>
+      {/* <div style={{ marginBottom: "10px" }}>
         <select
           onChange={(e) => setFilters({ ...filters, type: e.target.value })}
         >
@@ -274,7 +307,7 @@ const StationMapView = ({ station, onBackNav }) => {
           <option value="08/09/2024">08/09/2024</option>
           <option value="09/09/2024">09/09/2024</option>
         </select>
-      </div>
+      </div> */}
       <div id="map" ref={mapRef} style={{ height: "100vh", width: "100%" }} />
     </>
   );
