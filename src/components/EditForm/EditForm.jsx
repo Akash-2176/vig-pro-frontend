@@ -57,9 +57,10 @@ const EditForm = ({
         setJunctions(IntermediateJunctionPoints);
       }
     }
+    
   }, [idolData, stationDetails]);
-
-  // console.log(stationDetails);
+  console.log(formData);
+  
 
   const endPoints = station.defaultEndPoints.map((e) => e.place);
 
@@ -101,8 +102,18 @@ const EditForm = ({
     }
   };
 
+
   const handleNext = (e) => {
     e.preventDefault();
+    let requiredFields = []
+    formData.typeOfInstaller === "private" ? requiredFields = ["motherVillage", "licence"] : requiredFields = ["motherVillage", "placeOfInstallation", "licence"];
+    const isFormValid = requiredFields.every((field) => formData[field]);
+  
+    if (!isFormValid) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+  
     if (formData.typeOfInstaller === "private") {
       if (formData.hamletVillage) {
         setFormData((prevState) => ({
@@ -111,10 +122,50 @@ const EditForm = ({
         }));
       }
     }
-    console.log(formData);
+  
     setFormType((prevFormType) => prevFormType + 1);
   };
 
+  const handleNext1 = (e) => {
+    e.preventDefault();
+  
+    const requiredFields = ["permission.police", "permission.fireService", "permission.TNEB", "facility.electricalEquipment", "facility.lightingFacility", "facility.CCTVFacility"];
+    const isFormValid = requiredFields.every((field) => {
+      const fieldParts = field.split('.'); 
+      let currentValue = formData; 
+    
+      
+      for (const part of fieldParts) {
+        
+        if (currentValue.hasOwnProperty(part)) {
+          currentValue = currentValue[part]; 
+        } else {
+          return false; 
+        }
+      }
+    
+      return currentValue === true || currentValue === false;
+    });
+      console.log(isFormValid);
+    
+  
+    if (!isFormValid) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+  
+    if (formData.typeOfInstaller === "private") {
+      if (formData.hamletVillage) {
+        setFormData((prevState) => ({
+          ...prevState,
+          placeOfInstallation: formData.hamletVillage,
+        }));
+      }
+    }
+  
+    setFormType((prevFormType) => prevFormType + 1);
+  };
+  
   const handlePrev = (e) => {
     e.preventDefault();
     setFormType((prevFormType) => prevFormType - 1);
@@ -204,7 +255,7 @@ const EditForm = ({
   const handleChange2 = (e) => {
     const { name, value, type, id } = e.target;
 
-    if (type === "radio" && (id === "individual" || id === "group")) {
+    if (type === "radio" && (id === "individual" || id === "group" || id === "RTOYes" || id === "RTONo")) {
       setFormData((prevState) => ({
         ...prevState,
         [name]: value,
@@ -288,74 +339,112 @@ const EditForm = ({
     setShowLoading(true);
     setMessage("");
     setMessagecolor("");
-
+  
+    const requiredFields = [
+      "modeOfTransport.vehicleType",
+      "modeOfTransport.vehicleDescription",
+      "processionBy",
+      "immersionSafety.barricade",
+      "immersionSafety.lighting",
+      "immersionSafety.safetyByFireService",
+      "immersionSafety.PASystem",
+      "RTOpermission"
+    ];
+  
+    const missingFields = requiredFields.filter((field) => {
+      const parts = field.split(".");
+      let currentValue = formData;
+  
+      for (const part of parts) {
+        if (currentValue[part] === undefined) return true;
+        currentValue = currentValue[part];
+      }
+  
+      return currentValue === "" || currentValue === undefined;
+    });
+    console.log(missingFields);
+    
+  
+    if (missingFields.length > 0) {
+      alert("Please fill in all required fields.");
+      setShowLoading(false); 
+      return; 
+    }
+  
+    if (formData.typeOfInstaller === "private" && formData.hamletVillage) {
+      setFormData((prevState) => ({
+        ...prevState,
+        placeOfInstallation: formData.hamletVillage,
+      }));
+    }
+  
     const selectedStart = station.defaultStartPoints.find(
       (e) => e.place === formData.placeOfInstallation
     );
     const selectedEnd = station.defaultEndPoints.find(
       (e) => e.place === formData.placeOfImmersion
     );
-    console.log(selectedEnd);
+  
     const intermediatejun = junctions?.map((junction) => junction);
-
+  
     if (selectedEnd && selectedStart) {
-      console.log(selectedEnd, selectedStart);
-
+      const nextIdolId = getIdolId();
+  
       setUpdatedFormData({
         ...formData,
+        idol_id: nextIdolId,
         endCoords: selectedEnd.coords,
         startCoords: selectedStart.coords,
         intermediateJunctionPoints: intermediatejun,
+        stationName: station.stationLocation,
+        stationDivision: station.stationDivision,
+        stationDistrict: station.stationDistrict,
       });
     } else {
-      console.log("Selected location not found under the station");
+      alert("Location Details are not filled Properly.");
+      setShowLoading(false); // Stop loading if locations are not found
+      return; // Prevent further execution
     }
   };
-
+  
   useEffect(() => {
     if (updatedFormData) {
-      if (isOthers) {
-        setFormData((prevState) => ({
-          ...prevState,
-          placeOfInstallation: formData.hamletVillage,
-        }));
+      const filedata = new FormData();
+  
+      if (applicationFile) {
+        filedata.append("idolApplication", applicationFile);
       }
-
+  
+      if (imageFile) {
+        filedata.append("idolImage", imageFile);
+      }
+  
+      if (applicantImage) {
+        filedata.append("applicantImage", applicantImage);
+      }
+  
       const postData = async () => {
         try {
-          const response = await axios.put(
-            `${API_BASE_URL}/stations/${stationId}/${idolData.idol_id}/updateidol`,
+          const response = await axios.post(
+            `${API_BASE_URL}/stations/${stationId}/addidol`,
             updatedFormData
           );
-          setMessagecolor("warning");
-          setMessage("updating....");
-          console.log("Data sent successfully: " + response.data.idol);
-          const newidol = response.data.idol;
-          setStation((prevStation) => {
-            const updatedIdols = prevStation.stationIdol.map((idol) =>
-              idol.idol_id === newidol.idol_id ? newidol : idol
-            );
-            return {
-              ...prevStation,
-              stationIdol: updatedIdols,
-            };
-          });
-          setMessagecolor("success");
-          setMessage("update success..");
-          setTimeout(() => onClose(), 3000);
+  
+          setMessagecolor("primary");
+          setMessage("Success... Idol Updated")
+         
         } catch (error) {
           setMessagecolor("danger");
           setMessage(error.message);
-          console.log("Error: " + error);
         } finally {
           setShowLoading(false);
-          console.log(updatedFormData);
         }
       };
-
+  
       postData();
     }
   }, [updatedFormData]);
+  
 
   return (
     <div className="main my-5">
@@ -474,13 +563,14 @@ const EditForm = ({
               <br />
 
               <div className="form-group">
-                <label htmlFor="Mother_Village">Mother Village</label>
+                <label htmlFor="Mother_Village">Mother Village <span style={{ color: "red" }}>*</span></label>
                 <select
                   className="form-control"
                   name="motherVillage"
                   onChange={handleChange}
                   id="motherVillage"
                   value={formData.motherVillage || ""}
+                  required
                 >
                   <option value="">Select an option</option>
                   {motherVillages.map((values, index) => (
@@ -510,7 +600,7 @@ const EditForm = ({
               </div>
               {formData.typeOfInstaller === "private" ? (
                 <div className="form-group">
-                  <label htmlFor="Location">Location of Idol</label>
+                  <label htmlFor="Location">Location of Idol <span style={{ color: "red" }}>*</span></label>
                   <input
                     type="text"
                     id="idolLocation"
@@ -520,16 +610,18 @@ const EditForm = ({
                     value={`${formData.hamletVillage}`}
                     onChange={handleChange}
                     readOnly
+                    required
                   />
                 </div>
               ) : (
                 <div className="form-group">
-                  <label htmlFor="Location">Location of Idol</label>
+                  <label htmlFor="Location">Location of Idol <span style={{ color: "red" }}>*</span></label>
                   <select
                     id="idolLocation"
                     name="placeOfInstallation"
                     className="form-control"
                     placeholder="Enter the Location"
+                    required
                     value={
                       formData.placeOfInstallation
                         ? formData.placeOfInstallation
@@ -544,7 +636,7 @@ const EditForm = ({
                       </option>
                     ))}
                     <option value="others" id="others">
-                      others
+                      others(new location)
                     </option>
                   </select>
                   {isOthers && (
@@ -573,7 +665,7 @@ const EditForm = ({
               </div>
 
               <div className="form-group">
-                <label htmlFor="Height">Idol Height</label>
+                <label htmlFor="Height">Idol Height </label>
                 <input
                   type="number"
                   id="height"
@@ -586,7 +678,7 @@ const EditForm = ({
               </div>
 
               <div className="form-group">
-                <label>Idol License</label>
+                <label>Idol License <span style={{ color: "red" }}>*</span></label>
                 <div className="row" id="radioDiv">
                   <div className="col-sm-6">
                     <input
@@ -596,6 +688,7 @@ const EditForm = ({
                       id="commoncrowdoptionbtn1"
                       autoComplete="off"
                       value="yes"
+                      required
                       onChange={handleRadioChange}
                       checked={formData.licence === "yes" ? true : false}
                     />
@@ -614,6 +707,7 @@ const EditForm = ({
                       id="commoncrowdoptionbtn2"
                       autoComplete="off"
                       value="no"
+                      required
                       checked={formData.licence === "no" ? true : false}
                       onChange={handleRadioChange}
                     />
@@ -646,7 +740,7 @@ const EditForm = ({
 
                 {/* Police Permission */}
                 <div className="form-group">
-                  <label>Police permission is granted or not?</label>
+                  <label>Police permission is granted or not? <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -655,6 +749,7 @@ const EditForm = ({
                         name="permission.police"
                         value="yes"
                         id="policePermissionYes"
+                        required
                         onChange={handleChange1}
                         checked={
                           formData.permission.police === true ? true : false
@@ -674,6 +769,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="permission.police"
                         value="no"
+                        required
                         id="policePermissionNo"
                         checked={
                           formData.permission.police === false ? true : false
@@ -693,7 +789,7 @@ const EditForm = ({
 
                 {/* Fire Service Permission */}
                 <div className="form-group">
-                  <label>Fire Service permission is granted or not?</label>
+                  <label>Fire Service permission is granted or not? <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -704,6 +800,7 @@ const EditForm = ({
                         id="firePermissionYes"
                         onChange={handleChange1}
                         autoComplete="off"
+                        required
                         checked={
                           formData.permission.fireService === true
                             ? true
@@ -722,6 +819,7 @@ const EditForm = ({
                         type="radio"
                         className="btn-check form-control"
                         name="permission.fireService"
+                        required
                         value="no"
                         id="firePermissionNo"
                         onChange={handleChange1}
@@ -744,7 +842,7 @@ const EditForm = ({
 
                 {/* TNEB Permission */}
                 <div className="form-group">
-                  <label>TNEB permission is granted or not?</label>
+                  <label>TNEB permission is granted or not? <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -752,6 +850,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="permission.TNEB"
                         value="yes"
+                        required
                         id="tnebPermissionYes"
                         checked={
                           formData.permission.TNEB === true ? true : false
@@ -772,6 +871,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="permission.TNEB"
                         value="no"
+                        required
                         id="tnebPermissionNo"
                         onChange={handleChange1}
                         checked={
@@ -791,7 +891,7 @@ const EditForm = ({
 
                 {/* Electrical Equipment Insulation */}
                 <div className="form-group">
-                  <label>Electrical equipment is insulated or not?</label>
+                  <label>Electrical equipment is insulated or not? <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -801,6 +901,7 @@ const EditForm = ({
                         id="electricalInsulatedYes"
                         autoComplete="off"
                         value="yes"
+                        required
                         checked={
                           formData.facility.electricalEquipment === true
                             ? true
@@ -822,6 +923,7 @@ const EditForm = ({
                         name="facility.electricalEquipment"
                         id="electricalInsulatedNo"
                         autoComplete="off"
+                        required
                         value="no"
                         checked={
                           formData.facility.electricalEquipment === false
@@ -843,12 +945,13 @@ const EditForm = ({
                 {/* Lighting Facility */}
                 <div className="form-group">
                   <label htmlFor="">
-                    Lighting Facility is available or not?
+                    Lighting Facility is available or not? <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
                         type="radio"
+                        required
                         className="btn-check form-control"
                         name="facility.lightingFacility"
                         id="lightingAvailableYes"
@@ -876,6 +979,7 @@ const EditForm = ({
                         id="lightingAvailableNo"
                         autoComplete="off"
                         value="no"
+                        required
                         checked={
                           formData.facility.lightingFacility === false
                             ? true
@@ -895,11 +999,12 @@ const EditForm = ({
 
                 {/* CCTV Facility */}
                 <div className="form-group">
-                  <label>CCTV facility is available or not?</label>
+                  <label>CCTV facility is available or not? <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
                         type="radio"
+                        required
                         className="btn-check form-control"
                         name="facility.CCTVFacility"
                         id="cctvAvailableYes"
@@ -925,6 +1030,7 @@ const EditForm = ({
                         id="cctvAvailableNo"
                         autoComplete="off"
                         value="no"
+                        required
                         checked={
                           formData.facility.CCTVFacility === false
                             ? true
@@ -1078,7 +1184,7 @@ const EditForm = ({
                 <button
                   className="form-submit-btn nextBtn"
                   type="next"
-                  onClick={handleNext}
+                  onClick={handleNext1}
                 >
                   Save & Next
                 </button>
@@ -1107,7 +1213,7 @@ const EditForm = ({
                   Transport
                 </label>
                 <div className="form-group row mt-1">
-                  <label className="h6">Type of Vehicle</label>
+                  <label className="h6">Type of Vehicle <span style={{ color: "red" }}>*</span></label>
                   <div className="col-md-12">
                     <select
                       name="modeOfTransport.vehicleType"
@@ -1115,6 +1221,7 @@ const EditForm = ({
                       value={formData.modeOfTransport.vehicleType}
                       onChange={handleChange2}
                       id="transport"
+                      required
                     >
                       <option value="" disabled>
                         Select Vehicle Type
@@ -1129,9 +1236,10 @@ const EditForm = ({
                     </select>
 
                     <div className="col-md-12 my-2">
-                      <label>Description</label>
+                      <label>Description <span style={{ color: "red" }}>*</span></label>
                       <input
                         className="form-control"
+                        required
                         name="modeOfTransport.vehicleDescription"
                         placeholder="Enter Vehicle make and model"
                         value={formData.modeOfTransport.vehicleDescription}
@@ -1166,7 +1274,7 @@ const EditForm = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Procession by</label>
+                    <label>Procession by <span style={{ color: "red" }}>*</span></label>
                     <div className="row" id="radioDiv">
                       <div className="col-sm-6">
                         <input
@@ -1175,6 +1283,7 @@ const EditForm = ({
                           name="processionBy"
                           id="individual"
                           value="individual"
+                          required
                           onChange={handleChange2}
                           checked={
                             formData.processionBy === "individual"
@@ -1191,6 +1300,7 @@ const EditForm = ({
                           type="radio"
                           className="btn-check form-control"
                           name="processionBy"
+                          required
                           id="group"
                           value="group"
                           onChange={handleChange2}
@@ -1208,7 +1318,7 @@ const EditForm = ({
               </div>
 
               <div className="form-group row mt-1">
-                <label className="h5">Sensitivity</label>
+                <label className="h5">Sensitivity </label>
 
                 <div className="form-group">
                   <label htmlFor="sensitivity">Select Route Sensitivity</label>
@@ -1230,12 +1340,13 @@ const EditForm = ({
 
                 <div className="form-group">
                   <label>
-                    Are there Mosque and Church in the Procession route?
+                    Are there Mosque and Church in the Procession route? <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
                         type="radio"
+                        required
                         className="btn-check form-control"
                         name="isChurchMosque"
                         id="isChurchMosque1"
@@ -1435,7 +1546,7 @@ const EditForm = ({
                   </label>
                 </div>
                 <div className="form-group">
-                  <label>Barricade</label>
+                  <label>Barricade <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1443,6 +1554,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="immersionSafety.barricade"
                         id="barricadeYes"
+                        required
                         value="yes"
                         onChange={handleChange2}
                         checked={
@@ -1461,6 +1573,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="immersionSafety.barricade"
                         id="barricadeNo"
+                        required
                         value="no"
                         onChange={handleChange2}
                         checked={
@@ -1477,7 +1590,7 @@ const EditForm = ({
                 </div>
 
                 <div className="form-group">
-                  <label>Lighting Facility</label>
+                  <label>Lighting Facility <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1487,6 +1600,7 @@ const EditForm = ({
                         id="lightingYes"
                         value="yes"
                         onChange={handleChange2}
+                        required
                         checked={
                           formData.immersionSafety.lighting === true
                             ? true
@@ -1503,6 +1617,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="immersionSafety.lighting"
                         id="lightingNo"
+                        required
                         value="no"
                         onChange={handleChange2}
                         checked={
@@ -1520,7 +1635,7 @@ const EditForm = ({
 
                 <div className="form-group">
                   <label>
-                    Safety Measure by Fire Service (Drowning Prevention)
+                    Safety Measure by Fire Service (Drowning Prevention) <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -1531,6 +1646,7 @@ const EditForm = ({
                         id="safetyYes"
                         value="yes"
                         onChange={handleChange2}
+                        required
                         checked={
                           formData.immersionSafety.safetyByFireService === true
                             ? true
@@ -1547,6 +1663,7 @@ const EditForm = ({
                         className="btn-check form-control"
                         name="immersionSafety.safetyByFireService"
                         id="safetyNo"
+                        required
                         value="no"
                         onChange={handleChange2}
                         checked={
@@ -1563,7 +1680,7 @@ const EditForm = ({
                 </div>
 
                 <div className="form-group">
-                  <label>PA System</label>
+                  <label>PA System <span style={{ color: "red" }}>*</span></label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1572,6 +1689,7 @@ const EditForm = ({
                         name="immersionSafety.PASystem"
                         id="PAYes"
                         value="yes"
+                        required
                         onChange={handleChange2}
                         checked={
                           formData.immersionSafety.PASystem === true
@@ -1590,6 +1708,7 @@ const EditForm = ({
                         name="immersionSafety.PASystem"
                         id="PANo"
                         value="no"
+                        required
                         onChange={handleChange2}
                         checked={
                           formData.immersionSafety.PASystem === false
@@ -1598,6 +1717,41 @@ const EditForm = ({
                         }
                       />
                       <label className="btn btn-light" htmlFor="PANo">
+                        No
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>RTO License approved or not <span style={{ color: "red" }}>*</span></label>
+                  <div className="row" id="radioDiv">
+                    <div className="col-sm-6">
+                      <input
+                        type="radio"
+                        className="btn-check"
+                        name="RTOpermission"
+                        id="RTOYes"
+                        value="yes"
+                        required
+                        onChange={handleChange2}
+                        checked={formData.RTOpermission === "yes" ? true : false}
+                      />
+                      <label className="btn btn-light" htmlFor="RTOYes">
+                        Yes
+                      </label>
+                    </div>
+                    <div className="col-sm-6">
+                      <input
+                        type="radio"
+                        className="btn-check"
+                        name="RTOpermission"
+                        required
+                        id="RTONo"
+                        value="no"
+                        onChange={handleChange2}
+                        checked={formData.RTOpermission === "no" ? true : false}
+                      />
+                      <label className="btn btn-light" htmlFor="RTONo">
                         No
                       </label>
                     </div>

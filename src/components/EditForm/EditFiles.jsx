@@ -10,7 +10,7 @@ const EditFiles = ({ onClose, idolData, station, setStation }) => {
   const [fileType, setFileType] = useState(""); // Track type of file being updated (applicantImage or idolImage)
   const [url, setUrl] = useState("");
   const [showEditFileModal, setShowEditFileModal] = useState(false);
-
+  const [message, setMessage] = useState("");
   const handleEditClick = (type, urlData) => {
     setFileType(type);
     setUrl(urlData);
@@ -25,7 +25,9 @@ const EditFiles = ({ onClose, idolData, station, setStation }) => {
 
       return { ...prevStation, stationIdol: updatedIdols };
     });
-    setShowEditFileModal(false);
+    setMessage("Image Upload Success..!");
+    // setShowEditFileModal(false);
+    setTimeout(onClose, 3000);
   };
 
   return (
@@ -81,12 +83,15 @@ const EditFiles = ({ onClose, idolData, station, setStation }) => {
             </a>
             <button
               className="btn btn-primary p-2"
-              onClick={() => handleEditClick("idolApplication")}
+              onClick={() =>
+                handleEditClick("idolApplication", "uploadApplication")
+              }
             >
               {idolData.idolApplication ? "Edit Pdf" : "Add Pdf"}
             </button>
           </div>
         </div>
+        {message && <p className="h5 text-center">{message}</p>}
 
         {showEditFileModal && (
           <EditSingleFile

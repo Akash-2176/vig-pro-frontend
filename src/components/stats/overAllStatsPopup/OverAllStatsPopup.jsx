@@ -111,13 +111,13 @@ export default function OverAllStatsPopup({ stats, showModal, onClose }) {
                 <tr>
                   <td>Organizational Idols</td>
                   <td className="table-total-number">
-                    {stats?.Sensitive?.totalRegistered || "0"}
+                    {stats?.Organization?.totalRegistered || "0"}
                   </td>
                   <td className="table-total-number">
-                    {stats?.Sensitive?.totalImmersed || "0"}
+                    {stats?.Organization?.totalImmersed || "0"}
                   </td>
                   <td className="table-total-number">
-                    {stats?.Sensitive?.totalNotImmersed || "0"}
+                    {stats?.Organization?.totalNotImmersed || "0"}
                   </td>
                 </tr>
               </tbody>

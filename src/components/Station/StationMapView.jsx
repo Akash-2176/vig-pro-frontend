@@ -2,18 +2,18 @@ import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
-// import pinimg from "/mappin.png";
+import pinimg from "/mappin.png";
 import "./map.css";
 import blueMarker from "/mappin.png"; // Example: Marker for Private
 import greenMarker from "/pinimg1.png"; // Example: Marker for Public place
 import blackMarker from "/pinimg3.png";
 
-// const customIcon = L.icon({
-//   iconUrl: pinimg,
-//   iconSize: [64, 64],
-//   iconAnchor: [16, 32],
-//   popupAnchor: [0, -32],
-// });
+const customIcon = L.icon({
+  iconUrl: pinimg,
+  iconSize: [64, 64],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
 
 const StationMapView = ({ station, onBackNav }) => {
   const mapRef = useRef(null);
@@ -96,12 +96,12 @@ const StationMapView = ({ station, onBackNav }) => {
     // Add new markers
     allIdols.forEach((idol) => {
       if (idol.startCoords) {
-        const icon = iconMap[idol.typeOfInstaller] || blackMarker;
+        const icon = iconMap[idol.typeOfInstaller] || customIcon;
         const { lat, lon } = idol.startCoords;
         const marker = L.marker([lat, lon], { icon: icon })
           .bindPopup(
             `${idol.idol_id} <br>
-            <b>${idol.stationLocation}</b><br>  
+            <b>${idol.stationName}</b><br>  
             Type : ${idol.typeOfInstaller} - ${
               idol.typeOfInstaller === "organization"
                 ? `${idol.organizationName}`

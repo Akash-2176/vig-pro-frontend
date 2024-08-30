@@ -22,14 +22,14 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
   const [junctions, setJunctions] = useState([{ place: "", coords: "" }]);
   const [formData, setFormData] = useState({
     permission: {
-      police: false,
-      fireService: false,
-      TNEB: false,
+      police: null,
+      fireService: null,
+      TNEB: null,
     },
     facility: {
-      electricalEquipment: false,
-      lightingFacility: false,
-      CCTVFacility: false,
+      electricalEquipment: null,
+      lightingFacility: null,
+      CCTVFacility: null,
     },
     property: {
       type: "",
@@ -51,7 +51,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
   const stationDetails = station.motherVillage;
   const organizationOptions = station.defaultOrganization;
-  // const organizationOptions = ["1", "2", "3"]; //dummy
   const startPoints = station.defaultStartPoints.map((e) => e.place);
   const JunctionPoints = station.defaultJunctionPoints.map((e) => e);
   const IntermediateJunctionPoints =
@@ -68,9 +67,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     let idolID;
     const type =
       formData.typeOfInstaller === "private"
-        ? "PR"
+        ? "PVT"
         : formData.typeOfInstaller === "public"
-        ? "PU"
+        ? "PUB"
         : "ORG";
     if (station.stationIdol.length > 0) {
       idolIDs = station.stationIdol.map((val) => val.idol_id);
@@ -89,6 +88,32 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     }
 
     return idolID;
+  };
+
+  const handleFileUpload = (e, allowedTypes, setFile) => {
+    const fileInput = e.target;
+    const maxSize = 512 * 1024;
+    const file = fileInput.files[0];
+
+    if (file) {
+      if (allowedTypes.includes(file.type)) {
+        if (file.size <= maxSize) {
+          setFile(file);
+        } else {
+          alert(
+            `File size exceeds the ${(maxSize / 1024).toFixed(2)} KB limit.`
+          );
+          fileInput.value = "";
+          setFile(null);
+        }
+      } else {
+        alert(
+          `Invalid file type. Allowed types are: ${allowedTypes.join(", ")}.`
+        );
+        fileInput.value = "";
+        setFile(null);
+      }
+    }
   };
 
   const handleChange = (e) => {
@@ -136,6 +161,17 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
   const handleNext = (e) => {
     e.preventDefault();
+    let requiredFields = [];
+    formData.typeOfInstaller === "private"
+      ? (requiredFields = ["motherVillage", "licence"])
+      : (requiredFields = ["motherVillage", "placeOfInstallation", "licence"]);
+    const isFormValid = requiredFields.every((field) => formData[field]);
+
+    if (!isFormValid) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+
     if (formData.typeOfInstaller === "private") {
       if (formData.hamletVillage) {
         setFormData((prevState) => ({
@@ -144,7 +180,51 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
         }));
       }
     }
-    console.log(formData);
+
+    setFormType((prevFormType) => prevFormType + 1);
+  };
+
+  const handleNext1 = (e) => {
+    e.preventDefault();
+
+    const requiredFields = [
+      "permission.police",
+      "permission.fireService",
+      "permission.TNEB",
+      "facility.electricalEquipment",
+      "facility.lightingFacility",
+      "facility.CCTVFacility",
+    ];
+    const isFormValid = requiredFields.every((field) => {
+      const fieldParts = field.split(".");
+      let currentValue = formData;
+
+      for (const part of fieldParts) {
+        if (currentValue.hasOwnProperty(part)) {
+          currentValue = currentValue[part];
+        } else {
+          return false;
+        }
+      }
+
+      return currentValue === true || currentValue === false;
+    });
+    console.log(isFormValid);
+
+    if (!isFormValid) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+
+    if (formData.typeOfInstaller === "private") {
+      if (formData.hamletVillage) {
+        setFormData((prevState) => ({
+          ...prevState,
+          placeOfInstallation: formData.hamletVillage,
+        }));
+      }
+    }
+
     setFormType((prevFormType) => prevFormType + 1);
   };
 
@@ -235,7 +315,13 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
   const handleChange2 = (e) => {
     const { name, value, type, id } = e.target;
 
-    if (type === "radio" && (id === "individual" || id === "group")) {
+    if (
+      type === "radio" &&
+      (id === "individual" ||
+        id === "group" ||
+        id === "RTOYes" ||
+        id === "RTONo")
+    ) {
       setFormData((prevState) => ({
         ...prevState,
         [name]: value,
@@ -320,18 +406,54 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     setMessage("");
     setMessagecolor("");
 
+    const requiredFields = [
+      "modeOfTransport.vehicleType",
+      "modeOfTransport.vehicleDescription",
+      "processionBy",
+      "immersionSafety.barricade",
+      "immersionSafety.lighting",
+      "immersionSafety.safetyByFireService",
+      "immersionSafety.PASystem",
+      "RTOpermission",
+    ];
+
+    const missingFields = requiredFields.filter((field) => {
+      const parts = field.split(".");
+      let currentValue = formData;
+
+      for (const part of parts) {
+        if (currentValue[part] === undefined) return true;
+        currentValue = currentValue[part];
+      }
+
+      return currentValue === "" || currentValue === undefined;
+    });
+    console.log(missingFields);
+
+    if (missingFields.length > 0) {
+      alert("Please fill in all required fields.");
+      setShowLoading(false);
+      return;
+    }
+
+    if (formData.typeOfInstaller === "private" && formData.hamletVillage) {
+      setFormData((prevState) => ({
+        ...prevState,
+        placeOfInstallation: formData.hamletVillage,
+      }));
+    }
+
     const selectedStart = station.defaultStartPoints.find(
       (e) => e.place === formData.placeOfInstallation
     );
     const selectedEnd = station.defaultEndPoints.find(
       (e) => e.place === formData.placeOfImmersion
     );
-    console.log(selectedEnd);
+
     const intermediatejun = junctions?.map((junction) => junction);
 
     if (selectedEnd && selectedStart) {
       const nextIdolId = getIdolId();
-      console.log(selectedEnd, selectedStart);
 
       setUpdatedFormData({
         ...formData,
@@ -344,8 +466,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
         stationDistrict: station.stationDistrict,
       });
     } else {
-      throw new Error("Location Details are not filled Properly..");
-      console.log("Selected location not found under the station");
+      alert("Location Details are not filled Properly.");
+      setShowLoading(false); // Stop loading if locations are not found
+      return; // Prevent further execution
     }
   };
 
@@ -365,53 +488,48 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
         filedata.append("applicantImage", applicantImage);
       }
 
-      if (isOthers) {
-        setFormData((prevState) => ({
-          ...prevState,
-          placeOfInstallation: formData.hamletVillage,
-        }));
-      }
-
       const postData = async () => {
         try {
           const response = await axios.post(
             `${API_BASE_URL}/stations/${stationId}/addidol`,
             updatedFormData
           );
+          console.log("server response", response);
 
-          console.log("Data sent successfully: " + response.data);
-          const idolId = response.data;
-          setMessagecolor("primary");
-          setMessage("File uploading....");
+          const idolId = response.data.id;
 
-          const fileResponse = await axios.post(
-            `${API_BASE_URL}/stations/${stationId}/${idolId}/addfiles`,
-            filedata,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
-          );
+          if (
+            filedata.has("idolApplication") ||
+            filedata.has("idolImage") ||
+            filedata.has("applicantImage")
+          ) {
+            setMessagecolor("primary");
+            setMessage("File uploading....");
+            const fileResponse = await axios.post(
+              `${API_BASE_URL}/stations/${stationId}/${idolId}/addfiles`,
+              filedata,
+              {
+                headers: {
+                  "Content-Type": "multipart/form-data",
+                },
+              }
+            );
+            setMessagecolor("primary");
+            setMessage("File uploaded success");
+            onAddIdol(fileResponse.data.idol);
+          } else {
+            onAddIdol(response.data.idol);
+          }
 
-          console.log(
-            "Application file sent successfully: " + fileResponse.data.idol
-          );
-          onAddIdol(fileResponse.data.idol);
           setMessagecolor("primary");
           setMessage("Success Idol Added..!");
           setTimeout(() => onClose(), 3000);
         } catch (error) {
           setMessagecolor("danger");
-          setMessage(error.message);
-          console.log("Error: " + error);
+          setMessage(error?.response?.data?.message || error.message);
+          console.log(error);
         } finally {
           setShowLoading(false);
-          console.log("clientside ", updatedFormData);
-        }
-
-        for (let pair of filedata.entries()) {
-          console.log(`${pair[0]}: ${pair[1]}`);
         }
       };
 
@@ -449,14 +567,26 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
           {formType === 0 && (
             <div>
               <div className="form-group">
-                <label htmlFor="image">Upload Application File</label>
+                <label htmlFor="applicationFile">Upload Application File</label>
                 <input
                   type="file"
-                  id="image"
+                  id="applicationFile"
                   placeholder="choose file"
                   name="idolApplication"
                   className="form-control"
-                  onChange={(e) => setApplicationFile(e.target.files[0])}
+                  onChange={(e) =>
+                    handleFileUpload(
+                      e,
+                      [
+                        "application/pdf",
+                        "application/msword",
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        "image/jpeg",
+                        "image/png",
+                      ],
+                      setApplicationFile
+                    )
+                  }
                 />
                 {applicationFile && (
                   <div>
@@ -468,19 +598,26 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   </div>
                 )}
               </div>
+
               <div>
-                <label htmlFor="Applicant details " className="h5">
+                <label htmlFor="ApplicantDetails" className="h5">
                   Applicant Details
                 </label>
                 <div className="form-group">
-                  <label htmlFor="image">Upload applicant image</label>
+                  <label htmlFor="applicantImage">Upload Applicant Image</label>
                   <input
                     type="file"
-                    id="image"
+                    id="applicantImage"
                     placeholder="choose file"
                     name="applicantImage"
                     className="form-control"
-                    onChange={(e) => setApplicantImage(e.target.files[0])}
+                    onChange={(e) =>
+                      handleFileUpload(
+                        e,
+                        ["application/pdf", "image/jpeg", "image/png"],
+                        setApplicantImage
+                      )
+                    }
                   />
                   {applicantImage && (
                     <div>
@@ -502,7 +639,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   name="applicantName"
                   className="form-control"
                   placeholder="Enter Applicant Name"
-                  value={formData.applicantName ? formData.applicantName : ""}
+                  value={formData.applicantName || ""}
                   onChange={handleChange}
                 />
               </div>
@@ -556,19 +693,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   </select>
                 </div>
                 {formData.typeOfInstaller === "organization" && (
-                  // <div className="form-group">
-                  //   <label htmlFor="Organization"> Organization Name</label>
-                  //   <input
-                  //     type="text"
-                  //     id="Organization"
-                  //     name="organizationName"
-                  //     className="form-control"
-                  //     placeholder="Enter Organization name"
-                  //     value={formData.organizationName || ""}
-                  //     onChange={handleChange}
-                  //   />
-
-                  // </div>
                   <select
                     className="form-control"
                     onChange={handleChange}
@@ -585,13 +709,16 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="Mother_Village">Mother Village</label>
+                <label htmlFor="Mother_Village">
+                  Mother Village <span style={{ color: "red" }}>*</span>
+                </label>
                 <select
                   className="form-control"
                   name="motherVillage"
                   onChange={handleChange}
                   id="motherVillage"
                   value={formData.motherVillage || ""}
+                  required
                 >
                   <option value="">Select an option</option>
                   {motherVillages.map((values, index) => (
@@ -622,7 +749,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
               {formData.typeOfInstaller === "private" ? (
                 <div className="form-group">
-                  <label htmlFor="Location">Location of Idol</label>
+                  <label htmlFor="Location">
+                    Location of Idol <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="text"
                     id="idolLocation"
@@ -632,29 +761,20 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     value={`${formData.hamletVillage}`}
                     onChange={() => console.log("private changed")}
                     readOnly
+                    required
                   />
                 </div>
               ) : (
                 <div className="form-group">
-                  <label htmlFor="Location">Location of Idol</label>
-                  {/* <input
-                    type="text"
-                    id="idolLocation"
-                    name="placeOfInstallation"
-                    className="form-control"
-                    placeholder="Enter the Location"
-                    value={
-                      formData.placeOfInstallation
-                        ? formData.placeOfInstallation
-                        : ""
-                    }
-                    onChange={handleChange}
-                  /> */}
+                  <label htmlFor="Location">
+                    Location of Idol <span style={{ color: "red" }}>*</span>
+                  </label>
                   <select
                     id="idolLocation"
                     name="placeOfInstallation"
                     className="form-control"
                     placeholder="Enter the Location"
+                    required
                     value={
                       formData.placeOfInstallation
                         ? formData.placeOfInstallation
@@ -669,7 +789,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       </option>
                     ))}
                     <option value="others" id="others">
-                      others
+                      others(new location)
                     </option>
                   </select>
                   {isOthers && (
@@ -711,7 +831,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
               </div>
 
               <div className="form-group">
-                <label>Idol License</label>
+                <label>
+                  Idol License <span style={{ color: "red" }}>*</span>
+                </label>
                 <div className="row" id="radioDiv">
                   <div className="col-sm-6">
                     <input
@@ -722,6 +844,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       autoComplete="off"
                       value="yes"
                       onChange={handleRadioChange}
+                      required
                       checked={formData.licence === "yes" ? true : false}
                     />
                     <label
@@ -739,6 +862,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       id="commoncrowdoptionbtn2"
                       autoComplete="off"
                       value="no"
+                      required
                       checked={formData.licence === "no" ? true : false}
                       onChange={handleRadioChange}
                     />
@@ -771,7 +895,10 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 {/* Police Permission */}
                 <div className="form-group">
-                  <label>Police permission is granted or not?</label>
+                  <label>
+                    Police permission is granted or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -781,6 +908,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         value="yes"
                         id="policePermissionYes"
                         onChange={handleChange1}
+                        required
                         checked={
                           formData.permission.police === true ? true : false
                         }
@@ -805,6 +933,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         }
                         onChange={handleChange1}
                         autoComplete="off"
+                        required
                       />
                       <label
                         className="btn btn-light"
@@ -818,7 +947,10 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 {/* Fire Service Permission */}
                 <div className="form-group">
-                  <label>Fire Service permission is granted or not?</label>
+                  <label>
+                    Fire Service permission is granted or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -828,6 +960,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         value="yes"
                         id="firePermissionYes"
                         onChange={handleChange1}
+                        required
                         autoComplete="off"
                         checked={
                           formData.permission.fireService === true
@@ -851,6 +984,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="firePermissionNo"
                         onChange={handleChange1}
                         autoComplete="off"
+                        required
                         checked={
                           formData.permission.fireService === false
                             ? true
@@ -869,7 +1003,10 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 {/* TNEB Permission */}
                 <div className="form-group">
-                  <label>TNEB permission is granted or not?</label>
+                  <label>
+                    TNEB permission is granted or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -877,6 +1014,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         className="btn-check form-control"
                         name="permission.TNEB"
                         value="yes"
+                        required
                         id="tnebPermissionYes"
                         checked={
                           formData.permission.TNEB === true ? true : false
@@ -899,6 +1037,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         value="no"
                         id="tnebPermissionNo"
                         onChange={handleChange1}
+                        required
                         checked={
                           formData.permission.TNEB === false ? true : false
                         }
@@ -916,7 +1055,10 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 {/* Electrical Equipment Insulation */}
                 <div className="form-group">
-                  <label>Electrical equipment is insulated or not?</label>
+                  <label>
+                    Electrical equipment is insulated or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -925,6 +1067,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="facility.electricalEquipment"
                         id="electricalInsulatedYes"
                         autoComplete="off"
+                        required
                         value="yes"
                         checked={
                           formData.facility.electricalEquipment === true
@@ -947,6 +1090,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="facility.electricalEquipment"
                         id="electricalInsulatedNo"
                         autoComplete="off"
+                        required
                         value="no"
                         checked={
                           formData.facility.electricalEquipment === false
@@ -968,7 +1112,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 {/* Lighting Facility */}
                 <div className="form-group">
                   <label htmlFor="">
-                    Lighting Facility is available or not?
+                    Lighting Facility is available or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -979,6 +1124,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="lightingAvailableYes"
                         autoComplete="off"
                         value="yes"
+                        required
                         checked={
                           formData.facility.lightingFacility === true
                             ? true
@@ -1001,6 +1147,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="lightingAvailableNo"
                         autoComplete="off"
                         value="no"
+                        required
                         checked={
                           formData.facility.lightingFacility === false
                             ? true
@@ -1020,7 +1167,10 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 {/* CCTV Facility */}
                 <div className="form-group">
-                  <label>CCTV facility is available or not?</label>
+                  <label>
+                    CCTV facility is available or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1030,6 +1180,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="cctvAvailableYes"
                         autoComplete="off"
                         value="yes"
+                        required
                         checked={
                           formData.facility.CCTVFacility === true ? true : false
                         }
@@ -1050,11 +1201,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="cctvAvailableNo"
                         autoComplete="off"
                         value="no"
-                        checked={
-                          formData.facility.CCTVFacility === false
-                            ? true
-                            : false
-                        }
+                        required
+                        checked={formData.facility.CCTVFacility === false}
                         onChange={handleChange1}
                       />
                       <label
@@ -1202,7 +1350,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 <button
                   className="form-submit-btn nextBtn"
                   type="next"
-                  onClick={handleNext}
+                  onClick={handleNext1}
                 >
                   Save & Next
                 </button>
@@ -1218,7 +1366,19 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   id="image"
                   name="idolImage"
                   className="form-control"
-                  onChange={(e) => setImageFile(e.target.files[0])}
+                  onChange={(e) =>
+                    handleFileUpload(
+                      e,
+                      [
+                        "application/pdf",
+                        "application/msword",
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                        "image/jpeg",
+                        "image/png",
+                      ],
+                      setImageFile
+                    )
+                  }
                 />
               </div>
               {imageFile && (
@@ -1248,7 +1408,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   Transport
                 </label>
                 <div className="form-group row mt-1">
-                  <label className="h6">Type of Vehicle</label>
+                  <label className="h6">
+                    Type of Vehicle <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="col-md-12">
                     <select
                       name="modeOfTransport.vehicleType"
@@ -1256,6 +1418,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       value={formData.vehicleType}
                       onChange={handleChange2}
                       id="transport"
+                      required
                     >
                       <option value="" disabled>
                         Select Vehicle Type
@@ -1270,7 +1433,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     </select>
 
                     <div className="col-md-12 my-2">
-                      <label>Description</label>
+                      <label>
+                        Description <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         className="form-control"
                         name="modeOfTransport.vehicleDescription"
@@ -1278,6 +1443,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         value={formData.vehicleDescription}
                         onChange={handleChange2}
                         id="transport"
+                        required
                       />
                     </div>
 
@@ -1307,7 +1473,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   </div>
 
                   <div className="form-group">
-                    <label>Procession by</label>
+                    <label>
+                      Procession by <span style={{ color: "red" }}>*</span>
+                    </label>
                     <div className="row" id="radioDiv">
                       <div className="col-sm-6">
                         <input
@@ -1317,6 +1485,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                           id="individual"
                           value="individual"
                           onChange={handleChange2}
+                          required
                         />
                         <label className="btn btn-light" htmlFor="individual">
                           Individual
@@ -1329,6 +1498,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                           name="processionBy"
                           id="group"
                           value="group"
+                          required
                           onChange={handleChange2}
                         />
                         <label className="btn btn-light" htmlFor="group">
@@ -1364,7 +1534,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 <div className="form-group">
                   <label>
-                    Are there Mosque and Church in the Procession route?
+                    Are there Mosque and Church in the Procession route?{" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -1375,6 +1546,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="isChurchMosque1"
                         autoComplete="off"
                         value="yes"
+                        required
                         onChange={handleRadioChange}
                         checked={
                           formData.isChurchMosque === "yes" ? true : false
@@ -1395,6 +1567,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         id="isChurchMosque2"
                         autoComplete="off"
                         value="no"
+                        required
                         checked={
                           formData.isChurchMosque === "no" ? true : false
                         }
@@ -1478,9 +1651,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       value={formData.defaultJunctionPoint}
                       onChange={handleChange2}
                     >
-                      <option value="" disabled>
-                        Select Junction
-                      </option>
+                      <option value="">Select Junction</option>
                       {JunctionPoints.map((option, idx) => (
                         <option key={idx} value={option.place}>
                           {option.place}
@@ -1569,7 +1740,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   </label>
                 </div>
                 <div className="form-group">
-                  <label>Barricade</label>
+                  <label>
+                    Barricade <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1578,6 +1751,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.barricade"
                         id="barricadeYes"
                         value="yes"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="barricadeYes">
@@ -1591,6 +1765,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.barricade"
                         id="barricadeNo"
                         value="no"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="barricadeNo">
@@ -1601,7 +1776,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Lighting Facility</label>
+                  <label>
+                    Lighting Facility <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1610,6 +1787,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.lighting"
                         id="lightingYes"
                         value="yes"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="lightingYes">
@@ -1623,6 +1801,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.lighting"
                         id="lightingNo"
                         value="no"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="lightingNo">
@@ -1634,7 +1813,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 <div className="form-group">
                   <label>
-                    Safety Measure by Fire Service (Drowning Prevention)
+                    Safety Measure by Fire Service (Drowning Prevention){" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -1644,6 +1824,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.safetyByFireService"
                         id="safetyYes"
                         value="yes"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="safetyYes">
@@ -1656,6 +1837,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         className="btn-check form-control"
                         name="immersionSafety.safetyByFireService"
                         id="safetyNo"
+                        required
                         value="no"
                         onChange={handleChange2}
                       />
@@ -1667,7 +1849,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>PA System</label>
+                  <label>
+                    PA System <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1676,6 +1860,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.PASystem"
                         id="PAYes"
                         value="yes"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="PAYes">
@@ -1689,9 +1874,46 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         name="immersionSafety.PASystem"
                         id="PANo"
                         value="no"
+                        required
                         onChange={handleChange2}
                       />
                       <label className="btn btn-light" htmlFor="PANo">
+                        No
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>
+                    RTO License approved or not{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
+                  <div className="row" id="radioDiv">
+                    <div className="col-sm-6">
+                      <input
+                        type="radio"
+                        className="btn-check"
+                        name="RTOpermission"
+                        id="RTOYes"
+                        required
+                        value="yes"
+                        onChange={handleChange2}
+                      />
+                      <label className="btn btn-light" htmlFor="RTOYes">
+                        Yes
+                      </label>
+                    </div>
+                    <div className="col-sm-6">
+                      <input
+                        type="radio"
+                        className="btn-check"
+                        name="RTOpermission"
+                        id="RTONo"
+                        required
+                        value="no"
+                        onChange={handleChange2}
+                      />
+                      <label className="btn btn-light" htmlFor="RTONo">
                         No
                       </label>
                     </div>

@@ -4,7 +4,6 @@ import "./login_style.css";
 import axios from "axios";
 import Loading from "../loading/Loading";
 import API_BASE_URL from "../../../apiConfig";
-import loginBg from "/loginBG.png";
 
 function Login({ loginUser }) {
   const [username, setUsername] = useState("");
@@ -81,8 +80,8 @@ function Login({ loginUser }) {
   return (
     <div className="login-container">
       {showLoading && <Loading />}
-      <div className=" login-box p-4 p-md-5">
-        <p className="text-center h1 display-4 mb-4">{loginUser} Login</p>
+      <div className=" login-box p-4  my-4">
+        <p className="h1 mt-4 mb-5 text-center">{loginUser}  LOGIN</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label htmlFor="username" className="form-label h5">

@@ -14,9 +14,32 @@ export default function EditSingleFile({
   const [message, setMessage] = useState("");
   const [showLoading, setShowLoading] = useState(false);
 
+  const handleFileChange = (e, allowedTypes, setFile) => {
+    const fileInput = e.target;
+    const maxSize = 512 * 1024;
+    const file = fileInput.files[0];
+  
+    if (file) {
+      if (allowedTypes.includes(file.type)) {
+        if (file.size <= maxSize) {
+          setFile(file);       
+        } else {
+          alert(`File size exceeds the ${(maxSize / 1024).toFixed(2)} KB limit.`);
+          fileInput.value = ""; 
+          setFile(null); 
+        }
+      } else {
+        alert(`Invalid file type. Allowed types are: ${allowedTypes.join(", ")}.`);
+        fileInput.value = ""; 
+        setFile(null); 
+      }
+    }
+  };
+
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (!uploadfile) {
+      
       setMessage("Please select a file before uploading.");
       return;
     }
@@ -62,7 +85,17 @@ export default function EditSingleFile({
               type="file"
               name={uploadName}
               className="form-control"
-              onChange={(e) => setUploadfile(e.target.files[0])}
+              onChange={ (e) =>
+                handleFileChange(
+                  e,
+                  [
+                    "application/pdf",
+                    "image/jpeg",   
+                    "image/png" ,
+                    "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  ], 
+                  setUploadfile
+                )}
             />
             {uploadfile && (
               <div>

@@ -3,21 +3,25 @@
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-image: url("/loginBG.png");
+  background-image: url("/login-banner3.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
 }
 
 .login-box {
-  width: 550px;
-  background: rgba(255, 255, 255, 0.13);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10.8px);
-  -webkit-backdrop-filter: blur(10.8px);
-  border: 1px solid rgba(255, 255, 255, 0.53);
+  font-family: poppins;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  width: 500px;
+  margin-left: 200px !important;
+}
+.login-box p {
+  letter-spacing: 2px;
 }
 #loginbtn {
   position: relative;
@@ -41,6 +45,12 @@
   display: block;
 }
 
+.form-control {
+  background: transparent !important;
+  border-radius: 8px;
+  border: 1px solid grey !important;
+}
+
 @keyframes btn-anim1 {
   0% {
     left: -100%;
@@ -58,4 +68,20 @@
   height: 4px;
   background: linear-gradient(90deg, transparent, #03f40f);
   animation: btn-anim1 2s linear infinite;
+}
+@media only screen and (max-width: 1200px) {
+  .login-container {
+    background: hsla(186, 33%, 94%, 1);
+
+    background: linear-gradient(
+      90deg,
+      hsla(186, 33%, 94%, 1) 0%,
+      hsla(216, 41%, 79%, 1) 100%
+    );
+
+    justify-content: center;
+  }
+  .login-box {
+    margin-left: 0 !important;
+  }
 }
