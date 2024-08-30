@@ -18,12 +18,10 @@ export default function HomeDashboard({
     let allIdols = [];
     if (type === "Station") {
       console.log(type);
-
       allIdols = station.stationIdol;
     }
     if (type === "DSP") {
       console.log(type);
-
       allIdols = DSP.stationIds.flatMap((station) => station.stationIdol);
     }
     if (type === "SP") {
