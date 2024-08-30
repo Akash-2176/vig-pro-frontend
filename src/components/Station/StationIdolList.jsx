@@ -6,6 +6,7 @@ import axios from "axios";
 import { IdolPopup } from "../idolPopup/idolPopup";
 import EditPopup from "../EditForm/EditPopup";
 import StatusBarList from "../stats/statustablelist/StatusBarList";
+import API_BASE_URL from "../../../apiConfig";
 
 function StationIdolList({ station, setStation }) {
   const [filterStatus, setFilterStatus] = useState("all");
@@ -31,7 +32,7 @@ function StationIdolList({ station, setStation }) {
     try {
       // Send the patch request to update the idol's status
       const response = await axios.patch(
-        `http://localhost:3000/api/stations/${station.stationId}/idol/${idol_id}/immersed`
+        `${API_BASE_URL}/stations/${station.stationId}/idol/${idol_id}/immersed`
       );
       // Check if the request was successful
       console.log(response.data);
