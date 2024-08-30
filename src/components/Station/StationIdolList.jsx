@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./StationIdolList.css";
 import axios from "axios";
-import { IdolPopup } from "../idolPopup/idolPopup";
+import { IdolPopup } from "../idolPopup/IdolPopup";
 import EditPopup from "../EditForm/EditPopup";
 import StatusBarList from "../stats/statustablelist/StatusBarList";
 import API_BASE_URL from "../../../apiConfig";

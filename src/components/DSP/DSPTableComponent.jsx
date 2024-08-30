@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IdolPopup } from "../idolPopup/idolPopup";
+import { IdolPopup } from "../idolPopup/IdolPopup";
 import StatusBarList from "../stats/statustablelist/StatusBarList";
 
 const DSPTableComponent = ({ DSP }) => {
