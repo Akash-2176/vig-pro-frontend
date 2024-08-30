@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./form_Style.css";
+import "./form_style.css";
 import "./editfiles_style.css";
 import EditSingleFile from "./EditSingleFile"; // Import the single file editor
 import noImage from "/noimage.jpg";

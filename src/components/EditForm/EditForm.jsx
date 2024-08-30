@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./form_Style.css";
+import "./form_style.css";
 import API_BASE_URL from "../../../apiConfig";
 import Loading from "../loading/Loading";
 
@@ -57,10 +57,8 @@ const EditForm = ({
         setJunctions(IntermediateJunctionPoints);
       }
     }
-    
   }, [idolData, stationDetails]);
   console.log(formData);
-  
 
   const endPoints = station.defaultEndPoints.map((e) => e.place);
 
@@ -102,18 +100,19 @@ const EditForm = ({
     }
   };
 
-
   const handleNext = (e) => {
     e.preventDefault();
-    let requiredFields = []
-    formData.typeOfInstaller === "private" ? requiredFields = ["motherVillage", "licence"] : requiredFields = ["motherVillage", "placeOfInstallation", "licence"];
+    let requiredFields = [];
+    formData.typeOfInstaller === "private"
+      ? (requiredFields = ["motherVillage", "licence"])
+      : (requiredFields = ["motherVillage", "placeOfInstallation", "licence"]);
     const isFormValid = requiredFields.every((field) => formData[field]);
-  
+
     if (!isFormValid) {
       alert("Please fill out all required fields.");
       return;
     }
-  
+
     if (formData.typeOfInstaller === "private") {
       if (formData.hamletVillage) {
         setFormData((prevState) => ({
@@ -122,38 +121,42 @@ const EditForm = ({
         }));
       }
     }
-  
+
     setFormType((prevFormType) => prevFormType + 1);
   };
 
   const handleNext1 = (e) => {
     e.preventDefault();
-  
-    const requiredFields = ["permission.police", "permission.fireService", "permission.TNEB", "facility.electricalEquipment", "facility.lightingFacility", "facility.CCTVFacility"];
+
+    const requiredFields = [
+      "permission.police",
+      "permission.fireService",
+      "permission.TNEB",
+      "facility.electricalEquipment",
+      "facility.lightingFacility",
+      "facility.CCTVFacility",
+    ];
     const isFormValid = requiredFields.every((field) => {
-      const fieldParts = field.split('.'); 
-      let currentValue = formData; 
-    
-      
+      const fieldParts = field.split(".");
+      let currentValue = formData;
+
       for (const part of fieldParts) {
-        
         if (currentValue.hasOwnProperty(part)) {
-          currentValue = currentValue[part]; 
+          currentValue = currentValue[part];
         } else {
-          return false; 
+          return false;
         }
       }
-    
+
       return currentValue === true || currentValue === false;
     });
-      console.log(isFormValid);
-    
-  
+    console.log(isFormValid);
+
     if (!isFormValid) {
       alert("Please fill out all required fields.");
       return;
     }
-  
+
     if (formData.typeOfInstaller === "private") {
       if (formData.hamletVillage) {
         setFormData((prevState) => ({
@@ -162,10 +165,10 @@ const EditForm = ({
         }));
       }
     }
-  
+
     setFormType((prevFormType) => prevFormType + 1);
   };
-  
+
   const handlePrev = (e) => {
     e.preventDefault();
     setFormType((prevFormType) => prevFormType - 1);
@@ -255,7 +258,13 @@ const EditForm = ({
   const handleChange2 = (e) => {
     const { name, value, type, id } = e.target;
 
-    if (type === "radio" && (id === "individual" || id === "group" || id === "RTOYes" || id === "RTONo")) {
+    if (
+      type === "radio" &&
+      (id === "individual" ||
+        id === "group" ||
+        id === "RTOYes" ||
+        id === "RTONo")
+    ) {
       setFormData((prevState) => ({
         ...prevState,
         [name]: value,
@@ -339,7 +348,7 @@ const EditForm = ({
     setShowLoading(true);
     setMessage("");
     setMessagecolor("");
-  
+
     const requiredFields = [
       "modeOfTransport.vehicleType",
       "modeOfTransport.vehicleDescription",
@@ -348,48 +357,47 @@ const EditForm = ({
       "immersionSafety.lighting",
       "immersionSafety.safetyByFireService",
       "immersionSafety.PASystem",
-      "RTOpermission"
+      "RTOpermission",
     ];
-  
+
     const missingFields = requiredFields.filter((field) => {
       const parts = field.split(".");
       let currentValue = formData;
-  
+
       for (const part of parts) {
         if (currentValue[part] === undefined) return true;
         currentValue = currentValue[part];
       }
-  
+
       return currentValue === "" || currentValue === undefined;
     });
     console.log(missingFields);
-    
-  
+
     if (missingFields.length > 0) {
       alert("Please fill in all required fields.");
-      setShowLoading(false); 
-      return; 
+      setShowLoading(false);
+      return;
     }
-  
+
     if (formData.typeOfInstaller === "private" && formData.hamletVillage) {
       setFormData((prevState) => ({
         ...prevState,
         placeOfInstallation: formData.hamletVillage,
       }));
     }
-  
+
     const selectedStart = station.defaultStartPoints.find(
       (e) => e.place === formData.placeOfInstallation
     );
     const selectedEnd = station.defaultEndPoints.find(
       (e) => e.place === formData.placeOfImmersion
     );
-  
+
     const intermediatejun = junctions?.map((junction) => junction);
-  
+
     if (selectedEnd && selectedStart) {
       const nextIdolId = getIdolId();
-  
+
       setUpdatedFormData({
         ...formData,
         idol_id: nextIdolId,
@@ -406,33 +414,32 @@ const EditForm = ({
       return; // Prevent further execution
     }
   };
-  
+
   useEffect(() => {
     if (updatedFormData) {
       const filedata = new FormData();
-  
+
       if (applicationFile) {
         filedata.append("idolApplication", applicationFile);
       }
-  
+
       if (imageFile) {
         filedata.append("idolImage", imageFile);
       }
-  
+
       if (applicantImage) {
         filedata.append("applicantImage", applicantImage);
       }
-  
+
       const postData = async () => {
         try {
           const response = await axios.post(
             `${API_BASE_URL}/stations/${stationId}/addidol`,
             updatedFormData
           );
-  
+
           setMessagecolor("primary");
-          setMessage("Success... Idol Updated")
-         
+          setMessage("Success... Idol Updated");
         } catch (error) {
           setMessagecolor("danger");
           setMessage(error.message);
@@ -440,11 +447,10 @@ const EditForm = ({
           setShowLoading(false);
         }
       };
-  
+
       postData();
     }
   }, [updatedFormData]);
-  
 
   return (
     <div className="main my-5">
@@ -563,7 +569,9 @@ const EditForm = ({
               <br />
 
               <div className="form-group">
-                <label htmlFor="Mother_Village">Mother Village <span style={{ color: "red" }}>*</span></label>
+                <label htmlFor="Mother_Village">
+                  Mother Village <span style={{ color: "red" }}>*</span>
+                </label>
                 <select
                   className="form-control"
                   name="motherVillage"
@@ -600,7 +608,9 @@ const EditForm = ({
               </div>
               {formData.typeOfInstaller === "private" ? (
                 <div className="form-group">
-                  <label htmlFor="Location">Location of Idol <span style={{ color: "red" }}>*</span></label>
+                  <label htmlFor="Location">
+                    Location of Idol <span style={{ color: "red" }}>*</span>
+                  </label>
                   <input
                     type="text"
                     id="idolLocation"
@@ -615,7 +625,9 @@ const EditForm = ({
                 </div>
               ) : (
                 <div className="form-group">
-                  <label htmlFor="Location">Location of Idol <span style={{ color: "red" }}>*</span></label>
+                  <label htmlFor="Location">
+                    Location of Idol <span style={{ color: "red" }}>*</span>
+                  </label>
                   <select
                     id="idolLocation"
                     name="placeOfInstallation"
@@ -678,7 +690,9 @@ const EditForm = ({
               </div>
 
               <div className="form-group">
-                <label>Idol License <span style={{ color: "red" }}>*</span></label>
+                <label>
+                  Idol License <span style={{ color: "red" }}>*</span>
+                </label>
                 <div className="row" id="radioDiv">
                   <div className="col-sm-6">
                     <input
@@ -740,7 +754,10 @@ const EditForm = ({
 
                 {/* Police Permission */}
                 <div className="form-group">
-                  <label>Police permission is granted or not? <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    Police permission is granted or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -789,7 +806,10 @@ const EditForm = ({
 
                 {/* Fire Service Permission */}
                 <div className="form-group">
-                  <label>Fire Service permission is granted or not? <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    Fire Service permission is granted or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -842,7 +862,10 @@ const EditForm = ({
 
                 {/* TNEB Permission */}
                 <div className="form-group">
-                  <label>TNEB permission is granted or not? <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    TNEB permission is granted or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -891,7 +914,10 @@ const EditForm = ({
 
                 {/* Electrical Equipment Insulation */}
                 <div className="form-group">
-                  <label>Electrical equipment is insulated or not? <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    Electrical equipment is insulated or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -945,7 +971,8 @@ const EditForm = ({
                 {/* Lighting Facility */}
                 <div className="form-group">
                   <label htmlFor="">
-                    Lighting Facility is available or not? <span style={{ color: "red" }}>*</span>
+                    Lighting Facility is available or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -999,7 +1026,10 @@ const EditForm = ({
 
                 {/* CCTV Facility */}
                 <div className="form-group">
-                  <label>CCTV facility is available or not? <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    CCTV facility is available or not?{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1213,7 +1243,9 @@ const EditForm = ({
                   Transport
                 </label>
                 <div className="form-group row mt-1">
-                  <label className="h6">Type of Vehicle <span style={{ color: "red" }}>*</span></label>
+                  <label className="h6">
+                    Type of Vehicle <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="col-md-12">
                     <select
                       name="modeOfTransport.vehicleType"
@@ -1236,7 +1268,9 @@ const EditForm = ({
                     </select>
 
                     <div className="col-md-12 my-2">
-                      <label>Description <span style={{ color: "red" }}>*</span></label>
+                      <label>
+                        Description <span style={{ color: "red" }}>*</span>
+                      </label>
                       <input
                         className="form-control"
                         required
@@ -1274,7 +1308,9 @@ const EditForm = ({
                   </div>
 
                   <div className="form-group">
-                    <label>Procession by <span style={{ color: "red" }}>*</span></label>
+                    <label>
+                      Procession by <span style={{ color: "red" }}>*</span>
+                    </label>
                     <div className="row" id="radioDiv">
                       <div className="col-sm-6">
                         <input
@@ -1340,7 +1376,8 @@ const EditForm = ({
 
                 <div className="form-group">
                   <label>
-                    Are there Mosque and Church in the Procession route? <span style={{ color: "red" }}>*</span>
+                    Are there Mosque and Church in the Procession route?{" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -1546,7 +1583,9 @@ const EditForm = ({
                   </label>
                 </div>
                 <div className="form-group">
-                  <label>Barricade <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    Barricade <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1590,7 +1629,9 @@ const EditForm = ({
                 </div>
 
                 <div className="form-group">
-                  <label>Lighting Facility <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    Lighting Facility <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1635,7 +1676,8 @@ const EditForm = ({
 
                 <div className="form-group">
                   <label>
-                    Safety Measure by Fire Service (Drowning Prevention) <span style={{ color: "red" }}>*</span>
+                    Safety Measure by Fire Service (Drowning Prevention){" "}
+                    <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
@@ -1680,7 +1722,9 @@ const EditForm = ({
                 </div>
 
                 <div className="form-group">
-                  <label>PA System <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    PA System <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1723,7 +1767,10 @@ const EditForm = ({
                   </div>
                 </div>
                 <div className="form-group">
-                  <label>RTO License approved or not <span style={{ color: "red" }}>*</span></label>
+                  <label>
+                    RTO License approved or not{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div className="row" id="radioDiv">
                     <div className="col-sm-6">
                       <input
@@ -1734,7 +1781,9 @@ const EditForm = ({
                         value="yes"
                         required
                         onChange={handleChange2}
-                        checked={formData.RTOpermission === "yes" ? true : false}
+                        checked={
+                          formData.RTOpermission === "yes" ? true : false
+                        }
                       />
                       <label className="btn btn-light" htmlFor="RTOYes">
                         Yes
