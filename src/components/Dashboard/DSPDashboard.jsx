@@ -72,6 +72,10 @@ export default function DSPDashboard() {
         );
       case "dashboardmap":
         return <DSPMapView DSP={DSP} onBackNav={handleHomeDashboard} />; // Placeholder for dashboardmap case
+
+      case "dashstatslist":
+        return <DSPMainDashboard DSP={DSP} onBackNav={handleHomeDashboard} />;
+
       default:
         return <div>Unknown dashboard view</div>;
     }
