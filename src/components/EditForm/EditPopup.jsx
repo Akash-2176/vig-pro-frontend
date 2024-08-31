@@ -36,32 +36,37 @@ const EditPopup = ({ onClose, idolData, station, setStation, onShow }) => {
       {onShow && (
         <div>
           {/* {!(showEditFiles || showEditForm) && ( */}
-          <div className="main    edit__form__container__popup">
-            {/* {showLoading && <Loading />} */}
-            <div className="form-container edit__form__popup__box">
-              <div className="form__close__btn btn" onClick={onClose}>
-                &times;
-              </div>
-              <div className="logo-container">
-                <p className="h1 text-center">Edit Idol Details</p>
-              </div>
-              <div className="d-flex align-items-center justify-content-around g-2">
-                <button
-                  className="form-submit-btn prevBtn"
-                  type="next"
-                  // onClick={() => setShowEditForm(!showEditForm)}
-                  onClick={() => handleOpenUpdateForm(idolData)}
-                >
-                  Edit Form Details
-                </button>
-                <button
-                  className="form-submit-btn nextBtn"
-                  type="next"
-                  // onClick={() => setShowEditFiles(!showEditFiles)}
-                  onClick={() => handleOpenUpdateFile(idolData)}
-                >
-                  Edit Form Images
-                </button>
+          <div
+            className="main edit__form__container__popup modal fade show"
+            style={{ display: "block" }}
+          >
+            <div className="model__dialog">
+              {/* {showLoading && <Loading />} */}
+              <div className="form-container edit__form__popup__box">
+                <div className="form__close__btn btn" onClick={onClose}>
+                  &times;
+                </div>
+                <div className="logo-container">
+                  <p className="h1 text-center">Edit Idol Details</p>
+                </div>
+                <div className="d-flex align-items-center justify-content-around g-2">
+                  <button
+                    className="form-submit-btn prevBtn"
+                    type="next"
+                    // onClick={() => setShowEditForm(!showEditForm)}
+                    onClick={() => handleOpenUpdateForm(idolData)}
+                  >
+                    Edit Form Details
+                  </button>
+                  <button
+                    className="form-submit-btn nextBtn"
+                    type="next"
+                    // onClick={() => setShowEditFiles(!showEditFiles)}
+                    onClick={() => handleOpenUpdateFile(idolData)}
+                  >
+                    Edit Form Images
+                  </button>
+                </div>
               </div>
             </div>
           </div>

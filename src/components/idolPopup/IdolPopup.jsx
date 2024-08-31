@@ -326,9 +326,11 @@ export const IdolPopup = ({ idolData, onClose }) => {
           </table>
         </div>
         <div className="view-form-btn text-center">
-          <button className="btn btn-dark py-2 px-4 my-3">
-            View Applicant Form
-          </button>
+          <a href={idolData.idolApplication} className="">
+            <button className="btn btn-dark py-2 px-4 my-3">
+              View Applicant Form
+            </button>
+          </a>
         </div>
       </div>
     </div>

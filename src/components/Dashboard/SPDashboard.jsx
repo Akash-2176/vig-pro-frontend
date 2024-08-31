@@ -73,6 +73,9 @@ export default function SPDashboard() {
         );
       case "dashboardmap":
         return <SPMapView SP={SP} onBackNav={handleHomeDashboard} />; // Placeholder for dashboardmap case
+      case "dashstatslist":
+        return <SPMainDashboard SP={SP} onBackNav={handleHomeDashboard} />;
+
       default:
         return <div>Unknown dashboard view</div>;
     }

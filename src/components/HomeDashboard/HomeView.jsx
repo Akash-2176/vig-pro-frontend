@@ -15,7 +15,8 @@ const HomeView = ({ setDashview, stats }) => {
   const handleCardClick = (cardNumber) => {
     if (cardNumber === 1) setDashview("dashboardlist");
     if (cardNumber === 2) setDashview("dashboardmap");
-    if (cardNumber === 3) setShowModal(true);
+    if (cardNumber === 3) setDashview("dashstatslist");
+    // if (cardNumber === 3) setShowModal(true);
   };
   const handleCloseModal = () => setShowModal(false);
   return (
@@ -64,14 +65,14 @@ const HomeView = ({ setDashview, stats }) => {
       </div>
 
       <Footer />
-
+      {/* 
       {showModal && (
         <OverAllStatsPopup
           stats={stats}
           showModal={showModal}
           onClose={() => setShowModal(false)}
         />
-      )}
+      )} */}
     </div>
   );
 };

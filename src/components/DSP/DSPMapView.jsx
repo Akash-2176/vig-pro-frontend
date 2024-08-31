@@ -22,9 +22,11 @@ const DSPMapView = ({ DSP, onBackNav }) => {
   const routingControlRef = useRef(null);
   const junctionToEndRouteRef = useRef(null);
   const [filters, setFilters] = useState({
+    stationLocation: "",
     type: "",
     sensitivity: "",
     dateOfImmersion: "",
+    organizationName: "",
   });
 
   // console.log(DSP);
@@ -35,11 +37,8 @@ const DSPMapView = ({ DSP, onBackNav }) => {
   useEffect(() => {
     if (!mapInstance.current) {
       let centerCoords = [11.225, 78.1652];
-      if (DSP.divisionCoords && DSP.divisionCoords.coords.lat)
-        centerCoords = [
-          DSP.divisionCoords.coords.lat,
-          DSP.divisionCoords.coords.lon,
-        ];
+      if (DSP.divisionCoords)
+        centerCoords = [DSP.divisionCoords.lat, DSP.divisionCoords.lon];
 
       // Initialize the map
       mapInstance.current = L.map(mapRef.current).setView(centerCoords, 12);
@@ -102,12 +101,12 @@ const DSPMapView = ({ DSP, onBackNav }) => {
     // Add new markers
     allIdols.forEach((idol) => {
       if (idol.startCoords) {
-        const icon = iconMap[idol.typeOfInstaller] || blackMarker;
+        const icon = iconMap[idol.typeOfInstaller] || customIcon;
         const { lat, lon } = idol.startCoords;
-        const marker = L.marker([lat, lon], { icon: customIcon })
+        const marker = L.marker([lat, lon], { icon: icon })
           .bindPopup(
             `${idol.idol_id} <br>
-            <b>${idol.stationLocation}</b><br>  
+            <b>${idol.stationName}</b><br>  
             Type : ${idol.typeOfInstaller} - ${
               idol.typeOfInstaller === "organization"
                 ? `${idol.organizationName}`
@@ -128,9 +127,18 @@ const DSPMapView = ({ DSP, onBackNav }) => {
         idol.startJunctionPoint.coords.lon
       );
       const endPoint = L.latLng(idol.endCoords.lat, idol.endCoords.lon);
-      const intermediatePoint = idol.intermediateJunctionPoints.map((point) =>
-        L.latLng(point.coords.lat, point.coords.lon)
-      );
+
+      // NO intermediate point for short distance
+      const intermediatePoint =
+        Array.isArray(idol.intermediateJunctionPoints) &&
+        idol.intermediateJunctionPoints.length > 0
+          ? idol.intermediateJunctionPoints
+              .filter(
+                (point) =>
+                  point && point.coords && point.coords.lat && point.coords.lon
+              ) // Ensure point and coords exist
+              .map((point) => L.latLng(point.coords.lat, point.coords.lon))
+          : []; // Return an empty array if no valid junction points are present
 
       markersRef.current.forEach(({ marker }) => {
         if (marker.getLatLng().equals(startPoint)) {
@@ -188,8 +196,12 @@ const DSPMapView = ({ DSP, onBackNav }) => {
             junctionToEndRouteRef.current.remove();
           }
 
+          let waypoint = [];
+          if (intermediatePoint)
+            waypoint = [junctionPoint, ...intermediatePoint, endPoint];
+          else waypoint = [junctionPoint, endPoint];
           junctionToEndRouteRef.current = L.Routing.control({
-            waypoints: [junctionPoint, ...intermediatePoint, endPoint],
+            waypoints: waypoint,
             routeWhileDragging: false,
             lineOptions: {
               styles: [{ color: routeColor, opacity: 1, weight: 5 }],
@@ -250,18 +262,32 @@ const DSPMapView = ({ DSP, onBackNav }) => {
   }, [DSP]);
 
   useEffect(() => {
-    markersRef.current.forEach(({ marker, idol }) => {
+    markersRef.current.forEach(({ marker, data }) => {
+      console.log(data);
+
+      const matchesStation = filters.stationLocation
+        ? data.stationName === filters.stationLocation
+        : true;
       const matchesType = filters.type
-        ? idol.typeOfInstaller === filters.type
+        ? data.typeOfInstaller === filters.type
         : true;
       const matchesSensitivity = filters.sensitivity
-        ? idol.sensitivity === filters.sensitivity
+        ? data.sensitivity === filters.sensitivity
         : true;
       const matchesDate = filters.dateOfImmersion
-        ? idol.immersionDate === filters.dateOfImmersion
+        ? new Date(data.immersionDate).toLocaleDateString() ===
+          filters.dateOfImmersion
         : true;
-
-      if (matchesType && matchesSensitivity && matchesDate) {
+      const matchesOrganization = filters.organizationName
+        ? data.organizationName === filters.organizationName
+        : true;
+      if (
+        matchesType &&
+        matchesSensitivity &&
+        matchesDate &&
+        matchesOrganization &&
+        matchesStation
+      ) {
         marker.addTo(mapInstance.current); // Show marker
       } else {
         marker.remove(); // Hide marker
@@ -269,54 +295,103 @@ const DSPMapView = ({ DSP, onBackNav }) => {
     });
   }, [filters]);
 
+  const uniqueDates = [
+    ...new Set(
+      allIdols.map((idol) => new Date(idol.immersionDate).toLocaleDateString())
+    ),
+  ];
+
   return (
     <>
-      <div
-        style={{
-          position: "absolute",
-          right: "20px",
-          top: "20px",
-          zIndex: 1000,
-        }}
-      >
-        <button className="btn btn-dark ms-2 me-2" onClick={onBackNav}>
-          Back
-        </button>
+      <div className="d-flex align-items-center map-filter-div my-2">
+        <div className=" map-select-div my-2">
+          <button className="btn btn-dark ms-2 me-2" onClick={onBackNav}>
+            Back
+          </button>
+        </div>
+        {
+          <div className="row m-2">
+            <div className="col-md-3 map-select-div">
+              <select
+                onChange={(e) =>
+                  setFilters({ ...filters, stationLocation: e.target.value })
+                }
+                className="form-select my-2"
+              >
+                <option value="">Select Station</option>
+                {DSP.stationIds.map((station, i) => (
+                  <option key={i} value={station.stationLocation}>
+                    {station.stationLocation}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-md-3 map-select-div">
+              <select
+                onChange={(e) =>
+                  setFilters({ ...filters, type: e.target.value })
+                }
+                className="form-select my-2"
+              >
+                <option value="">Select Type</option>
+                <option value="private">Private</option>
+                <option value="public">Private in public place</option>
+                <option value="organization">
+                  Organization in public place
+                </option>
+              </select>
+            </div>
+            <div className="col-md-3 map-select-div">
+              {filters.type === "organization" && (
+                <select
+                  onChange={(e) =>
+                    setFilters({ ...filters, organizationName: e.target.value })
+                  }
+                  className="form-select my-2"
+                >
+                  <option value="">Select Type</option>
+                  {DSP.stationIds[0].defaultOrganization &&
+                    DSP.stationIds[0].defaultOrganization.map((org) => (
+                      <option key={org}>{org}</option>
+                    ))}
+                </select>
+              )}
+            </div>
+            <div className=" col-md-4  map-select-div">
+              <select
+                onChange={(e) =>
+                  setFilters({ ...filters, sensitivity: e.target.value })
+                }
+                className="form-select my-2"
+              >
+                <option value="">Select Sensitivity</option>
+                <option value="Hyper-Sensitive">HyperSensitive</option>
+                <option value="Sensitive">Sensitive</option>
+                <option value="Nonsensitive">NonSensitive</option>
+              </select>
+            </div>
+            <div className="col-md-5 map-select-div">
+              <select
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    dateOfImmersion: e.target.value,
+                  })
+                }
+                className="form-select my-2"
+              >
+                <option value="">Select Date of Immersion</option>
+                {uniqueDates.map((date, i) => (
+                  <option value={date} key={i}>
+                    {date}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        }
       </div>
-      <div style={{ marginBottom: "10px" }}>
-        <select
-          onChange={(e) => setFilters({ ...filters, type: e.target.value })}
-        >
-          <option value="">Select Type</option>
-          <option value="Private">Private</option>
-          <option value="Private in public place">
-            Private in public place
-          </option>
-          <option value="Organization in public place">
-            Organization in public place
-          </option>
-        </select>
-        <select
-          onChange={(e) =>
-            setFilters({ ...filters, sensitivity: e.target.value })
-          }
-        >
-          <option value="">Select Sensitivity</option>
-          <option value="HyperSensitive">HyperSensitive</option>
-          <option value="Sensitive">Sensitive</option>
-          <option value="NonSensitive">NonSensitive</option>
-        </select>
-        <select
-          onChange={(e) =>
-            setFilters({ ...filters, dateOfImmersion: e.target.value })
-          }
-        >
-          <option value="">Select Date of Immersion</option>
-          <option value="07/09/2024">07/09/2024</option>
-          <option value="08/09/2024">08/09/2024</option>
-          <option value="09/09/2024">09/09/2024</option>
-        </select>
-      </div>
+
       <div id="map" ref={mapRef} style={{ height: "100vh", width: "100%" }} />
     </>
   );

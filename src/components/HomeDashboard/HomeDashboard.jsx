@@ -13,20 +13,23 @@ export default function HomeDashboard({
   SP,
 }) {
   const [stats, setStats] = useState(null);
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   useEffect(() => {
     let allIdols = [];
     if (type === "Station") {
       console.log(type);
       allIdols = station.stationIdol;
+      setWelcomeMessage(() => `${station.stationLocation} - Police Station`);
     }
     if (type === "DSP") {
       console.log(type);
       allIdols = DSP.stationIds.flatMap((station) => station.stationIdol);
+      setWelcomeMessage(() => `${DSP.dspDivision} - DSP`);
     }
     if (type === "SP") {
       console.log(type);
-
+      setWelcomeMessage(() => `${SP.spDivision} - SP`);
       allIdols = SP.dspIds.flatMap((dsp) =>
         dsp.stationIds.flatMap((station) =>
           station.stationIdol.map((idol) => ({
@@ -36,6 +39,7 @@ export default function HomeDashboard({
           }))
         )
       );
+      // setWelcomeMessage(() => `${SP.stationLocation} - Police Station`);
     }
     console.log(allIdols);
     const calculateAllStats = (allIdols) => {
@@ -145,7 +149,7 @@ export default function HomeDashboard({
         </button>
       </div>
       <div>
-        <h1 className="h1 text-center mt-2 mb-2">Home Page</h1>
+        <h1 className="h1 text-center mt-2 mb-2">{welcomeMessage} Home Page</h1>
         <HomeView setDashview={setDashview} stats={stats} />
         {/* <HomeView setDashview={setDashview} stats={null} /> */}
       </div>

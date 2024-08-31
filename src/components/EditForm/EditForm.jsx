@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./form_style.css";
+import "./form_Style.css";
 import API_BASE_URL from "../../../apiConfig";
 import Loading from "../loading/Loading";
 
@@ -104,8 +104,13 @@ const EditForm = ({
     e.preventDefault();
     let requiredFields = [];
     formData.typeOfInstaller === "private"
-      ? (requiredFields = ["motherVillage", "licence"])
-      : (requiredFields = ["motherVillage", "placeOfInstallation", "licence"]);
+      ? (requiredFields = ["motherVillage", "licence", "typeOfInstaller"])
+      : (requiredFields = [
+          "motherVillage",
+          "placeOfInstallation",
+          "licence",
+          "typeOfInstaller",
+        ]);
     const isFormValid = requiredFields.every((field) => formData[field]);
 
     if (!isFormValid) {
@@ -135,7 +140,9 @@ const EditForm = ({
       "facility.electricalEquipment",
       "facility.lightingFacility",
       "facility.CCTVFacility",
+      "property.type",
     ];
+
     const isFormValid = requiredFields.every((field) => {
       const fieldParts = field.split(".");
       let currentValue = formData;
@@ -148,8 +155,14 @@ const EditForm = ({
         }
       }
 
+      // Adjust validation for `property.type`
+      if (field === "property.type") {
+        return currentValue !== ""; // Ensure it's not an empty string
+      }
+
       return currentValue === true || currentValue === false;
     });
+
     console.log(isFormValid);
 
     if (!isFormValid) {
@@ -168,7 +181,6 @@ const EditForm = ({
 
     setFormType((prevFormType) => prevFormType + 1);
   };
-
   const handlePrev = (e) => {
     e.preventDefault();
     setFormType((prevFormType) => prevFormType - 1);
@@ -358,6 +370,8 @@ const EditForm = ({
       "immersionSafety.safetyByFireService",
       "immersionSafety.PASystem",
       "RTOpermission",
+      "sensitivity",
+      "immersionDate",
     ];
 
     const missingFields = requiredFields.filter((field) => {
@@ -374,7 +388,7 @@ const EditForm = ({
     console.log(missingFields);
 
     if (missingFields.length > 0) {
-      alert("Please fill in all required fields.");
+      alert(`${missingFields} is not filled`);
       setShowLoading(false);
       return;
     }
@@ -386,17 +400,20 @@ const EditForm = ({
       }));
     }
 
-    const selectedStart = station.defaultStartPoints.find(
-      (e) => e.place === formData.placeOfInstallation
-    );
-    const selectedEnd = station.defaultEndPoints.find(
-      (e) => e.place === formData.placeOfImmersion
-    );
+    let selectedStart = formData.typeOfInstaller === "private"
+    ? formData.placeOfInstallation
+    : station.defaultStartPoints.find(
+        (e) => e.place === formData.placeOfInstallation
+      );
 
+  const selectedEnd = station.defaultEndPoints.find(
+    (e) => e.place === formData.placeOfImmersion
+  );
+      
     const intermediatejun = junctions?.map((junction) => junction);
 
     if (selectedEnd && selectedStart) {
-      const nextIdolId = getIdolId();
+      const nextIdolId = formData.idol_id;
 
       setUpdatedFormData({
         ...formData,
@@ -417,34 +434,42 @@ const EditForm = ({
 
   useEffect(() => {
     if (updatedFormData) {
-      const filedata = new FormData();
-
-      if (applicationFile) {
-        filedata.append("idolApplication", applicationFile);
-      }
-
-      if (imageFile) {
-        filedata.append("idolImage", imageFile);
-      }
-
-      if (applicantImage) {
-        filedata.append("applicantImage", applicantImage);
+      if (isOthers) {
+        setFormData((prevState) => ({
+          ...prevState,
+          placeOfInstallation: formData.hamletVillage,
+        }));
       }
 
       const postData = async () => {
         try {
-          const response = await axios.post(
-            `${API_BASE_URL}/stations/${stationId}/addidol`,
+          const response = await axios.put(
+            `${API_BASE_URL}/stations/${stationId}/${idolData.idol_id}/updateidol`,
             updatedFormData
           );
-
-          setMessagecolor("primary");
-          setMessage("Success... Idol Updated");
+          setMessagecolor("warning");
+          setMessage("updating....");
+          console.log("Data sent successfully: " + response.data.idol);
+          const newidol = response.data.idol;
+          setStation((prevStation) => {
+            const updatedIdols = prevStation.stationIdol.map((idol) =>
+              idol.idol_id === newidol.idol_id ? newidol : idol
+            );
+            return {
+              ...prevStation,
+              stationIdol: updatedIdols,
+            };
+          });
+          setMessagecolor("success");
+          setMessage("update success..");
+          setTimeout(() => onClose(), 3000);
         } catch (error) {
           setMessagecolor("danger");
           setMessage(error.message);
+          console.log("Error: " + error);
         } finally {
           setShowLoading(false);
+          console.log(updatedFormData);
         }
       };
 
@@ -456,9 +481,6 @@ const EditForm = ({
     <div className="main my-5">
       {showLoading && <Loading />}
       <div className="form-container">
-        <div className="form__back__btn btn backBtn" onClick={onback}>
-          &larr;
-        </div>
         <div className="form__close__btn btn" onClick={onClose}>
           &times;
         </div>
@@ -1080,7 +1102,9 @@ const EditForm = ({
               </div>
 
               <div className="form-group row mt-3">
-                <label className="h5">Place / Properties</label>
+                <label className="h5">
+                  Place / Properties <span style={{ color: "red" }}>*</span>
+                </label>
                 <div className="col-md-12">
                   <select
                     className="form-control subForecastOption"
@@ -1357,7 +1381,10 @@ const EditForm = ({
                 <label className="h5">Sensitivity </label>
 
                 <div className="form-group">
-                  <label htmlFor="sensitivity">Select Route Sensitivity</label>
+                  <label htmlFor="sensitivity">
+                    Select Route Sensitivity{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div>
                     <select
                       className="form-control"
@@ -1365,6 +1392,7 @@ const EditForm = ({
                       id="sensitivity"
                       value={formData.sensitivity ? formData.sensitivity : ""}
                       name="sensitivity"
+                      required
                     >
                       <option value="">Select Option</option>
                       <option value="Nonsensitive">Non-sensitve</option>
@@ -1428,26 +1456,60 @@ const EditForm = ({
               <div className="form-group row mt-1">
                 <label className="h5">Route</label>
 
-                <div className="form-group ">
-                  <label htmlFor="PlaceOfInstallation" className="col-3">
-                    Starting points
-                  </label>
-                  <select
-                    id="PlaceOfInstallation"
-                    name="placeOfInstallation"
-                    className="form-control col-9"
-                    placeholder="Enter place of immersion"
-                    value={formData.placeOfInstallation || ""}
-                    onChange={handleChange2}
-                  >
-                    <option value="">Select an option</option>
-                    {startPoints.map((value, index) => (
-                      <option key={index} value={value}>
-                        {value}
+                {formData.typeOfInstaller === "private" ? (
+                  <div className="form-group">
+                    <label htmlFor="Location">
+                      Starting Points <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <input
+                      type="text"
+                      id="placeOfInstallation"
+                      name="placeOfInstallation"
+                      className="form-control"
+                      placeholder="Enter the Location"
+                      value={`${formData.hamletVillage}`}
+                      onChange={() => console.log("private changed")}
+                      readOnly
+                    />
+                  </div>
+                ) : (
+                  <div className="form-group">
+                    <label htmlFor="Location">
+                      Starting Points <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <select
+                      id="placeOfInstallation"
+                      name="placeOfInstallation"
+                      className="form-control"
+                      placeholder="Enter the Location"
+                      value={
+                        formData.placeOfInstallation
+                          ? formData.placeOfInstallation
+                          : ""
+                      }
+                      onChange={handleChange}
+                    >
+                      <option value="">Select an option</option>
+                      {startPoints.map((values, index) => (
+                        <option key={index} value={values}>
+                          {values}
+                        </option>
+                      ))}
+                      <option value="others" id="others">
+                        others(new location)
                       </option>
-                    ))}
-                  </select>
-                </div>
+                    </select>
+                    {isOthers && (
+                      <input
+                        type="text"
+                        id="otherLocation"
+                        name="otherLocation"
+                        className="form-control"
+                        placeholder="Enter the Location"
+                      />
+                    )}
+                  </div>
+                )}
 
                 <div className="form-group ">
                   <label htmlFor="placeOfImmersion" className="col-3">

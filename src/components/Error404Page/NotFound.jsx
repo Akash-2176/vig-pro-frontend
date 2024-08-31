@@ -5,12 +5,16 @@ import { useNavigate } from "react-router-dom";
 export default function NotFound() {
   const navigate = useNavigate();
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
   return (
     <div className="bg-light d-flex justify-content-center align-items-center flex-column vh-100">
       <img src={errorImg} height="500px" alt="404" />
       <p className="h1 display-4 fw-bold">Uh-oh! 404 error</p>
-      <p className="h5 mt-3  text-danger">We can't find that page.</p>
-      <button href="#" className="mt-2 btn btn-success btn-lg">
+      <p className="h5 mt-3 text-danger">We can't find that page.</p>
+      <button onClick={handleGoBack} className="mt-2 btn btn-success btn-lg">
         Go Back Home
       </button>
     </div>

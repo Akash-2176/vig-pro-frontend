@@ -163,8 +163,13 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     e.preventDefault();
     let requiredFields = [];
     formData.typeOfInstaller === "private"
-      ? (requiredFields = ["motherVillage", "licence"])
-      : (requiredFields = ["motherVillage", "placeOfInstallation", "licence"]);
+      ? (requiredFields = ["motherVillage", "licence", "typeOfInstaller"])
+      : (requiredFields = [
+          "motherVillage",
+          "placeOfInstallation",
+          "licence",
+          "typeOfInstaller",
+        ]);
     const isFormValid = requiredFields.every((field) => formData[field]);
 
     if (!isFormValid) {
@@ -194,7 +199,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
       "facility.electricalEquipment",
       "facility.lightingFacility",
       "facility.CCTVFacility",
+      "property.type",
     ];
+
     const isFormValid = requiredFields.every((field) => {
       const fieldParts = field.split(".");
       let currentValue = formData;
@@ -207,8 +214,14 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
         }
       }
 
+      // Adjust validation for `property.type`
+      if (field === "property.type") {
+        return currentValue !== ""; // Ensure it's not an empty string
+      }
+
       return currentValue === true || currentValue === false;
     });
+
     console.log(isFormValid);
 
     if (!isFormValid) {
@@ -415,6 +428,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
       "immersionSafety.safetyByFireService",
       "immersionSafety.PASystem",
       "RTOpermission",
+      "sensitivity",
+      "placeOfImmersion",
     ];
 
     const missingFields = requiredFields.filter((field) => {
@@ -443,9 +458,12 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
       }));
     }
 
-    const selectedStart = station.defaultStartPoints.find(
-      (e) => e.place === formData.placeOfInstallation
-    );
+    let selectedStart =
+      formData.typeOfInstaller === "private"
+        ? formData.placeOfInstallation
+        : station.defaultStartPoints.find(
+            (e) => e.place === formData.placeOfInstallation
+          );
     const selectedEnd = station.defaultEndPoints.find(
       (e) => e.place === formData.placeOfImmersion
     );
@@ -673,7 +691,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="commonoption">Installer Type</label>
+                <label htmlFor="commonoption">
+                  Installer Type <span style={{ color: "red" }}>*</span>
+                </label>
                 <div>
                   <select
                     className="form-control"
@@ -682,6 +702,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     value={
                       formData.typeOfInstaller ? formData.typeOfInstaller : ""
                     }
+                    required
                     name="typeOfInstaller"
                   >
                     <option value="">Select Option</option>
@@ -814,6 +835,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   placeholder="Enter the Date"
                   value={formData.setupDate ? formData.setupDate : ""}
                   onChange={handleChange}
+                  required
                 />
               </div>
 
@@ -1217,7 +1239,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
               </div>
 
               <div className="form-group row mt-3">
-                <label className="h5">Place / Properties</label>
+                <label className="h5">
+                  Place / Properties <span style={{ color: "red" }}>*</span>
+                </label>
                 <div className="col-md-12">
                   <select
                     className="form-control subForecastOption"
@@ -1390,7 +1414,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
               )}
               <div className="form-group">
                 <label htmlFor="date" className="h5">
-                  Date of Immersion
+                  Date of Immersion <span style={{ color: "red" }}>*</span>
                 </label>
                 <input
                   type="date"
@@ -1420,9 +1444,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       id="transport"
                       required
                     >
-                      <option value="" disabled>
-                        Select Vehicle Type
-                      </option>
+                      <option value="">Select Vehicle Type</option>
                       <option value="two-wheeler">Two-Wheeler</option>
                       <option value="four-wheeler-open">
                         Four-Wheeler (Open Top)
@@ -1515,11 +1537,15 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 <label className="h5">Sensitivity</label>
 
                 <div className="form-group">
-                  <label htmlFor="sensitivity">Select Route Sensitivity</label>
+                  <label htmlFor="sensitivity">
+                    Select Route Sensitivity{" "}
+                    <span style={{ color: "red" }}>*</span>
+                  </label>
                   <div>
                     <select
                       className="form-control"
                       onChange={handleChange}
+                      required
                       id="sensitivity"
                       value={formData.sensitivity ? formData.sensitivity : ""}
                       name="sensitivity"
@@ -1610,7 +1636,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
                 <div className="form-group ">
                   <label htmlFor="placeOfImmersion" className="col-3">
-                    Place of Immersion
+                    Place of Immersion <span style={{ color: "red" }}>*</span>
                   </label>
                   <select
                     id="placeOfImmersion"
@@ -1619,6 +1645,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     placeholder="Enter place of immersion"
                     value={formData.placeOfImmersion || ""}
                     onChange={handleChange2}
+                    required
                   >
                     <option value="">Select an option</option>
                     {endPoints.map((value, index) => (

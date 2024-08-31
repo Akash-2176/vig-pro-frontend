@@ -12,3 +12,10 @@
 .leaflet-routing-container {
   display: none !important;
 }
+
+.map-filter-div {
+  position: absolute;
+  top: 0;
+  left: 60px;
+  z-index: 9999;
+}
