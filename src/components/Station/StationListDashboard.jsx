@@ -19,27 +19,27 @@ export default function StationListDashboard({
       <header>
         <div className="stationlist-nav">
           <div className="d-flex mx-4 align-items-center">
-            <img src={logo} alt="tn police logo" id="policeLogo"></img>
+            <img src={logo} alt="tn police logo" id="station-dashboard-policeLogo"></img>
             <p className="h1 mx-3"> District Police</p>
           </div>
-          <img src={banner} id="nav_banner"></img>
+          <img src={banner} id="station-dashboard-banner"></img>
         </div>
 
         <div className="d-flex justify-content-between">
-          <div className="ms-3   mt-3 pe-4">
-            <button className="btn btn-dark  ms-2 me-2" onClick={onBackNav}>
-              Back
+          <div className="ms-3   mt-3 ">
+          <button className="btn btn-danger" onClick={handleLogout}>
+              Logout
             </button>
           </div>
-          <div className="mt-3 pe-4">
+          <div className="mt-3 me-3">
             <button
               className="btn btn-success mx-3"
               onClick={() => setShowAddIdol(true)}
             >
               Add Idol
             </button>{" "}
-            <button className="btn btn-danger" onClick={handleLogout}>
-              Logout
+            <button className="btn btn-dark" onClick={onBackNav}>
+              Back
             </button>
           </div>
         </div>

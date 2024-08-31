@@ -11,17 +11,16 @@
 .stationlist-nav p {
   letter-spacing: 5px !important;
 }
-#policeLogo {
-  height: 90px !important;
+#station-dashboard-policeLogo{
+  height: 80px !important;
 }
-
+#station-dashboard-banner{
+height: 120px !important;
+}
 .h1 {
   letter-spacing: 2px;
 }
-th {
-  font-size: 1.2rem;
-}
-.filter-buttons {
+.station-filter-buttons {
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -30,12 +29,25 @@ th {
   background-color: green;
   color: white;
 }
-th,
-td {
-  text-align: center;
-  border: 2px solid grey;
-}
 
 .table-rows {
   height: 60px;
+}
+
+@media (max-width:768px) {
+  #station-dashboard-banner{
+    display: none;
+  }
+  #station-dashboard-policeLogo{
+ height:50px !important;
+  }
+  .logout-back-btn-div{
+    margin-right: 2px !important;
+  }
+.logout-back-btn-div button{
+font-size: small !important;
+}
+.back-btn-dsp-dashboard{
+  margin-right: 2px !important;
+}
 }

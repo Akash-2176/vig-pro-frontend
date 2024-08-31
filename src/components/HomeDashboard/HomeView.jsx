@@ -20,7 +20,8 @@ const HomeView = ({ setDashview, stats }) => {
   };
   const handleCloseModal = () => setShowModal(false);
   return (
-    <div className="card-div row d-flex justify-content-evenly">
+    <div className="card-div">
+        <div className="row justify-content-evenly p-0 m-0">
       <div
         className="card col-sm-12 col-md-4 col-lg-3 my-4 mx-3"
         onClick={() => handleCardClick(3)}
@@ -73,7 +74,7 @@ const HomeView = ({ setDashview, stats }) => {
           onClose={() => setShowModal(false)}
         />
       )} */}
-    </div>
+    </div></div>
   );
 };
 

@@ -134,22 +134,22 @@ export default function HomeDashboard({
   return (
     <div className="App">
       <header className="App-header">
-        <div className="d-flex mx-4 align-items-center">
+        <div className="d-flex police-logo-title-div mx-4 align-items-center">
           <img src={logo} alt="tn police logo" id="homepage-policeLogo"></img>
           <p className="h1 mx-4"> District Police</p>
         </div>
         <img src={banner} id="homepage-nav_banner"></img>
       </header>
-      <div className="text-end mx-5">
+      <div className="text-end me-2">
         <button
-          className="btn mt-2 fs-5  btn-danger ms-2"
+          className="btn mt-2  logout-btn-homepage btn-danger ms-2"
           onClick={handleLogout}
         >
           Logout
         </button>
       </div>
       <div>
-        <h1 className="h1 text-center mt-2 mb-2">{welcomeMessage} Home Page</h1>
+        <p className="h1 text-center mt-2 mb-2">{welcomeMessage} Home Page</p>
         <HomeView setDashview={setDashview} stats={stats} />
         {/* <HomeView setDashview={setDashview} stats={null} /> */}
       </div>

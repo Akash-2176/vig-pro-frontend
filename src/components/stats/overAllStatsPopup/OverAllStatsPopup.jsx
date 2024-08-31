@@ -37,8 +37,9 @@ export default function OverAllStatsPopup({ stats, showModal, onClose }) {
               Total no of Not Immersed Idols :{" "}
               <strong>{stats?.totalNotImmersed || "0"}</strong>
             </p>
-            <table className="table table-bordered">
-              <thead>
+            <div className="table-responsive-sm">
+            <table className="table table-bordered table-light table-striped">
+              <thead className="align-middle">
                 <tr>
                   <th>Category</th>
                   <th>Total No of Idols Registered</th>
@@ -121,7 +122,7 @@ export default function OverAllStatsPopup({ stats, showModal, onClose }) {
                   </td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
           <div className="modal-footer">
             <button

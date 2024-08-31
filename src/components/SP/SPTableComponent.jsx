@@ -171,14 +171,13 @@ function SPTableComponent({ SP }) {
   console.log(filteredData);
 
   return (
-    <div className="mx-5 my-2 viewDiv">
+    <div className="mx-4 my-2 viewDiv">
       <StatusBarList data={StatusDataArray} />
       {showIdolPopup && (
         <div>
           <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
         </div>
       )}
-      <p className="h1 text-center mb-3"> Station</p>
       <div className="row mb-5" id="sp-filters">
         <div className="col-lg-3 my-2">
           <label htmlFor="divisionSelect" className="me-sm-2 mb-2">
@@ -288,9 +287,9 @@ function SPTableComponent({ SP }) {
           </select>
         </div>
       </div>
-      <div className="table-responsive-lg">
+      <div className="table-responsive-xxl">
         <table className="table sp-table table-light table-striped table-hover">
-          <thead>
+          <thead className="align-middle">
             <tr>
               <th>S.No</th>
               <th>Idol ID</th>

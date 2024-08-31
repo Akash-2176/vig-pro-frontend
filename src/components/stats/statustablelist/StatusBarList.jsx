@@ -8,7 +8,8 @@ const StatusBarList = ({ data }) => {
       className="container mt-4 d-flex align-items-center"
       style={{ height: "30vh" }}
     >
-      <table className="table table-dark table-striped table-hover">
+          <div className="table-responsive-lg">
+      <table className="table table-dark table-striped table-hover table-bordered text-center align-middle">
         <thead>
           <tr>
             <td>total idols</td>
@@ -36,7 +37,7 @@ const StatusBarList = ({ data }) => {
           </tr>
         </tbody>
       </table>
-    </div>
+    </div></div>
   );
 };
 

@@ -310,7 +310,7 @@ const DSPMapView = ({ DSP, onBackNav }) => {
           </button>
         </div>
         {
-          <div className="row m-2">
+          <div className="row">
             <div className="col-md-3 map-select-div">
               <select
                 onChange={(e) =>
@@ -322,6 +322,38 @@ const DSPMapView = ({ DSP, onBackNav }) => {
                 {DSP.stationIds.map((station, i) => (
                   <option key={i} value={station.stationLocation}>
                     {station.stationLocation}
+                  </option>
+                ))}
+              </select>
+            </div>
+      
+            <div className=" col-md-3  map-select-div">
+              <select
+                onChange={(e) =>
+                  setFilters({ ...filters, sensitivity: e.target.value })
+                }
+                className="form-select my-2"
+              >
+                <option value="">Select Sensitivity</option>
+                <option value="Hyper-Sensitive">HyperSensitive</option>
+                <option value="Sensitive">Sensitive</option>
+                <option value="Nonsensitive">NonSensitive</option>
+              </select>
+            </div>
+            <div className="col-md-4 map-select-div">
+              <select
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    dateOfImmersion: e.target.value,
+                  })
+                }
+                className="form-select my-2"
+              >
+                <option value="">Select Date of Immersion</option>
+                {uniqueDates.map((date, i) => (
+                  <option value={date} key={i}>
+                    {date}
                   </option>
                 ))}
               </select>
@@ -356,37 +388,6 @@ const DSPMapView = ({ DSP, onBackNav }) => {
                     ))}
                 </select>
               )}
-            </div>
-            <div className=" col-md-4  map-select-div">
-              <select
-                onChange={(e) =>
-                  setFilters({ ...filters, sensitivity: e.target.value })
-                }
-                className="form-select my-2"
-              >
-                <option value="">Select Sensitivity</option>
-                <option value="Hyper-Sensitive">HyperSensitive</option>
-                <option value="Sensitive">Sensitive</option>
-                <option value="Nonsensitive">NonSensitive</option>
-              </select>
-            </div>
-            <div className="col-md-5 map-select-div">
-              <select
-                onChange={(e) =>
-                  setFilters({
-                    ...filters,
-                    dateOfImmersion: e.target.value,
-                  })
-                }
-                className="form-select my-2"
-              >
-                <option value="">Select Date of Immersion</option>
-                {uniqueDates.map((date, i) => (
-                  <option value={date} key={i}>
-                    {date}
-                  </option>
-                ))}
-              </select>
             </div>
           </div>
         }
