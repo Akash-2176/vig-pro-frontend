@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./form_Style.css";
+import "./form_style.css";
 import API_BASE_URL from "../../../apiConfig";
 import Loading from "../loading/Loading";
 
@@ -400,16 +400,17 @@ const EditForm = ({
       }));
     }
 
-    let selectedStart = formData.typeOfInstaller === "private"
-    ? formData.placeOfInstallation
-    : station.defaultStartPoints.find(
-        (e) => e.place === formData.placeOfInstallation
-      );
+    let selectedStart =
+      formData.typeOfInstaller === "private"
+        ? formData.placeOfInstallation
+        : station.defaultStartPoints.find(
+            (e) => e.place === formData.placeOfInstallation
+          );
 
-  const selectedEnd = station.defaultEndPoints.find(
-    (e) => e.place === formData.placeOfImmersion
-  );
-      
+    const selectedEnd = station.defaultEndPoints.find(
+      (e) => e.place === formData.placeOfImmersion
+    );
+
     const intermediatejun = junctions?.map((junction) => junction);
 
     if (selectedEnd && selectedStart) {
