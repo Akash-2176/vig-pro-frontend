@@ -92,6 +92,9 @@
     margin-bottom: 0 !important;
     padding: 0 !important;
   }
+  .idol-popup-close-btn{
+    display: none;
+  }
 
   .idol-form-img {
     height: 150px;

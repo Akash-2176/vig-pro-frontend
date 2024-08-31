@@ -216,11 +216,11 @@ function StationIdolList({ station, setStation }) {
       </div>
 
       <div
-        className="filter-buttons row m-5 btn-group btn-group-toggle w-100"
+        className="station-filter-buttons row mx-0 mt-4 btn-group btn-group-toggle w-100"
         role="group"
         aria-label="Button group"
       >
-        <div className="col-sm-2 my-2">
+        <div className="col-md-2 my-2">
           <input
             type="radio"
             className="btn-check"
@@ -231,13 +231,13 @@ function StationIdolList({ station, setStation }) {
             onClick={() => handleFilter("all")}
           />
           <label
-            className="btn btn-outline-primary w-100 flex-fill"
+            className="btn btn-outline-primary border w-100 flex-fill"
             htmlFor="filter-button1"
           >
             All
           </label>
         </div>
-        <div className="col-sm-2 my-2">
+        <div className="col-md-2 my-2">
           <input
             type="radio"
             className="btn-check"
@@ -247,13 +247,13 @@ function StationIdolList({ station, setStation }) {
             onClick={() => handleFilter("COMPLETE")}
           />
           <label
-            className="btn btn-outline-primary w-100 flex-fill"
+            className="btn btn-outline-primary border w-100 flex-fill"
             htmlFor="filter-button2"
           >
             Immersion Complete
           </label>
         </div>
-        <div className="col-sm-2 my-2">
+        <div className="col-md-2 my-2">
           <input
             type="radio"
             className="btn-check"
@@ -263,16 +263,16 @@ function StationIdolList({ station, setStation }) {
             onClick={() => handleFilter("INCOMPLETE")}
           />
           <label
-            className="btn btn-outline-primary w-100 flex-fill"
+            className="btn btn-outline-primary border w-100 flex-fill"
             htmlFor="filter-button3"
           >
             Immersion Incomplete
           </label>
         </div>
       </div>
-      <div className="tableDiv m-5 table-responsive-xl">
-        <table className="table table-light table-striped table-hover table-bordered">
-          <thead>
+      <div className="tableDiv m-5 table-responsive-xxl">
+        <table className="station-table-div table table-light table-striped table-hover table-bordered">
+          <thead className="text-center align-middle">
             <tr className="text-center">
               <th>S.No</th>
               <th>Idol ID</th>
@@ -285,7 +285,7 @@ function StationIdolList({ station, setStation }) {
               <th>Action</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="text-center">
             {filteredData.map((item, index) => (
               <tr key={item.idol_id} onClick={() => handleOpenIdolInfo(item)}>
                 <td>{index + 1}</td>
@@ -296,25 +296,25 @@ function StationIdolList({ station, setStation }) {
                 <td>{item.typeOfInstaller}</td>
                 <td>{item.sensitivity}</td>
                 <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
-                <td className="d-flex">
+                <td className="d-flex align-items-center justify-content-center">
                   {item.isImmersed ? (
                     <span>Completed</span>
                   ) : (
                     <button
-                      className="btn btn-warning"
+                      className="btn my-2 btn-warning"
                       onClick={(event) => handleComplete(item.idol_id, event)}
                     >
                       Complete
                     </button>
                   )}
                   <button
-                    className="btn btn-success mx-2"
+                    className="btn my-2 btn-success mx-2"
                     onClick={(event) => handleEdit(item, event)}
                   >
                     Edit
                   </button>
                   <button
-                    className="btn btn-danger"
+                    className="btn my-2 btn-danger"
                     onClick={(event) => handleDelete(item.idol_id, event)}
                   >
                     Delete

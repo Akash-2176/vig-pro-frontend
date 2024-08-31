@@ -8,20 +8,20 @@ export default function DSPListDashboard({ DSP, handleLogout, onBackNav }) {
     <div className="App">
       <header className="App-header">
         <div className="d-flex mx-4 align-items-center">
-          <img src={logo} alt="tn police logo" id="policeLogo"></img>
+          <img src={logo} alt="tn police logo" id="dsp-dashboard-policeLogo"></img>
           <p className="h1 mx-3"> District Police</p>
         </div>
 
-        <img src={banner} id="nav_banner"></img>
+        <img src={banner} id="dsp-dashboard-banner"></img>
       </header>{" "}
-      <div className="text-end mt-3 me-3">
+      <div className=" logout-back-btn-div text-end mt-3 me-3">
         <button
-          className="btn btn-success text-light fs-5 ms-2 me-2"
+          className="btn btn-dark text-light  ms-2 me-2 back-btn-dsp-dashboard"
           onClick={onBackNav}
         >
           Back
         </button>
-        <button className="btn btn-danger fs-5 ms-2" onClick={handleLogout}>
+        <button className="btn btn-danger ms-2" onClick={handleLogout}>
           Logout
         </button>
       </div>

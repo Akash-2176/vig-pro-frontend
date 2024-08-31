@@ -54,16 +54,49 @@
   text-align: center !important;
   border: 1px solid black !important;
 }
-#nav_banner {
-  height: 120px;
+#sp-dashboard-banner{
+  height: 120px !important;
 }
 #body {
   font-family: Roboto;
 }
 
-#policeLogo {
+#sp-dashboard-policeLogo{
   height: 70px;
 }
 .viewDiv {
   font-family: poppins;
+}
+@media (max-width:768px) {
+  #sp-dashboard-banner{
+    display: none;
+  }
+  #sp-dashboard-policeLogo{
+ height:50px !important;
+  }
+  .logout-back-btn-div{
+    margin-right: 2px !important;
+  }
+.logout-back-btn-div button{
+font-size: small !important;
+}
+.back-btn-dsp-dashboard{
+  margin-right: 2px !important;
+}
+.back-logout-sp-dashboard-btn-div button{
+  font-size:smaller !important;
+  }
+
+}
+
+@media (max-width:1050px) {
+  #sp-dashboard-banner{
+    height:65px !important;
+  }
+  #sp-dashboard-policeLogo{
+ height:50px !important;
+  }
+  .back-logout-sp-dashboard-btn-div button{
+    font-size: small !important;
+    }
 }

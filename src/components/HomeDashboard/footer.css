@@ -1,0 +1,22 @@
+
+@media only screen and (max-width:800px){
+    .contact-details{
+        flex-direction: column !important;
+        justify-content:center !important;
+        align-items:self-start !important;
+        margin-top: 20px !important;
+        padding-bottom: 10px;
+    }
+    .contact-inner-details{
+        display: flex;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .contact-inner-details p,.contact-inner-details div{
+        margin-top: 0 !important;
+    }
+        .contact-details-number{
+            display: flex;
+margin-top: 0 !important;
+        }
+}

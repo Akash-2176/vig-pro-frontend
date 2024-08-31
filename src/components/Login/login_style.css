@@ -83,5 +83,6 @@
   }
   .login-box {
     margin-left: 0 !important;
+    margin: 0px 30px !important;
   }
 }

@@ -6,7 +6,7 @@ export const IdolPopup = ({ idolData, onClose }) => {
   return (
     <div className="idol-form-popup-container">
       <div className="idol-form-popup-box my-5 mx-5 px-5 py-4">
-        <div className="idol-popup-close-btn" onClick={onClose}>
+        <div className="idol-popup-close-btn h1" onClick={onClose}>
           &times;
         </div>
         <p className="h1 text-center mb-5 mt-4 text-success">
@@ -24,19 +24,19 @@ export const IdolPopup = ({ idolData, onClose }) => {
             <div className="idol-form-content-innerbox ms-5">
               <table className="idol-form-content-list-div">
                 <tr>
-                  <td className="h5 pe-3">Name : </td>
+                  <td className="h5 pe-3">Name :</td>
                   <td>{idolData.applicantName}</td>
                 </tr>
               </table>
               <table className="idol-form-content-list-div my-5">
                 <tr>
-                  <td className="h5 pe-3">Address:</td>
+                  <td className="h5 pe-3">Address :</td>
                   <td> {idolData.applicantAddress}</td>
                 </tr>
               </table>
               <table className="idol-form-content-list-div">
                 <tr>
-                  <td className="h5 pe-3">Mobile No : </td>
+                  <td className="h5 pe-3">Mobile No :</td>
                   <td> {idolData.applicantPhNum}</td>
                 </tr>
               </table>
@@ -89,9 +89,9 @@ export const IdolPopup = ({ idolData, onClose }) => {
           </div>
         </div>
 
-        <table className="idol-form-content-innerbox my-3">
+        <table className="idol-form-content-innerbox">
           <tr>
-            <td className="h5 pe-5">Type Of Installer</td>
+            <td className="h5 pe-5">Type Of Installer :</td>
             <td>{idolData.typeOfInstaller}</td>
           </tr>
           {idolData.typeOfInstaller === "organization" && (
@@ -100,12 +100,12 @@ export const IdolPopup = ({ idolData, onClose }) => {
               <td>{idolData.organizationName}</td>
             </tr>
           )}
-          <tr>
+          <tr className="my-3">
             <td className="h5 pe-5">Date of Installation : </td>
             <td>{new Date(idolData.setupDate).toLocaleDateString()}</td>
           </tr>
         </table>
-        <table className="idol-form-content-innerbox my-3">
+        <table className="idol-form-content-innerbox">
           <tr>
             <td className="h5 pe-5">Height : </td>
             <td>{idolData.height}</td>

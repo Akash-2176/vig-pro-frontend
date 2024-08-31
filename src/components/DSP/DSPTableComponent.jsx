@@ -240,82 +240,18 @@ const DSPTableComponent = ({ DSP }) => {
         </div>
       </div>
 
-      <div className="tableDiv table-responsive-lg my-5">
+      <div className="tableDiv table-responsive-xxl my-5">
         <table className="table dsp-table table-light table-striped table-hover">
           <thead>
             <tr>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                S.No
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Idol ID
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Location of Installation
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Place of Immersion
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Date of Immersion
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Type
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Sensitive
-              </th>
-              <th
-                style={{
-                  cursor: "pointer",
-                  borderBottom: "1px solid #ddd",
-                  padding: "8px",
-                }}
-              >
-                Status
-              </th>
+              <th>S.No</th>
+              <th>Idol ID</th>
+              <th>Location of Installation</th>
+              <th>Place of Immersion</th>
+              <th>Date of Immersion</th>
+              <th>Type</th>
+              <th>Sensitive</th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>

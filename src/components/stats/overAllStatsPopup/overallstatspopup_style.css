@@ -5,12 +5,12 @@
   -webkit-backdrop-filter: blur(17px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+  min-height: 100vh;
 }
 .modal-dialog {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
 }
 
 .modal-body .table {
@@ -28,3 +28,4 @@
   font-weight: bold;
   color: red !important;
 }
+

@@ -228,9 +228,9 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
 
   return (
     <div>
-      <div className="text-end mt-3 me-3">
+      <div className="text-end mt-3 me-2">
         <button
-          className="btn btn-success text-light fs-5 ms-2 me-2"
+          className="btn btn-success text-light fs-6 ms-2 me-2"
           onClick={onBackNav}
         >
           Back
@@ -239,13 +239,13 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       <div>
         <p className="h1 my-5">Date Wise Immersion Count</p>
         <div className="table-responsive-xxl m-5">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+          <table className="table table-sm  table-bordered  border-dark table-hover table-striped table-light text-center">
+            <thead className="align-middle">
               <tr>
-                <th className="align-middle" rowSpan="2">
+                <th rowSpan="2">
                   S.No
                 </th>
-                <th className="align-middle" rowSpan="2">
+                <th  rowSpan="2">
                   Date
                 </th>
                 {divisions.map((division, index) => (
@@ -253,7 +253,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
                     <th colSpan="3">{division}</th>
                   </React.Fragment>
                 ))}
-                <th className="align-middle" rowSpan="2">
+                <th  rowSpan="2">
                   Total
                 </th>
               </tr>
@@ -267,7 +267,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody  className="align-middle">
               {dates.map((date, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
@@ -319,16 +319,16 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       <div>
         <p className="h1 my-5">Party-wise Installation Details</p>
         <div className="table-responsive-xxl m-5 ">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+            <thead className="align-middle">
               <tr>
-                <th className="align-middle" rowSpan="2">
+                <th rowSpan="2">
                   Division
                 </th>
                 <th colSpan={Organizations.length}>
                   Party-wise/Organization/Public
                 </th>
-                <th className="align-middle" rowSpan="2">
+                <th  rowSpan="2">
                   Total Count of Idols
                 </th>
               </tr>
@@ -355,8 +355,8 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
      <div>
       <p className="h1 my-5">Registration count</p>
       <div className="table-responsive-xxl m-5">
-        <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-          <thead>
+        <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+          <thead className="align-middle">
             <tr>
               <th>Category</th>
               <th>Sensitive</th>
