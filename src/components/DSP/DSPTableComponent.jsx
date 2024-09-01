@@ -355,7 +355,7 @@ const DSPTableComponent = ({ DSP }) => {
                   <td>{item.idol_id}</td>
                   <td>{item.placeOfInstallation}</td>
                   <td>{item.placeOfImmersion}</td>
-                  <td>{new Date(item.setupDate).toLocaleDateString()}</td>
+                  <td>{new Date(item.immersionDate).toLocaleDateString()}</td>
                   <td>{item.typeOfInstaller}</td>
                   <td>{item.sensitivity}</td>
                   <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
