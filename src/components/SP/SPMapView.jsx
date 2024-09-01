@@ -4,13 +4,45 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import pinimg from "/mappin.png";
 import "./map.css";
+import finalMarker from "/finalmarker.svg";
+import intermediateMarker from "/intermarker.svg";
 import blueMarker from "/mappin.png"; // Example: Marker for Private
 import greenMarker from "/pinimg1.png"; // Example: Marker for Public place
 import blackMarker from "/pinimg3.png";
+import chruchMarker from "/chruchicon.png";
+import mosqueicon from "/mosqueicon.svg";
 
 const customIcon = L.icon({
   iconUrl: pinimg, // Replace with the URL to your custom icon image
-  iconSize: [64, 64], // Size of the icon
+  iconSize: [54, 54], // Size of the icon
+  iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
+  popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+});
+
+const intermediateIcon = L.icon({
+  iconUrl: intermediateMarker, // Replace with the URL to your custom icon image
+  iconSize: [36, 36], // Size of the icon
+  iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
+  popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+});
+
+const finalIcon = L.icon({
+  iconUrl: finalMarker, // Replace with the URL to your custom icon image
+  iconSize: [54, 54], // Size of the icon
+  iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
+  popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+});
+
+const chruchIcon = L.icon({
+  iconUrl: chruchMarker, // Replace with the URL to your custom icon image
+  iconSize: [36, 36], // Size of the icon
+  iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
+  popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
+});
+
+const mosqueIcon = L.icon({
+  iconUrl: mosqueicon, // Replace with the URL to your custom icon image
+  iconSize: [36, 36], // Size of the icon
   iconAnchor: [16, 32], // Point of the icon which will correspond to marker's location
   popupAnchor: [0, -32], // Point from which the popup should open relative to the iconAnchor
 });
@@ -21,6 +53,10 @@ const SPMapView = ({ SP, onBackNav }) => {
   const markersRef = useRef([]);
   const routingControlRef = useRef(null);
   const junctionToEndRouteRef = useRef(null);
+  const junctionMarkerRef = useRef(null);
+  const endMarkerRef = useRef(null);
+  const churchCoordsRef = useRef([]);
+  const mosqueCoordsRef = useRef([]);
   const [filters, setFilters] = useState({
     subdivision: "",
     stationLocation: "",
@@ -29,9 +65,50 @@ const SPMapView = ({ SP, onBackNav }) => {
     dateOfImmersion: "",
     organizationName: "",
   });
+  const filtersRef = useRef(filters);
+  const [showFilter, setShowFilter] = useState(true);
+
+  const offsetLatLon = (lat, lon, offset) => {
+    const newLat = lat + offset * (Math.random() - 0.5);
+    const newLon = lon + offset * (Math.random() - 0.5);
+    return [newLat, newLon];
+  };
+
+  // All idol together , adding offset to startpoint to avoid overlap
   const allIdols = SP.dspIds.flatMap((dsp) =>
-    dsp.stationIds.flatMap((station) => station.stationIdol)
+    dsp.stationIds.flatMap((station) =>
+      station.stationIdol.map((idol) => ({
+        ...idol,
+        newStartPoint: offsetLatLon(
+          idol?.startCoords?.lat,
+          idol?.startCoords?.lon,
+          0.0006
+        ),
+      }))
+    )
   );
+
+  const churchCoords = [];
+  const mosqueCoords = [];
+
+  SP.dspIds.forEach((dsp) => {
+    dsp.stationIds.forEach((station) => {
+      if (
+        Array.isArray(station.defaultChurchPoints) &&
+        station.defaultChurchPoints.length > 0
+      ) {
+        churchCoords.push(...station.defaultChurchPoints);
+      }
+
+      if (
+        Array.isArray(station.defaultMosquePoints) &&
+        station.defaultMosquePoints.length > 0
+      ) {
+        mosqueCoords.push(...station.defaultMosquePoints);
+      }
+    });
+  });
+
   useEffect(() => {
     if (!mapInstance.current) {
       let centerCoords = [11.225, 78.1652];
@@ -74,17 +151,17 @@ const SPMapView = ({ SP, onBackNav }) => {
     const iconMap = {
       private: L.icon({
         iconUrl: blueMarker,
-        iconSize: [52, 52],
+        iconSize: [54, 54],
         iconAnchor: [16, 32],
       }),
       public: L.icon({
         iconUrl: greenMarker,
-        iconSize: [52, 52],
+        iconSize: [54, 54],
         iconAnchor: [16, 32],
       }),
       organization: L.icon({
         iconUrl: blackMarker,
-        iconSize: [52, 52],
+        iconSize: [54, 54],
         iconAnchor: [16, 32],
       }),
     };
@@ -99,26 +176,74 @@ const SPMapView = ({ SP, onBackNav }) => {
     allIdols.forEach((idol) => {
       if (idol.startCoords) {
         const icon = iconMap[idol.typeOfInstaller] || customIcon;
-        const { lat, lon } = idol.startCoords;
-        const marker = L.marker([lat, lon], { icon: icon })
+        let { lat, lon } = idol.startCoords;
+
+        const marker = L.marker(idol.newStartPoint, { icon: icon })
+
           .bindPopup(
             `${idol.idol_id} <br>
-            <b>${idol.stationName}</b><br>  
-            Type : ${idol.typeOfInstaller} - ${
+          <b>${idol.stationName}</b><br>  
+          Type : ${idol.typeOfInstaller} - ${
               idol.typeOfInstaller === "organization"
                 ? `${idol.organizationName}`
                 : ""
             } <br>
-              Sensitivity : ${idol.sensitivity}
-              <br>Hamletvillage: ${idol.hamletVillage}`
+          Sensitivity : ${idol.sensitivity}<br>
+          Hamletvillage: ${idol.hamletVillage}`
           )
+          .on("mouseover", function (e) {
+            // Open popup on hover
+            this.openPopup();
+          })
+          .on("mouseout", function (e) {
+            // Close popup when not hovering
+            this.closePopup();
+          })
+          .on("click", () => {
+            // Show route on click
+            showRoute(idol);
+          })
           .addTo(mapInstance.current);
+
         markersRef.current.push({ marker, data: idol });
       }
     });
 
+    churchCoordsRef.current = [];
+    mosqueCoordsRef.current = [];
+
+    churchCoords.forEach((chruch) => {
+      const marker = L.marker([chruch.coords.lat, chruch.coords.lon], {
+        icon: chruchIcon,
+      }).bindPopup(`<b>${chruch.place}</b>`);
+      // .on("mouseover", function (e) {
+      //   // Open popup on hover
+      //   this.openPopup();
+      // })
+      // .on("mouseout", function (e) {
+      //   // Close popup when not hovering
+      //   this.closePopup();
+      // })
+
+      churchCoordsRef.current.push(marker);
+    });
+
+    mosqueCoords.forEach((mosque) => {
+      const marker = L.marker([mosque.coords.lat, mosque.coords.lon], {
+        icon: mosqueIcon,
+      }).bindPopup(`<b>${mosque.place}</b>`);
+      mosqueCoordsRef.current.push(marker);
+    });
+
+    // console.log(churchCoords);
+    // console.log(mosqueCoords);
+
+    // To point  markers of intermediate and final
+
     const showRoute = (idol) => {
-      const startPoint = L.latLng(idol.startCoords.lat, idol.startCoords.lon);
+      setShowFilter(() => false);
+      // const startPoint = L.latLng(idol.startCoords.lat, idol.startCoords.lon);
+      const startPoint = L.latLng(idol.newStartPoint);
       const junctionPoint = L.latLng(
         idol.startJunctionPoint.coords.lat,
         idol.startJunctionPoint.coords.lon
@@ -137,6 +262,7 @@ const SPMapView = ({ SP, onBackNav }) => {
               .map((point) => L.latLng(point.coords.lat, point.coords.lon))
           : []; // Return an empty array if no valid junction points are present
 
+      // Clean up existing markers
       markersRef.current.forEach(({ marker }) => {
         if (marker.getLatLng().equals(startPoint)) {
           marker.addTo(mapInstance.current);
@@ -154,10 +280,18 @@ const SPMapView = ({ SP, onBackNav }) => {
         junctionToEndRouteRef.current.remove();
         junctionToEndRouteRef.current = null;
       }
+      if (junctionMarkerRef.current) {
+        junctionMarkerRef.current.remove();
+        junctionMarkerRef.current = null;
+      }
+      if (endMarkerRef.current) {
+        endMarkerRef.current.remove();
+        endMarkerRef.current = null;
+      }
 
-      const startPointData = markersRef.current.find(({ marker }) =>
-        marker.getLatLng().equals(startPoint)
-      ).data;
+      // const startPointData = markersRef.current.find(({ marker }) =>
+      //   marker.getLatLng().equals(startPoint)
+      // ).data;
 
       let routeColor = "blue";
       switch (idol.sensitivity) {
@@ -186,6 +320,26 @@ const SPMapView = ({ SP, onBackNav }) => {
         addWaypoints: false,
       }).addTo(mapInstance.current);
 
+      //
+      // Add Junction Marker
+      junctionMarkerRef.current = L.marker(
+        [junctionPoint.lat, junctionPoint.lng],
+        {
+          icon: intermediateIcon,
+        }
+      ).addTo(mapInstance.current);
+      junctionMarkerRef.current.bindPopup("<b>Junction point</b>").openPopup();
+
+      // Add End Marker
+      endMarkerRef.current = L.marker([endPoint.lat, endPoint.lng], {
+        icon: finalIcon,
+      }).addTo(mapInstance.current);
+      endMarkerRef.current
+        .bindPopup(
+          `<b>Immersion Place</b><br><span>${idol.placeOfImmersion}</span>`
+        )
+        .openPopup();
+
       routingControlRef.current.on("routesfound", (e) => {
         const routes = e.routes;
         if (routes && routes.length > 0) {
@@ -209,9 +363,45 @@ const SPMapView = ({ SP, onBackNav }) => {
           }).addTo(mapInstance.current);
         }
       });
+
+      // Adding chruch
+
+      churchCoordsRef.current.forEach((marker) => {
+        marker.addTo(mapInstance.current);
+      });
+
+      // Adding Mosque
+
+      mosqueCoordsRef.current.forEach((marker) => {
+        marker.addTo(mapInstance.current);
+      });
     };
 
     const restoreMarkers = () => {
+      // removing chruch
+
+      churchCoordsRef.current.forEach((marker) => {
+        marker.remove();
+      });
+
+      // removing Mosque
+
+      mosqueCoordsRef.current.forEach((marker) => {
+        marker.remove();
+      });
+
+      // Remove the junction and end markers
+      if (endMarkerRef.current) {
+        endMarkerRef.current.remove();
+        endMarkerRef.current = null;
+      }
+
+      if (junctionMarkerRef.current) {
+        junctionMarkerRef.current.remove();
+        junctionMarkerRef.current = null;
+      }
+
+      setShowFilter(() => true);
       if (routingControlRef.current) {
         routingControlRef.current.remove();
         routingControlRef.current = null;
@@ -220,9 +410,43 @@ const SPMapView = ({ SP, onBackNav }) => {
         junctionToEndRouteRef.current.remove();
         junctionToEndRouteRef.current = null;
       }
+      const currentFilters = filtersRef.current;
+      // console.log(currentFilters);
 
-      markersRef.current.forEach(({ marker }) => {
-        marker.addTo(mapInstance.current);
+      markersRef.current.forEach(({ marker, data }) => {
+        const matchesDivision = currentFilters.subdivision
+          ? data.stationDivision === currentFilters.subdivision
+          : true;
+        const matchesStation = currentFilters.stationLocation
+          ? data.stationName === currentFilters.stationLocation
+          : true;
+        const matchesType = currentFilters.type
+          ? data.typeOfInstaller === currentFilters.type
+          : true;
+        const matchesSensitivity = currentFilters.sensitivity
+          ? data.sensitivity === currentFilters.sensitivity
+          : true;
+        const matchesDate = currentFilters.dateOfImmersion
+          ? new Date(data.immersionDate).toLocaleDateString() ===
+            currentFilters.dateOfImmersion
+          : true;
+        const matchesOrganization = currentFilters.organizationName
+          ? data.organizationName === currentFilters.organizationName
+          : true;
+        if (
+          matchesType &&
+          matchesSensitivity &&
+          matchesDate &&
+          matchesOrganization &&
+          matchesStation &&
+          matchesDivision
+        ) {
+          marker.addTo(mapInstance.current); // Show marker
+        }
+
+        // else {
+        //   marker.remove(); // Hide marker
+        // }
       });
     };
 
@@ -259,6 +483,8 @@ const SPMapView = ({ SP, onBackNav }) => {
   }, [SP]);
 
   useEffect(() => {
+    filtersRef.current = filters;
+
     markersRef.current.forEach(({ marker, data }) => {
       const matchesDivision = filters.subdivision
         ? data.stationDivision === filters.subdivision
@@ -279,6 +505,7 @@ const SPMapView = ({ SP, onBackNav }) => {
       const matchesOrganization = filters.organizationName
         ? data.organizationName === filters.organizationName
         : true;
+
       if (
         matchesType &&
         matchesSensitivity &&
@@ -294,6 +521,16 @@ const SPMapView = ({ SP, onBackNav }) => {
     });
   }, [filters]);
 
+  useEffect(() => {
+    setFilters((prevFilters) => ({ ...prevFilters, stationLocation: "" }));
+  }, [filters.subdivision]); // This effect will run whenever subdivision changes
+
+  useEffect(() => {
+    if (filters.type != "organization") {
+      setFilters((prevFilters) => ({ ...prevFilters, organizationName: "" }));
+    }
+  }, [filters.type]); // This effect will run whenever subdivision changes
+
   const uniqueDates = [
     ...new Set(
       allIdols.map((idol) => new Date(idol.immersionDate).toLocaleDateString())
@@ -308,16 +545,17 @@ const SPMapView = ({ SP, onBackNav }) => {
             Back
           </button>
         </div>
-        {
+        {showFilter && (
           <div className="row m-2">
             <div className="col-md-3 map-select-div">
               <select
+                value={filters.subdivision}
                 onChange={(e) =>
                   setFilters({ ...filters, subdivision: e.target.value })
                 }
                 className="form-select my-2"
               >
-                <option value="">Select Station</option>
+                <option value="">Select Subdivision</option>
                 {SP.dspIds.map((dsp, i) => (
                   <option key={i} value={dsp.dspDivision}>
                     {dsp.dspDivision}
@@ -327,6 +565,7 @@ const SPMapView = ({ SP, onBackNav }) => {
             </div>
             <div className="col-md-3 map-select-div">
               <select
+                value={filters.stationLocation}
                 onChange={(e) =>
                   setFilters({ ...filters, stationLocation: e.target.value })
                 }
@@ -347,6 +586,7 @@ const SPMapView = ({ SP, onBackNav }) => {
             </div>
             <div className="col-md-3 map-select-div">
               <select
+                value={filters.type}
                 onChange={(e) =>
                   setFilters({ ...filters, type: e.target.value })
                 }
@@ -360,24 +600,26 @@ const SPMapView = ({ SP, onBackNav }) => {
                 </option>
               </select>
             </div>
-            <div className="col-md-3 map-select-div">
-              {filters.type === "organization" && (
+            {filters.type === "organization" && (
+              <div className="col-md-3 map-select-div">
                 <select
+                  value={filters.organizationName}
                   onChange={(e) =>
                     setFilters({ ...filters, organizationName: e.target.value })
                   }
                   className="form-select my-2"
                 >
-                  <option value="">Select Type</option>
+                  <option value="">Select Organization</option>
                   {SP.dspIds[0].stationIds[0].defaultOrganization &&
                     SP.dspIds[0].stationIds[0].defaultOrganization.map(
                       (org) => <option key={org}>{org}</option>
                     )}
                 </select>
-              )}
-            </div>
+              </div>
+            )}
             <div className=" col-md-4  map-select-div">
               <select
+                value={filters.sensitivity}
                 onChange={(e) =>
                   setFilters({ ...filters, sensitivity: e.target.value })
                 }
@@ -391,6 +633,7 @@ const SPMapView = ({ SP, onBackNav }) => {
             </div>
             <div className="col-md-5 map-select-div">
               <select
+                value={filters.dateOfImmersion}
                 onChange={(e) =>
                   setFilters({
                     ...filters,
@@ -408,7 +651,7 @@ const SPMapView = ({ SP, onBackNav }) => {
               </select>
             </div>
           </div>
-        }
+        )}
       </div>
 
       <div id="map" ref={mapRef} style={{ height: "100vh", width: "100%" }} />

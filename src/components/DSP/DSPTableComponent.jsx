@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { IdolPopup } from "../idolPopup/IdolPopup";
 import StatusBarList from "../stats/statustablelist/StatusBarList";
 
@@ -12,26 +12,35 @@ const DSPTableComponent = ({ DSP }) => {
   const [selectedStatus, setSelectedStatus] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
 
-  const handlePoliceStationSelect = (event) => {
-    setSelectedPoliceStation(event.target.value);
-  };
+  const [filters, setFilters] = useState({
+    stationLocation: "",
+    type: "",
+    sensitivity: "",
+    dateOfImmersion: "",
+    organizationName: "",
+    immpersionState: "",
+  });
 
-  const handleTypeSelect = (event) => {
-    setSelectedType(event.target.value);
-  };
+  // const handlePoliceStationSelect = (event) => {
+  //   setSelectedPoliceStation(event.target.value);
+  // };
 
-  const handleSensitiveSelect = (event) => {
-    setSelectedSensitive(event.target.value);
-  };
+  // const handleTypeSelect = (event) => {
+  //   setSelectedType(event.target.value);
+  // };
 
-  const handleStatusSelect = (event) => {
-    setSelectedStatus(event.target.value);
-  };
+  // const handleSensitiveSelect = (event) => {
+  //   setSelectedSensitive(event.target.value);
+  // };
 
-  const handleDateSelect = (event) => {
-    const selectedDate = event.target.value;
-    setSelectedDate(selectedDate);
-  };
+  // const handleStatusSelect = (event) => {
+  //   setSelectedStatus(event.target.value);
+  // };
+
+  // const handleDateSelect = (event) => {
+  //   const selectedDate = event.target.value;
+  //   setSelectedDate(selectedDate);
+  // };
 
   const DSPgetAllStationIdol = (DSPdata) => {
     console.log(DSPdata.stationIds);
@@ -39,46 +48,84 @@ const DSPTableComponent = ({ DSP }) => {
     return DSPdata.stationIds.flatMap((station) =>
       station.stationIdol.map((idol) => ({
         ...idol,
-        stationLocation: station.stationLocation,
       }))
     );
   };
 
   // Flatten the data structure and map relevant fields for easier filtering
-  let filteredData = DSPgetAllStationIdol(DSP);
+  let allIdols = DSPgetAllStationIdol(DSP);
 
-  const station = DSP.stationIds;
-  let Dates = filteredData.map((e) => {
-    // console.log(e.immersionDate);
+  // const station = DSP.stationIds;
+  // let Dates = filteredData.map((e) => {
+  //   // console.log(e.immersionDate);
 
-    new Date(e.immersionDate).toISOString().split("T")[0];
-  });
-  const dates = Dates.filter((value, index) => Dates.indexOf(value) === index);
+  //   new Date(e.immersionDate).toISOString().split("T")[0];
+  // });
+  // const dates = Dates.filter((value, index) => Dates.indexOf(value) === index);
 
-  filteredData = filteredData.filter((item) => {
-    console.log(selectedType);
+  // filteredData = filteredData.filter((item) => {
+  //   console.log(selectedType);
 
-    const typeMatch = !selectedType || item.typeOfInstaller === selectedType;
+  //   const typeMatch = !selectedType || item.typeOfInstaller === selectedType;
 
-    const sensitiveMatch =
-      !selectedSensitive || item.sensitivity === selectedSensitive;
-    const statusMatch =
-      !selectedStatus ||
-      (selectedStatus === "Complete" && item.isImmersed) ||
-      (selectedStatus === "Incomplete" && !item.isImmersed);
-    const dateMatch =
-      !selectedDate || dates.find((e) => e === selectedDate) === selectedDate;
-    const policeStationMatch =
-      !selectedPoliceStation || item.stationLocation === selectedPoliceStation;
+  //   const sensitiveMatch =
+  //     !selectedSensitive || item.sensitivity === selectedSensitive;
+  //   const statusMatch =
+  //     !selectedStatus ||
+  //     (selectedStatus === "Complete" && item.isImmersed) ||
+  //     (selectedStatus === "Incomplete" && !item.isImmersed);
+  //   const dateMatch =
+  //     !selectedDate || dates.find((e) => e === selectedDate) === selectedDate;
+  //   const policeStationMatch =
+  //     !selectedPoliceStation || item.stationLocation === selectedPoliceStation;
 
-    console.log(item.stationLocation);
+  //   console.log(item.stationLocation);
+
+  //   return (
+  //     typeMatch &&
+  //     sensitiveMatch &&
+  //     statusMatch &&
+  //     dateMatch &&
+  //     policeStationMatch
+  //   );
+  // });
+
+  useEffect(() => {
+    if (filters.type != "organization") {
+      setFilters((prevFilters) => ({ ...prevFilters, organizationName: "" }));
+    }
+  }, [filters.type]);
+
+  let filteredData = allIdols.filter((data) => {
+    const matchesStation = filters.stationLocation
+      ? data.stationName === filters.stationLocation
+      : true;
+    const matchesType = filters.type
+      ? data.typeOfInstaller === filters.type
+      : true;
+    const matchesSensitivity = filters.sensitivity
+      ? data.sensitivity === filters.sensitivity
+      : true;
+    const matchesDate = filters.dateOfImmersion
+      ? new Date(data.immersionDate).toLocaleDateString() ===
+        filters.dateOfImmersion
+      : true;
+    const matchesOrganization = filters.organizationName
+      ? data.organizationName === filters.organizationName
+      : true;
+
+    const filterStatus = data.isImmersed === true ? "Complete" : "Incomplete";
+    const matchesStatus = filters.immpersionState
+      ? filterStatus === filters.immpersionState
+      : true;
 
     return (
-      typeMatch &&
-      sensitiveMatch &&
-      statusMatch &&
-      dateMatch &&
-      policeStationMatch
+      matchesType &&
+      matchesSensitivity &&
+      matchesDate &&
+      matchesOrganization &&
+      matchesStation &&
+      matchesStatus
     );
   });
 
@@ -130,13 +177,18 @@ const DSPTableComponent = ({ DSP }) => {
   const handleCloseIdolPopup = () => {
     setShowIdolPopup(false);
   };
-
+  const uniqueDates = [
+    ...new Set(
+      allIdols.map((idol) => new Date(idol.immersionDate).toLocaleDateString())
+    ),
+  ];
   return (
     <div className="mx-5 my-2 viewDiv">
       <StatusBarList data={StatusDataArray} />
       {showIdolPopup && (
         <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
       )}
+
       <div className="btn-Div">
         <div className="row mb-5" id="dsp-filters">
           <div className="col-lg-3 my-2">
@@ -146,16 +198,18 @@ const DSPTableComponent = ({ DSP }) => {
             <select
               id="subPlaceSelect"
               className="form-select"
-              value={selectedPoliceStation}
-              onChange={handlePoliceStationSelect}
+              value={filters.stationLocation}
+              onChange={(e) =>
+                setFilters(() => ({
+                  ...filters,
+                  stationLocation: e.target.value,
+                }))
+              }
             >
               <option value="">Select Police Station</option>
-              {station.map((policeStation) => (
-                <option
-                  key={policeStation.stationLocation}
-                  value={policeStation.stationLocation}
-                >
-                  {policeStation.stationLocation}
+              {DSP.stationIds.map((station, i) => (
+                <option key={i} value={station.stationLocation}>
+                  {station.stationLocation}
                 </option>
               ))}
             </select>
@@ -168,26 +222,51 @@ const DSPTableComponent = ({ DSP }) => {
             <select
               id="typeSelect"
               className="form-select"
-              value={selectedType}
-              onChange={handleTypeSelect}
+              value={filters.type}
+              onChange={(e) =>
+                setFilters(() => ({ ...filters, type: e.target.value }))
+              }
             >
               <option value="">All</option>
               <option value="private">Private</option>
               <option value="public">Public</option>
-              <option value="organisation">Organisation</option>
+              <option value="organization">Organization</option>
             </select>
           </div>
-
+          <div className="col-lg-2 my-2">
+            <label htmlFor="organizationSelect" className="me-sm-2 mb-2">
+              Organization :
+            </label>
+            <select
+              id="organizationSelect"
+              className="form-select"
+              value={filters.organizationName}
+              onChange={(e) =>
+                setFilters(() => ({
+                  ...filters,
+                  organizationName: e.target.value,
+                }))
+              }
+            >
+              <option value="">Select Organization</option>
+              {DSP.stationIds[0].defaultOrganization &&
+                DSP.stationIds[0].defaultOrganization.map((org) => (
+                  <option key={org}>{org}</option>
+                ))}
+            </select>
+          </div>
           <div className="col-lg-3 my-2">
             <label htmlFor="sensitiveSelect" className="me-sm-2 mb-2">
               Sensitivity:
             </label>
             <select
               className="form-select"
-              onChange={handleSensitiveSelect}
               id="sensitivity"
-              value={selectedSensitive}
               name="sensitivity"
+              value={filters.sensitivity}
+              onChange={(e) =>
+                setFilters(() => ({ ...filters, sensitivity: e.target.value }))
+              }
             >
               <option value="">Select Option</option>
               <option value="Insensitive">Insensitive</option>
@@ -203,8 +282,13 @@ const DSPTableComponent = ({ DSP }) => {
             <select
               id="statusSelect"
               className="form-select"
-              value={selectedStatus}
-              onChange={handleStatusSelect}
+              value={filters.immpersionState}
+              onChange={(e) =>
+                setFilters(() => ({
+                  ...filters,
+                  immpersionState: e.target.value,
+                }))
+              }
             >
               <option value="">All</option>
               <option value="Complete">Complete</option>
@@ -226,13 +310,18 @@ const DSPTableComponent = ({ DSP }) => {
             <select
               id="dateInput"
               className="form-select"
-              value={selectedDate}
-              onChange={handleDateSelect}
+              value={filters.dateOfImmersion}
+              onChange={(e) =>
+                setFilters(() => ({
+                  ...filters,
+                  dateOfImmersion: e.target.value,
+                }))
+              }
             >
               <option value="">Select date</option>
-              {dates.map((el, index) => (
-                <option key={index} value={el}>
-                  {el}
+              {uniqueDates.map((date, i) => (
+                <option value={date} key={i}>
+                  {date}
                 </option>
               ))}
             </select>
@@ -255,22 +344,30 @@ const DSPTableComponent = ({ DSP }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((item, index) => (
-              <tr
-                key={index}
-                style={{ borderBottom: "1px solid #ddd" }}
-                onClick={() => handleOpenIdolInfo(item)}
-              >
-                <td>{index + 1}</td>
-                <td>{item.idol_id}</td>
-                <td>{item.placeOfInstallation}</td>
-                <td>{item.placeOfImmersion}</td>
-                <td>{new Date(item.setupDate).toLocaleDateString()}</td>
-                <td>{item.typeOfInstaller}</td>
-                <td>{item.sensitivity}</td>
-                <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
+            {filteredData.length > 0 ? (
+              filteredData.map((item, index) => (
+                <tr
+                  key={index}
+                  style={{ borderBottom: "1px solid #ddd" }}
+                  onClick={() => handleOpenIdolInfo(item)}
+                >
+                  <td>{index + 1}</td>
+                  <td>{item.idol_id}</td>
+                  <td>{item.placeOfInstallation}</td>
+                  <td>{item.placeOfImmersion}</td>
+                  <td>{new Date(item.setupDate).toLocaleDateString()}</td>
+                  <td>{item.typeOfInstaller}</td>
+                  <td>{item.sensitivity}</td>
+                  <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className="fs-3 py-3" colSpan={"8"}>
+                  No idols available
+                </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

@@ -65,20 +65,18 @@ const processData = (idolsByLocationAndOrg, Organizations) => {
 };
 
 export default function DSPMainDashboard({ DSP, onBackNav }) {
-  
-  let filteredData = 
-    DSP.stationIds.flatMap((station) =>
-      station.stationIdol.map((idol) => ({
-        ...idol,
-        stationLocation: station.stationLocation,
-        stationDivision: station.stationDivision,
-      }))
-    )
-    console.log(filteredData);
+  let filteredData = DSP.stationIds.flatMap((station) =>
+    station.stationIdol.map((idol) => ({
+      ...idol,
+      stationLocation: station.stationLocation,
+      stationDivision: station.stationDivision,
+    }))
+  );
+  console.log(filteredData);
 
   const aggregatedData = aggregateDataByDateAndLocation(filteredData);
-  console.log(aggregatedData.map(e => e.location));
-  
+  console.log(aggregatedData.map((e) => e.location));
+
   const dates = [...new Set(aggregatedData.map((entry) => entry.date))];
   const divisions = [...new Set(aggregatedData.map((entry) => entry.location))];
 
@@ -184,53 +182,53 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
         registrationCount.total[installerType]++;
       }
     }
-  });  
+  });
 
   const tableData = [
     {
-      category: 'Total Registered',
+      category: "Total Registered",
       sensitive: registrationCount.Sensitive.totalRegistered,
       nonSensitive: registrationCount.Nonsensitive.totalRegistered,
-      hyperSensitive: registrationCount['Hyper-Sensitive'].totalRegistered,
-      total: registrationCount.total.totalRegistered
+      hyperSensitive: registrationCount["Hyper-Sensitive"].totalRegistered,
+      total: registrationCount.total.totalRegistered,
     },
     {
-      category: 'Total Immersed',
+      category: "Total Immersed",
       sensitive: registrationCount.Sensitive.totalImmersed,
       nonSensitive: registrationCount.Nonsensitive.totalImmersed,
-      hyperSensitive: registrationCount['Hyper-Sensitive'].totalImmersed,
-      total: registrationCount.total.totalImmersed
+      hyperSensitive: registrationCount["Hyper-Sensitive"].totalImmersed,
+      total: registrationCount.total.totalImmersed,
     },
     {
-      category: 'Total Not Immersed',
+      category: "Total Not Immersed",
       sensitive: registrationCount.Sensitive.totalNotImmersed,
       nonSensitive: registrationCount.Nonsensitive.totalNotImmersed,
-      hyperSensitive: registrationCount['Hyper-Sensitive'].totalNotImmersed,
-      total: registrationCount.total.totalNotImmersed
+      hyperSensitive: registrationCount["Hyper-Sensitive"].totalNotImmersed,
+      total: registrationCount.total.totalNotImmersed,
     },
     {
-      category: 'Public',
+      category: "Public",
       sensitive: registrationCount.Sensitive.public,
       nonSensitive: registrationCount.Nonsensitive.public,
-      hyperSensitive: registrationCount['Hyper-Sensitive'].public,
-      total: registrationCount.total.public
+      hyperSensitive: registrationCount["Hyper-Sensitive"].public,
+      total: registrationCount.total.public,
     },
     {
-      category: 'Private',
+      category: "Private",
       sensitive: registrationCount.Sensitive.private,
       nonSensitive: registrationCount.Nonsensitive.private,
-      hyperSensitive: registrationCount['Hyper-Sensitive'].private,
-      total: registrationCount.total.private
-    }
+      hyperSensitive: registrationCount["Hyper-Sensitive"].private,
+      total: registrationCount.total.private,
+    },
   ];
 
   let formattedDate = "";
 
   return (
     <div>
-      <div className="text-end mt-3 me-2">
+      <div className="text-end mt-3 me-3">
         <button
-          className="btn btn-success text-light fs-6 ms-2 me-2"
+          className="btn btn-success text-light fs-5 ms-2 me-2"
           onClick={onBackNav}
         >
           Back
@@ -239,13 +237,13 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       <div>
         <p className="h1 my-5">Date Wise Immersion Count</p>
         <div className="table-responsive-xxl m-5">
-          <table className="table table-sm  table-bordered  border-dark table-hover table-striped table-light text-center">
-            <thead className="align-middle">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
+            <thead>
               <tr>
-                <th rowSpan="2">
+                <th className="align-middle" rowSpan="2">
                   S.No
                 </th>
-                <th  rowSpan="2">
+                <th className="align-middle" rowSpan="2">
                   Date
                 </th>
                 {divisions.map((division, index) => (
@@ -253,7 +251,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
                     <th colSpan="3">{division}</th>
                   </React.Fragment>
                 ))}
-                <th  rowSpan="2">
+                <th className="align-middle" rowSpan="2">
                   Total
                 </th>
               </tr>
@@ -267,7 +265,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
                 ))}
               </tr>
             </thead>
-            <tbody  className="align-middle">
+            <tbody>
               {dates.map((date, index) => (
                 <tr key={index}>
                   <td>{index + 1}</td>
@@ -319,16 +317,16 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       <div>
         <p className="h1 my-5">Party-wise Installation Details</p>
         <div className="table-responsive-xxl m-5 ">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
-            <thead className="align-middle">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
+            <thead>
               <tr>
-                <th rowSpan="2">
+                <th className="align-middle" rowSpan="2">
                   Division
                 </th>
                 <th colSpan={Organizations.length}>
                   Party-wise/Organization/Public
                 </th>
-                <th  rowSpan="2">
+                <th className="align-middle" rowSpan="2">
                   Total Count of Idols
                 </th>
               </tr>
@@ -352,33 +350,33 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
           </table>
         </div>
       </div>
-     <div>
-      <p className="h1 my-5">Registration count</p>
-      <div className="table-responsive-xxl m-5">
-        <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
-          <thead className="align-middle">
-            <tr>
-              <th>Category</th>
-              <th>Sensitive</th>
-              <th>Non-sensitive</th>
-              <th>Hyper-sensitive</th>
-              <th>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tableData.map((row, index) => (
-              <tr key={index}>
-                <td>{row.category}</td>
-                <td>{row.sensitive}</td>
-                <td>{row.nonSensitive}</td>
-                <td>{row.hyperSensitive}</td>
-                <td>{row.total}</td>
+      <div>
+        <p className="h1 my-5">Registration count</p>
+        <div className="table-responsive-xxl m-5">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Sensitive</th>
+                <th>Non-sensitive</th>
+                <th>Hyper-sensitive</th>
+                <th>Total</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tableData.map((row, index) => (
+                <tr key={index}>
+                  <td>{row.category}</td>
+                  <td>{row.sensitive}</td>
+                  <td>{row.nonSensitive}</td>
+                  <td>{row.hyperSensitive}</td>
+                  <td>{row.total}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
     </div>
   );
 }

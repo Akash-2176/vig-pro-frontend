@@ -235,24 +235,18 @@ export default function SPMainDashboard({ SP, onBackNav }) {
       </div>
       <div>
         <p className="h1 my-5">Date Wise Immersion Count</p>
-        <div className="table-responsive-xxl m-5">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+        <div className="table-responsive-xxl mx-5">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center ">
+            <thead className="align-middle">
               <tr>
-                <th className="align-middle" rowSpan="2">
-                  S.No
-                </th>
-                <th className="align-middle" rowSpan="2">
-                  Date
-                </th>
+                <th rowSpan="2">S.No</th>
+                <th rowSpan="2">Date</th>
                 {divisions.map((division, index) => (
                   <React.Fragment key={index}>
                     <th colSpan="3">{division}</th>
                   </React.Fragment>
                 ))}
-                <th className="align-middle" rowSpan="2">
-                  Total
-                </th>
+                <th rowSpan="2">Total</th>
               </tr>
               <tr>
                 {divisions.map((division, index) => (
@@ -315,19 +309,15 @@ export default function SPMainDashboard({ SP, onBackNav }) {
       </div>
       <div>
         <p className="h1 my-5">Party-wise Installation Details</p>
-        <div className="table-responsive-xxl m-5 ">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+        <div className="table-responsive-xxl mx-5 ">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+            <thead className="align-middle">
               <tr>
-                <th className="align-middle" rowSpan="2">
-                  Division
-                </th>
+                <th rowSpan="2">Division</th>
                 <th colSpan={Organizations.length}>
                   Party-wise/Organization/Public
                 </th>
-                <th className="align-middle" rowSpan="2">
-                  Total Count of Idols
-                </th>
+                <th rowSpan="2">Total Count of Idols</th>
               </tr>
               <tr>
                 {Organizations.map((party) => (
@@ -351,9 +341,9 @@ export default function SPMainDashboard({ SP, onBackNav }) {
       </div>
       <div>
         <p className="h1 my-5">Registration count</p>
-        <div className="table-responsive-xxl m-5">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+        <div className="table-responsive-xxl mx-5 mb-5">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+            <thead className="align-items">
               <tr>
                 <th>Category</th>
                 <th>Sensitive</th>

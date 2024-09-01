@@ -150,7 +150,7 @@ export default function HomeDashboard({
       </div>
       <div>
         <p className="h1 text-center mt-2 mb-2">{welcomeMessage} Home Page</p>
-        <HomeView setDashview={setDashview} stats={stats} />
+        <HomeView setDashview={setDashview} stats={stats} type={type} />
         {/* <HomeView setDashview={setDashview} stats={null} /> */}
       </div>
     </div>
