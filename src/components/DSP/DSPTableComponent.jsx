@@ -269,7 +269,7 @@ const DSPTableComponent = ({ DSP }) => {
               }
             >
               <option value="">Select Option</option>
-              <option value="Insensitive">Insensitive</option>
+              <option value="Nonsensitive">Nonsensitive</option>
               <option value="Sensitive">Sensitive</option>
               <option value="Hyper-Sensitive">Hyper-Sensitive</option>
             </select>
