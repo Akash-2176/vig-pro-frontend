@@ -75,8 +75,8 @@ function StationIdolList({ station, setStation }) {
     }
     try {
       // Send the patch request to update the idol's status
-      const response = await axios.post(
-        `http://localhost:3000/api/stations/${station.stationId}/${idol_id}/deleteIdol`
+      const response = await axios.delete(
+        `${API_BASE_URL}/stations/${station.stationId}/${idol_id}/deleteIdol`
       );
       console.log(response.data);
 
