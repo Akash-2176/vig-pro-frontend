@@ -541,7 +541,7 @@ const DSPMapView = ({ DSP, onBackNav }) => {
 
   return (
     <>
-      <div className="d-flex align-items-center map-filter-div my-2">
+      <div className="d-flex  map-filter-div my-2">
         <div className=" map-select-div my-2">
           <button className="btn btn-dark ms-2 me-2" onClick={onBackNav}>
             Back

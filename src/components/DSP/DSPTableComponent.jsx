@@ -343,7 +343,7 @@ const DSPTableComponent = ({ DSP }) => {
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="align-middle">
             {filteredData.length > 0 ? (
               filteredData.map((item, index) => (
                 <tr

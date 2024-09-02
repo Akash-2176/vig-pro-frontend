@@ -75,7 +75,7 @@ function StationIdolList({ station, setStation }) {
     }
     try {
       // Send the patch request to update the idol's status
-      const response = await axios.delete(
+      const response = await axios.post(
         `http://localhost:3000/api/stations/${station.stationId}/${idol_id}/deleteIdol`
       );
       console.log(response.data);
@@ -285,7 +285,7 @@ function StationIdolList({ station, setStation }) {
               <th>Action</th>
             </tr>
           </thead>
-          <tbody className="text-center">
+          <tbody className="text-center align-middle">
             {filteredData.map((item, index) => (
               <tr key={item.idol_id} onClick={() => handleOpenIdolInfo(item)}>
                 <td>{index + 1}</td>

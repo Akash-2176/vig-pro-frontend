@@ -20,7 +20,7 @@ export default function DSPListDashboard({ DSP, handleLogout, onBackNav }) {
       </header>{" "}
       <div className=" logout-back-btn-div text-end mt-3 me-3">
         <button
-          className="btn btn-dark text-light  ms-2 me-2 back-btn-dsp-dashboard"
+          className="btn btn-success text-light  ms-2 me-2 back-btn-dsp-dashboard"
           onClick={onBackNav}
         >
           Back

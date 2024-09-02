@@ -379,7 +379,7 @@ function SPTableComponent({ SP }) {
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="align-middle">
             {filteredData.length > 0 ? (
               filteredData.map((item, index) => (
                 <tr key={item._id} onClick={() => handleOpenIdolInfo(item)}>

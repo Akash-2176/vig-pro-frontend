@@ -251,8 +251,8 @@ export default function SPMainDashboard({ SP, onBackNav }) {
               <tr>
                 {divisions.map((division, index) => (
                   <React.Fragment key={index}>
-                    <th>Public</th>
                     <th>Private</th>
+                    <th>Public</th>
                     <th>Organization</th>
                   </React.Fragment>
                 ))}
@@ -280,8 +280,8 @@ export default function SPMainDashboard({ SP, onBackNav }) {
                       : { public: 0, private: 0, organization: 0 };
                     return (
                       <React.Fragment key={division}>
-                        <td>{counts.public}</td>
                         <td>{counts.private}</td>
+                        <td>{counts.public}</td>
                         <td>{counts.organization}</td>
                       </React.Fragment>
                     );
@@ -343,11 +343,11 @@ export default function SPMainDashboard({ SP, onBackNav }) {
         <p className="h1 my-5">Registration count</p>
         <div className="table-responsive-xxl mx-5 mb-5">
           <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
-            <thead className="align-items">
+            <thead className="align-middle">
               <tr>
                 <th>Category</th>
-                <th>Sensitive</th>
                 <th>Non-sensitive</th>
+                <th>Sensitive</th>
                 <th>Hyper-sensitive</th>
                 <th>Total</th>
               </tr>
@@ -356,8 +356,8 @@ export default function SPMainDashboard({ SP, onBackNav }) {
               {tableData.map((row, index) => (
                 <tr key={index}>
                   <td>{row.category}</td>
-                  <td>{row.sensitive}</td>
                   <td>{row.nonSensitive}</td>
+                  <td>{row.sensitive}</td>
                   <td>{row.hyperSensitive}</td>
                   <td>{row.total}</td>
                 </tr>

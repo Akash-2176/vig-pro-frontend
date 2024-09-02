@@ -29,19 +29,16 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       }))
     );
   }, [DSP]);
- 
+
   const Locations = Array.from(
     new Set(filteredData.map((e) => e.stationLocation))
   );
-  
 
   const [immersionData, setImmersionData] = useState([]);
 
   const [filter, setFilter] = useState("Namakkal");
 
   useEffect(() => {
-  
-    
     const formatImmersionData = (data) => {
       const immersionDataMap = {};
 
@@ -79,7 +76,6 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
   };
 
   const filteredResults = immersionData.filter((row) => row.place === filter);
-
 
   const idolsByLocationAndOrg = filteredData.reduce((acc, idol) => {
     if (idol.typeOfInstaller === "organization") {
@@ -234,10 +230,11 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
           Back
         </button>
       </div>
-      <div className="mx-5">
-        <div className="mb-3">
-          <h2>Datewise Immersion Count</h2>
-          <label htmlFor="filterDropdown" className="form-label">
+
+      <div className="mb-3">
+        <p className="text-center h1 my-3">Datewise Immersion Count</p>
+        <div className="form-group mx-4">
+          <label htmlFor="filterDropdown" className="form-label h5">
             Select the station:
           </label>
           <select
@@ -249,81 +246,77 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
             {Locations.map((e) => (
               <option value={e}>{e}</option>
             ))}
-            
           </select>
         </div>
-
-        <div className="table-responsive">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
-              <tr>
-                <th rowSpan="2">S.No</th>
-                <th rowSpan="2">Date</th>
-                <th colSpan="3">{filter}</th>
-                <th colSpan="3">Total count of idols in all stations</th>
-                <th rowSpan="2">Total Idols</th>
-              </tr>
-              <tr>
-                <th>Public</th>
-                <th>Private</th>
-                <th>Organization</th>
-                <th>Public</th>
-                <th>Private</th>
-                <th>Organization</th>
-              </tr>
-            </thead>
-            <tbody>
-              {uniqueDates.map((date, index) => {
-                const rowData = immersionData.find(
-                  (row) => row.date === date && row.place === filter
-                );
-                const totalPublic = immersionData
-                  .filter((row) => row.date === date)
-                  .reduce((total, current) => total + current.pub, 0);
-
-                const totalOrg = immersionData
-                  .filter((row) => row.date === date)
-                  .reduce((total, current) => total + current.org, 0);
-
-                const totalpvt = immersionData
-                  .filter((row) => row.date === date)
-                  .reduce((total, current) => total + current.pvt, 0);
-
-                const totalSum = totalPublic + totalOrg + totalpvt;
-
-                return (
-                  <tr key={index}>
-                    <td>{index + 1}.</td>
-                    <td>{date}</td>
-                    <td>{rowData?.pub ?? 0}</td>
-                    <td>{rowData?.pvt ?? 0}</td>
-                    <td>{rowData?.org ?? 0}</td>
-                    <td>{totalPublic}</td>
-                    <td>{totalpvt}</td>
-                    <td>{totalOrg}</td>
-                    <td>{totalSum}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
       </div>
+
+      <div className="table-responsive-xxl mx-4">
+        <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+          <thead className="align-middle">
+            <tr>
+              <th rowSpan="2">S.No</th>
+              <th rowSpan="2">Date</th>
+              <th colSpan="3">{filter}</th>
+              <th colSpan="3">Total count of idols in all stations</th>
+              <th rowSpan="2">Total Idols</th>
+            </tr>
+            <tr>
+              <th>Private</th>
+              <th>Public</th>
+              <th>Organization</th>
+              <th>Private</th>
+              <th>Public</th>
+              <th>Organization</th>
+            </tr>
+          </thead>
+          <tbody className="align-middle">
+            {uniqueDates.map((date, index) => {
+              const rowData = immersionData.find(
+                (row) => row.date === date && row.place === filter
+              );
+              const totalPublic = immersionData
+                .filter((row) => row.date === date)
+                .reduce((total, current) => total + current.pub, 0);
+
+              const totalOrg = immersionData
+                .filter((row) => row.date === date)
+                .reduce((total, current) => total + current.org, 0);
+
+              const totalpvt = immersionData
+                .filter((row) => row.date === date)
+                .reduce((total, current) => total + current.pvt, 0);
+
+              const totalSum = totalPublic + totalOrg + totalpvt;
+
+              return (
+                <tr key={index}>
+                  <td>{index + 1}.</td>
+                  <td>{date}</td>
+                  <td>{rowData?.pvt ?? 0}</td>
+                  <td>{rowData?.pub ?? 0}</td>
+                  <td>{rowData?.org ?? 0}</td>
+                  <td>{totalpvt}</td>
+                  <td>{totalPublic}</td>
+                  <td>{totalOrg}</td>
+                  <td>{totalSum}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
       <div>
         <p className="h1 my-5">Party-wise Installation Details</p>
-        <div className="table-responsive-xxl m-5 ">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+        <div className="table-responsive-xxl mx-5">
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+            <thead className="align-middle">
               <tr>
-                <th className="align-middle" rowSpan="2">
-                  Division
-                </th>
+                <th rowSpan="2">Division</th>
                 <th colSpan={Organizations.length}>
                   Party-wise/Organization/Public
                 </th>
-                <th className="align-middle" rowSpan="2">
-                  Total Count of Idols
-                </th>
+                <th rowSpan="2">Total Count of Idols</th>
               </tr>
               <tr>
                 {Organizations.map((party) => (
@@ -331,7 +324,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="align-middle">
               {processedData.map((row, index) => (
                 <tr key={index}>
                   <td>{row.location}</td>
@@ -348,22 +341,22 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       <div>
         <p className="h1 my-5">Registration count</p>
         <div className="table-responsive-xxl m-5">
-          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
-            <thead>
+          <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
+            <thead className="align-middle">
               <tr>
                 <th>Category</th>
-                <th>Sensitive</th>
                 <th>Non-sensitive</th>
+                <th>Sensitive</th>
                 <th>Hyper-sensitive</th>
                 <th>Total</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="align-middle">
               {tableData.map((row, index) => (
                 <tr key={index}>
                   <td>{row.category}</td>
-                  <td>{row.sensitive}</td>
                   <td>{row.nonSensitive}</td>
+                  <td>{row.sensitive}</td>
                   <td>{row.hyperSensitive}</td>
                   <td>{row.total}</td>
                 </tr>
