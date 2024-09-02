@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "/tnpolicelogo.png";
-import banner from "/banner.jpeg";
+import banner from "/banner.png";
 import SPTableComponent from "../SP/SPTableComponent";
 
 export default function SPListDashboard({ SP, handleLogout, onBackNav }) {
@@ -26,10 +26,7 @@ export default function SPListDashboard({ SP, handleLogout, onBackNav }) {
           >
             Back
           </button>
-          <button
-            className="btn  btn-danger ms-2"
-            onClick={handleLogout}
-          >
+          <button className="btn  btn-danger ms-2" onClick={handleLogout}>
             Logout
           </button>
         </div>

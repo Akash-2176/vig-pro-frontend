@@ -4,13 +4,18 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import pinimg from "/mappin.png";
 import "./map.css";
-import finalMarker from "/finalmarker.svg";
+// import finalMarker from "/finalmarker.svg";
+import finalMarker from "/finalicon.png";
 import intermediateMarker from "/intermarker.svg";
 import blueMarker from "/mappin.png"; // Example: Marker for Private
 import greenMarker from "/pinimg1.png"; // Example: Marker for Public place
 import blackMarker from "/pinimg3.png";
 import chruchMarker from "/chruchicon.png";
 import mosqueicon from "/mosqueicon.svg";
+// import vigvehicle icon
+import vigbikeMarker from "/vigbike.png";
+import vigcarMarker from "/vigcar.png";
+import vigtruckMarker from "/vigtruck.png";
 
 const customIcon = L.icon({
   iconUrl: pinimg, // Replace with the URL to your custom icon image
@@ -152,6 +157,24 @@ const StationMapView = ({ station, onBackNav }) => {
       }),
       organization: L.icon({
         iconUrl: blackMarker,
+        iconSize: [54, 54],
+        iconAnchor: [16, 32],
+      }),
+    };
+
+    const junctionMapIcon = {
+      "two-wheeler": L.icon({
+        iconUrl: vigbikeMarker,
+        iconSize: [54, 54],
+        iconAnchor: [16, 32],
+      }),
+      "four-wheeler-open": L.icon({
+        iconUrl: vigcarMarker,
+        iconSize: [54, 54],
+        iconAnchor: [16, 32],
+      }),
+      "four-wheeler-closed": L.icon({
+        iconUrl: vigtruckMarker,
         iconSize: [54, 54],
         iconAnchor: [16, 32],
       }),
@@ -308,7 +331,9 @@ const StationMapView = ({ station, onBackNav }) => {
       junctionMarkerRef.current = L.marker(
         [junctionPoint.lat, junctionPoint.lng],
         {
-          icon: intermediateIcon,
+          icon:
+            junctionMapIcon[idol.modeOfTransport.vehicleType] ||
+            intermediateIcon,
         }
       ).addTo(mapInstance.current);
       junctionMarkerRef.current.bindPopup("<b>Junction point</b>").openPopup();

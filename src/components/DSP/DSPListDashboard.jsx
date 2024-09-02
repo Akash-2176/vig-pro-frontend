@@ -1,6 +1,6 @@
 import React from "react";
 import logo from "/tnpolicelogo.png";
-import banner from "/banner.jpeg";
+import banner from "/banner.png";
 import DSPTableComponent from "../DSP/DSPTableComponent";
 
 export default function DSPListDashboard({ DSP, handleLogout, onBackNav }) {
@@ -8,7 +8,11 @@ export default function DSPListDashboard({ DSP, handleLogout, onBackNav }) {
     <div className="App">
       <header className="App-header">
         <div className="d-flex mx-4 align-items-center">
-          <img src={logo} alt="tn police logo" id="dsp-dashboard-policeLogo"></img>
+          <img
+            src={logo}
+            alt="tn police logo"
+            id="dsp-dashboard-policeLogo"
+          ></img>
           <p className="h1 mx-3"> District Police</p>
         </div>
 

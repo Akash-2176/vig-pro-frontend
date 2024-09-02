@@ -1,5 +1,5 @@
 import logo from "/tnpolicelogo.png";
-import banner from "/banner.jpeg";
+import banner from "/banner.png";
 import HomeView from "./HomeView";
 import "./homedashboard.css";
 import { useEffect, useState } from "react";

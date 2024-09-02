@@ -1,49 +1,4 @@
-import React from "react";
-
-const calculateTotalCounts = (entry) => {
-  return {
-    public: entry.public.length,
-    private: entry.private.length,
-    organization: entry.organization.length,
-  };
-};
-
-const aggregateDataByDateAndLocation = (filteredData) => {
-  const dataByDateAndDivision = [];
-
-  filteredData.forEach((idol) => {
-    const {
-      stationLocation: location,
-      typeOfInstaller: type,
-      immersionDate,
-    } = idol;
-
-    let dateEntry = dataByDateAndDivision.find(
-      (entry) => entry.date === immersionDate && entry.location === location
-    );
-
-    if (!dateEntry) {
-      dateEntry = {
-        date: immersionDate,
-        location,
-        public: [],
-        private: [],
-        organization: [],
-      };
-      dataByDateAndDivision.push(dateEntry);
-    }
-
-    if (type === "public") {
-      dateEntry.public.push(idol);
-    } else if (type === "private") {
-      dateEntry.private.push(idol);
-    } else if (type === "organization") {
-      dateEntry.organization.push(idol);
-    }
-  });
-
-  return dataByDateAndDivision;
-};
+import React, { useEffect, useMemo, useState } from "react";
 
 const processData = (idolsByLocationAndOrg, Organizations) => {
   return Object.keys(idolsByLocationAndOrg).map((location) => {
@@ -65,20 +20,66 @@ const processData = (idolsByLocationAndOrg, Organizations) => {
 };
 
 export default function DSPMainDashboard({ DSP, onBackNav }) {
-  let filteredData = DSP.stationIds.flatMap((station) =>
-    station.stationIdol.map((idol) => ({
-      ...idol,
-      stationLocation: station.stationLocation,
-      stationDivision: station.stationDivision,
-    }))
+  const filteredData = useMemo(() => {
+    return DSP.stationIds.flatMap((station) =>
+      station.stationIdol.map((idol) => ({
+        ...idol,
+        stationLocation: station.stationLocation,
+        stationDivision: station.stationDivision,
+      }))
+    );
+  }, [DSP]);
+ 
+  const Locations = Array.from(
+    new Set(filteredData.map((e) => e.stationLocation))
   );
-  console.log(filteredData);
+  
 
-  const aggregatedData = aggregateDataByDateAndLocation(filteredData);
-  console.log(aggregatedData.map((e) => e.location));
+  const [immersionData, setImmersionData] = useState([]);
 
-  const dates = [...new Set(aggregatedData.map((entry) => entry.date))];
-  const divisions = [...new Set(aggregatedData.map((entry) => entry.location))];
+  const [filter, setFilter] = useState("Namakkal");
+
+  useEffect(() => {
+  
+    
+    const formatImmersionData = (data) => {
+      const immersionDataMap = {};
+
+      data.forEach((entry) => {
+        const date = new Date(entry.immersionDate).toISOString().split("T")[0];
+        const place = entry.stationLocation;
+        const typeOfInstaller = entry.typeOfInstaller;
+
+        const key = `${date}_${place}`;
+
+        if (!immersionDataMap[key]) {
+          immersionDataMap[key] = { date, place, pub: 0, org: 0, pvt: 0 };
+        }
+
+        if (typeOfInstaller === "public") {
+          immersionDataMap[key].pub += 1;
+        } else if (typeOfInstaller === "organization") {
+          immersionDataMap[key].org += 1;
+        } else if (typeOfInstaller === "private") {
+          immersionDataMap[key].pvt += 1;
+        }
+      });
+
+      return Object.values(immersionDataMap);
+    };
+
+    setImmersionData(formatImmersionData(filteredData));
+  }, [filteredData]);
+
+  const uniqueDates = [...new Set(immersionData.map((row) => row.date))];
+
+  const handleFilterChange = (e) => {
+    const selectedFilter = e.target.value;
+    setFilter(selectedFilter);
+  };
+
+  const filteredResults = immersionData.filter((row) => row.place === filter);
+
 
   const idolsByLocationAndOrg = filteredData.reduce((acc, idol) => {
     if (idol.typeOfInstaller === "organization") {
@@ -98,7 +99,6 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
 
     return acc;
   }, {});
-  console.log(idolsByLocationAndOrg);
 
   const partyWiseDivisions = Object.keys(idolsByLocationAndOrg);
   const Organizations = [
@@ -234,82 +234,77 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
           Back
         </button>
       </div>
-      <div>
-        <p className="h1 my-5">Date Wise Immersion Count</p>
-        <div className="table-responsive-xxl m-5">
+      <div className="mx-5">
+        <div className="mb-3">
+          <h2>Datewise Immersion Count</h2>
+          <label htmlFor="filterDropdown" className="form-label">
+            Select the station:
+          </label>
+          <select
+            id="filterDropdown"
+            className="form-select border-black"
+            value={filter}
+            onChange={handleFilterChange}
+          >
+            {Locations.map((e) => (
+              <option value={e}>{e}</option>
+            ))}
+            
+          </select>
+        </div>
+
+        <div className="table-responsive">
           <table className="table table-sm table-bordered border-dark table-hover table-striped table-light">
             <thead>
               <tr>
-                <th className="align-middle" rowSpan="2">
-                  S.No
-                </th>
-                <th className="align-middle" rowSpan="2">
-                  Date
-                </th>
-                {divisions.map((division, index) => (
-                  <React.Fragment key={index}>
-                    <th colSpan="3">{division}</th>
-                  </React.Fragment>
-                ))}
-                <th className="align-middle" rowSpan="2">
-                  Total
-                </th>
+                <th rowSpan="2">S.No</th>
+                <th rowSpan="2">Date</th>
+                <th colSpan="3">{filter}</th>
+                <th colSpan="3">Total count of idols in all stations</th>
+                <th rowSpan="2">Total Idols</th>
               </tr>
               <tr>
-                {divisions.map((division, index) => (
-                  <React.Fragment key={index}>
-                    <th>Public</th>
-                    <th>Private</th>
-                    <th>Organization</th>
-                  </React.Fragment>
-                ))}
+                <th>Public</th>
+                <th>Private</th>
+                <th>Organization</th>
+                <th>Public</th>
+                <th>Private</th>
+                <th>Organization</th>
               </tr>
             </thead>
             <tbody>
-              {dates.map((date, index) => (
-                <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>
-                    {
-                      (formattedDate = date
-                        ?.slice(0, -14)
-                        .split("-")
-                        .reverse()
-                        .join("-"))
-                    }
-                  </td>
-                  {divisions.map((location) => {
-                    const entry = aggregatedData.find(
-                      (e) => e.date === date && e.location === location
-                    );
-                    const counts = entry
-                      ? calculateTotalCounts(entry)
-                      : { public: 0, private: 0, organization: 0 };
-                    return (
-                      <React.Fragment key={location}>
-                        <td>{counts.public}</td>
-                        <td>{counts.private}</td>
-                        <td>{counts.organization}</td>
-                      </React.Fragment>
-                    );
-                  })}
-                  <td>
-                    {divisions.reduce((total, location) => {
-                      const entry = aggregatedData.find(
-                        (e) => e.date === date && e.location === location
-                      );
-                      return (
-                        total +
-                        (entry
-                          ? calculateTotalCounts(entry).public +
-                            calculateTotalCounts(entry).private +
-                            calculateTotalCounts(entry).organization
-                          : 0)
-                      );
-                    }, 0)}
-                  </td>
-                </tr>
-              ))}
+              {uniqueDates.map((date, index) => {
+                const rowData = immersionData.find(
+                  (row) => row.date === date && row.place === filter
+                );
+                const totalPublic = immersionData
+                  .filter((row) => row.date === date)
+                  .reduce((total, current) => total + current.pub, 0);
+
+                const totalOrg = immersionData
+                  .filter((row) => row.date === date)
+                  .reduce((total, current) => total + current.org, 0);
+
+                const totalpvt = immersionData
+                  .filter((row) => row.date === date)
+                  .reduce((total, current) => total + current.pvt, 0);
+
+                const totalSum = totalPublic + totalOrg + totalpvt;
+
+                return (
+                  <tr key={index}>
+                    <td>{index + 1}.</td>
+                    <td>{date}</td>
+                    <td>{rowData?.pub ?? 0}</td>
+                    <td>{rowData?.pvt ?? 0}</td>
+                    <td>{rowData?.org ?? 0}</td>
+                    <td>{totalPublic}</td>
+                    <td>{totalpvt}</td>
+                    <td>{totalOrg}</td>
+                    <td>{totalSum}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
