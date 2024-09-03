@@ -23,4 +23,7 @@
   .email-support {
     font-size: small;
   }
+  .contact-details-number {
+    flex-direction: column;
+  }
 }

@@ -11,8 +11,12 @@ const Footer = () => {
           <div class="contact-inner-details col-md-3">
             <p class="h5 mt-2">Contact:</p>
             <div className="contact-details-number mt-3 ms-5 h6">
-              <p className="me-4">9999999999</p>
-              <p>9999999999</p>
+              <p className="me-4">Akash - 7305594291</p>
+              <p>Surendhar - 8248309218</p>
+              <p className="me-4">Kavin - 9080802151</p>
+              <p>Deepan - 9442479225</p>
+              <p className="me-4">Sabarish - 7010661497</p>
+              <p>Rilwan - 7339547680</p>
             </div>
           </div>
 
