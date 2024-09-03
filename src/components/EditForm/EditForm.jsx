@@ -1831,7 +1831,7 @@ const EditForm = ({
                 </div>
                 <div className="form-group">
                   <label>
-                    RTO License approved or not{" "}
+                    RDO License approved or not
                     <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">
