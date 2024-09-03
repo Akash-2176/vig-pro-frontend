@@ -49,6 +49,12 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     ],
   });
 
+  useEffect(() => {
+    if (formData.typeOfInstaller !== "organization") {
+      formData.organizationName = "";
+    }
+  }, [formData.typeOfInstaller]);
+
   const stationDetails = station.motherVillage;
   const organizationOptions = station.defaultOrganization;
   const startPoints = station.defaultStartPoints.map((e) => e.place);
@@ -164,6 +170,13 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
     let requiredFields = [];
     formData.typeOfInstaller === "private"
       ? (requiredFields = ["motherVillage", "licence", "typeOfInstaller"])
+      : formData.typeOfInstaller === "organization"
+      ? (requiredFields = [
+          "motherVillage",
+          "licence",
+          "typeOfInstaller",
+          "organizationName",
+        ])
       : (requiredFields = [
           "motherVillage",
           "placeOfInstallation",
@@ -458,12 +471,28 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
       }));
     }
 
-    let selectedStart =
-      formData.typeOfInstaller === "private"
-        ? formData.placeOfInstallation
-        : station.defaultStartPoints.find(
-            (e) => e.place === formData.placeOfInstallation
-          );
+    let selectedStart;
+
+    if (formData.typeOfInstaller === "private") {
+      // Check if the placeOfInstallation matches any place inside the motherVillage hamlet villages
+      for (const [villageName, villageArray] of Object.entries(
+        station.motherVillage
+      )) {
+        const matchingVillage = villageArray.find(
+          (village) => village.place === formData.placeOfInstallation
+        );
+        if (matchingVillage) {
+          selectedStart = matchingVillage;
+          break; // Stop the loop if a match is found
+        }
+      }
+    } else {
+      // Fallback to defaultStartPoints if typeOfInstaller is not "private"
+      selectedStart = station.defaultStartPoints.find(
+        (e) => e.place === formData.placeOfInstallation
+      );
+    }
+
     const selectedEnd = station.defaultEndPoints.find(
       (e) => e.place === formData.placeOfImmersion
     );
@@ -472,6 +501,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
 
     if (selectedEnd && selectedStart) {
       const nextIdolId = getIdolId();
+      console.log(selectedStart);
 
       setUpdatedFormData({
         ...formData,
@@ -548,6 +578,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
           console.log(error);
         } finally {
           setShowLoading(false);
+          console.log(updatedFormData);
         }
       };
 
@@ -714,18 +745,23 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                   </select>
                 </div>
                 {formData.typeOfInstaller === "organization" && (
-                  <select
-                    className="form-control"
-                    onChange={handleChange}
-                    id="Organization"
-                    value={formData.organizationName || ""}
-                    name="organizationName"
-                  >
-                    <option value="">Select an option</option>
-                    {organizationOptions.map((value, index) => (
-                      <option key={index}>{value}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <label htmlFor="commonoption">
+                      Organization Name <span style={{ color: "red" }}>*</span>
+                    </label>
+                    <select
+                      className="form-control"
+                      onChange={handleChange}
+                      id="Organization"
+                      value={formData.organizationName || ""}
+                      name="organizationName"
+                    >
+                      <option value="">Select an option</option>
+                      {organizationOptions.map((value, index) => (
+                        <option key={index}>{value}</option>
+                      ))}
+                    </select>
+                  </div>
                 )}
               </div>
 
@@ -1692,7 +1728,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         key={index}
                       >
                         <label htmlFor="IntermediateJunctionPoints">
-                          Intermediate Junction points
+                          En route Junction points
                         </label>
 
                         <div className="col-md-4">
@@ -1912,7 +1948,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 </div>
                 <div className="form-group">
                   <label>
-                    RTO License approved or not{" "}
+                    RDO License approved or not{" "}
                     <span style={{ color: "red" }}>*</span>
                   </label>
                   <div className="row" id="radioDiv">

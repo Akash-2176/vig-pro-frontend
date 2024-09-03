@@ -26,6 +26,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
         ...idol,
         stationLocation: station.stationLocation,
         stationDivision: station.stationDivision,
+        organizations: station.defaultOrganization,
       }))
     );
   }, [DSP]);
@@ -43,7 +44,9 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
       const immersionDataMap = {};
 
       data.forEach((entry) => {
-        const date = new Date(entry.immersionDate).toISOString().split("T")[0];
+        // const date = new Date(entry.immersionDate).toISOString().split("T")[0];
+        const date = new Date(entry.immersionDate).toLocaleDateString();
+
         const place = entry.stationLocation;
         const typeOfInstaller = entry.typeOfInstaller;
 
@@ -97,28 +100,9 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
   }, {});
 
   const partyWiseDivisions = Object.keys(idolsByLocationAndOrg);
-  const Organizations = [
-    "HINDU MUNNANI",
-    "IMK-TN",
-    "RSS",
-    "VHP(AI)",
-    "ABHMS(T.B)",
-    "IMK & Hanuman sena (S.V.Sridhar)",
-    "Hindu Iyakka pervai",
-    "Siva sena",
-    "Yuva sena",
-    "BJP",
-    "VBMK",
-    "Om anmiga peravai",
-    "sri Ram Sena",
-    "VVP",
-    "Agila bharath Siva Ruthra sena",
-    "AIIMK",
-    "Desiya Sindanai peravai",
-    "Public & Fishermen",
-  ];
-
+  const Organizations = filteredData[0].organizations;
   const processedData = processData(idolsByLocationAndOrg, Organizations);
+  console.log(processedData);
 
   const registrationCount = {
     Sensitive: {
@@ -312,7 +296,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
           <table className="table table-sm table-bordered border-dark table-hover table-striped table-light text-center">
             <thead className="align-middle">
               <tr>
-                <th rowSpan="2">Division</th>
+                <th rowSpan="2">Station</th>
                 <th colSpan={Organizations.length}>
                   Party-wise/Organization/Public
                 </th>
