@@ -100,26 +100,7 @@ export default function SPMainDashboard({ SP, onBackNav }) {
   console.log(idolsByDivisionAndOrg);
 
   const partyWiseDivisions = Object.keys(idolsByDivisionAndOrg);
-  const Organizations = [
-    "HINDU MUNNANI",
-    "IMK-TN",
-    "RSS",
-    "VHP(AI)",
-    "ABHMS(T.B)",
-    "IMK & Hanuman sena (S.V.Sridhar)",
-    "Hindu Iyakka pervai",
-    "Siva sena",
-    "Yuva sena",
-    "BJP",
-    "VBMK",
-    "Om anmiga peravai",
-    "sri Ram Sena",
-    "VVP",
-    "Agila bharath Siva Ruthra sena",
-    "AIIMK",
-    "Desiya Sindanai peravai",
-    "Public & Fishermen",
-  ];
+  const Organizations = SP.dspIds[0].stationIds[0].defaultOrganization;
 
   const processedData = processData(idolsByDivisionAndOrg, Organizations);
 

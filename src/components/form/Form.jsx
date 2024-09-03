@@ -443,6 +443,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
       "RTOpermission",
       "sensitivity",
       "placeOfImmersion",
+      "immersionDate",
+      "startJunctionPoint",
     ];
 
     const missingFields = requiredFields.filter((field) => {
@@ -637,7 +639,11 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     )
                   }
                 />
-                <div><a href="https://imageresizer.com/" target="_blank">image compressor</a></div>
+                <div>
+                  <a href="https://imageresizer.com/" target="_blank">
+                    image compressor
+                  </a>
+                </div>
                 {applicationFile && (
                   <div>
                     <p>Selected file: {applicationFile.name}</p>
@@ -647,7 +653,6 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     </p>
                   </div>
                 )}
-                
               </div>
 
               <div>
@@ -847,9 +852,9 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                         {values}
                       </option>
                     ))}
-                    <option value="others" id="others">
+                    {/* <option value="others" id="others">
                       others(new location)
-                    </option>
+                    </option> */}
                   </select>
                   {isOthers && (
                     <input
@@ -1652,15 +1657,15 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 <label className="h5">Route</label>
 
                 <div className="form-group ">
-                <label htmlFor="routeStartingPoint">Starting Point</label>
-                    <input
-                      type="text"
-                      id="routeStartingPoint"
-                      placeholder="Starting point not selected"
-                      className="form-control"
-                      value={formData.placeOfInstallation} // Replace with the actual starting point name
-                      readOnly
-                    />
+                  <label htmlFor="routeStartingPoint">Starting Point</label>
+                  <input
+                    type="text"
+                    id="routeStartingPoint"
+                    placeholder="Starting point not selected"
+                    className="form-control"
+                    value={formData.placeOfInstallation} // Replace with the actual starting point name
+                    readOnly
+                  />
                 </div>
 
                 <div className="form-group ">
@@ -1698,7 +1703,8 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                       readOnly
                     />
                     <label htmlFor="DefaultJunctionPoint">
-                      Default junction points
+                      Default junction points{" "}
+                      <span style={{ color: "red" }}>*</span>
                     </label>
                     <select
                       className="form-control"

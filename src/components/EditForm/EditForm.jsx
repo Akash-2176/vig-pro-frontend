@@ -34,6 +34,9 @@ const EditForm = ({
   const IntermediateJunctionPoints = idolData.intermediateJunctionPoints.map(
     (e) => e
   );
+  const DefaultIntermediateJunctionPoints =
+    station.defaultIntermediateJunctionPoints.map((e) => e);
+  console.log(JunctionPoints);
 
   useEffect(() => {
     if (idolData) {
@@ -195,14 +198,12 @@ const EditForm = ({
     }));
   };
   const handleJunctionChange = (index, e) => {
-    const selectedOption = IntermediateJunctionPoints.find(
+    const selectedOption = DefaultIntermediateJunctionPoints.find(
       (option) => option.place === e.target.value
     );
-    setJunctions((prevJunctions) =>
-      prevJunctions.map((junction, i) =>
-        i === index ? selectedOption : junction
-      )
-    );
+    const updatedJunctions = [...junctions];
+    updatedJunctions[index] = selectedOption;
+    setJunctions(updatedJunctions);
   };
 
   const handleAddJunction = (e) => {
@@ -303,8 +304,7 @@ const EditForm = ({
       const selectedJunction = JunctionPoints.find(
         (junction) => junction.place === value
       );
-
-      if (selectedJunction) {
+      if (selectedJunction.length !== 0) {
         setFormData((prevState) => ({
           ...prevState,
           startJunctionPoint: {
@@ -372,6 +372,7 @@ const EditForm = ({
       "RTOpermission",
       "sensitivity",
       "immersionDate",
+      "startJunctionPoint",
     ];
 
     const missingFields = requiredFields.filter((field) => {
@@ -421,6 +422,7 @@ const EditForm = ({
         idol_id: nextIdolId,
         endCoords: selectedEnd.coords,
         startCoords: selectedStart.coords,
+
         intermediateJunctionPoints: intermediatejun,
         stationName: station.stationLocation,
         stationDivision: station.stationDivision,
@@ -670,9 +672,6 @@ const EditForm = ({
                         {values}
                       </option>
                     ))}
-                    <option value="others" id="others">
-                      others(new location)
-                    </option>
                   </select>
                   {isOthers && (
                     <input
@@ -1250,7 +1249,7 @@ const EditForm = ({
             <div>
               <div className="form-group">
                 <label htmlFor="date" className="h5">
-                  Date of Immersion
+                  Date of Immersion <span style={{ color: "red" }}>*</span>
                 </label>
                 <input
                   type="date"
@@ -1546,18 +1545,17 @@ const EditForm = ({
                       readOnly
                     />
                     <label htmlFor="DefaultJunctionPoint">
-                      Default junction points
+                      Default junction points{" "}
+                      <span style={{ color: "red" }}>*</span>
                     </label>
                     <select
                       className="form-control"
                       id="DefaultJunctionPoint"
                       name="startJunctionPoint"
-                      value={formData.startJunctionPoint || ""}
+                      value={formData.startJunctionPoint.place || ""}
                       onChange={handleChange2}
                     >
-                      <option value="" disabled>
-                        Select Junction
-                      </option>
+                      <option value="">Select Junction</option>
                       {JunctionPoints.map((option, idx) => (
                         <option key={idx} value={option.place}>
                           {option.place}
@@ -1584,11 +1582,13 @@ const EditForm = ({
                             <option value="" disabled>
                               Select Intermediate Junctions
                             </option>
-                            {IntermediateJunctionPoints.map((option, idx) => (
-                              <option key={idx} value={option.place}>
-                                {option.place}
-                              </option>
-                            ))}
+                            {DefaultIntermediateJunctionPoints.map(
+                              (option, idx) => (
+                                <option key={idx} value={option.place}>
+                                  {option.place}
+                                </option>
+                              )
+                            )}
                           </select>
                         </div>
                         <div className="col-md-4">

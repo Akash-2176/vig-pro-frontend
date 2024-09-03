@@ -62,8 +62,8 @@ const HomeView = ({ setDashview, stats, type }) => {
           </span>
           <img src={card2Image} alt="Card 2" />
           <p className="card-content mt-5">
-            give me a content for displaying list for vinayagar chadurthi
-            registered list of idols and applicantsas paragraph
+            This shows the location of idols and the route of procession up to
+            the immersion point, along with the idol details and more...
           </p>
         </div>
 
