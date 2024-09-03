@@ -22,7 +22,7 @@ const processData = (idolsByLocationAndOrg, Organizations) => {
 export default function DSPMainDashboard({ DSP, onBackNav }) {
   const filteredData = useMemo(() => {
     return DSP.stationIds.flatMap((station) =>
-      station.stationIdol.map((idol) => ({
+      station.stationIdol?.map((idol) => ({
         ...idol,
         stationLocation: station.stationLocation,
         stationDivision: station.stationDivision,
@@ -100,7 +100,7 @@ export default function DSPMainDashboard({ DSP, onBackNav }) {
   }, {});
 
   const partyWiseDivisions = Object.keys(idolsByLocationAndOrg);
-  const Organizations = filteredData[0].organizations;
+  const Organizations = DSP.stationIds[0].defaultOrganization;
   const processedData = processData(idolsByLocationAndOrg, Organizations);
   console.log(processedData);
 
