@@ -637,6 +637,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     )
                   }
                 />
+                <div><a href="https://imageresizer.com/" target="_blank">image compressor</a></div>
                 {applicationFile && (
                   <div>
                     <p>Selected file: {applicationFile.name}</p>
@@ -646,6 +647,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                     </p>
                   </div>
                 )}
+                
               </div>
 
               <div>
@@ -1650,24 +1652,15 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
                 <label className="h5">Route</label>
 
                 <div className="form-group ">
-                  <label htmlFor="PlaceOfInstallation" className="col-3">
-                    Starting points
-                  </label>
-                  <select
-                    id="PlaceOfInstallation"
-                    name="placeOfInstallation"
-                    className="form-control col-9"
-                    placeholder="Enter place of immersion"
-                    value={formData.placeOfInstallation || ""}
-                    onChange={handleChange2}
-                  >
-                    <option value="">Select an option</option>
-                    {startPoints.map((value, index) => (
-                      <option key={index} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </select>
+                <label htmlFor="routeStartingPoint">Starting Point</label>
+                    <input
+                      type="text"
+                      id="routeStartingPoint"
+                      placeholder="Starting point not selected"
+                      className="form-control"
+                      value={formData.placeOfInstallation} // Replace with the actual starting point name
+                      readOnly
+                    />
                 </div>
 
                 <div className="form-group ">
