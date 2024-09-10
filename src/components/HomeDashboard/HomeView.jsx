@@ -1,6 +1,7 @@
 import card1Image from "/viewlistnew.png";
 import card2Image from "/mapimg.png";
 import card3Image from "/registration_img.png";
+import card4Image from "/trackingimg.png";
 import Footer from "./Footer";
 import { useEffect, useState } from "react";
 import OverAllStatsPopup from "../stats/overAllStatsPopup/OverAllStatsPopup";
@@ -15,6 +16,7 @@ const HomeView = ({ setDashview, stats, type }) => {
   const handleCardClick = (cardNumber) => {
     if (cardNumber === 1) setDashview("dashboardlist");
     if (cardNumber === 2) setDashview("dashboardmap");
+    if (cardNumber === 4) setDashview("dashboardtracking");
     if (cardNumber === 3 && type === "Station") setShowModal(true);
     else if (cardNumber === 3) setDashview("dashstatslist");
   };
@@ -67,6 +69,21 @@ const HomeView = ({ setDashview, stats, type }) => {
           </p>
         </div>
 
+        {type === "SP" && (
+          <div
+            className="card col-sm-12 col-md-4 col-lg-3 my-4 mx-3"
+            onClick={() => handleCardClick(4)}
+          >
+            <span className="card-body">
+              <span className="h3 card-title">Tracking</span>
+            </span>
+            <img src={card4Image} alt="Card 2" />
+            <p className="card-content mt-5">
+              The tracking section provides real-time updates on idol locations
+              during the procession, ensuring visibility and safety.
+            </p>
+          </div>
+        )}
         <Footer />
 
         {showModal && (

@@ -1,0 +1,6 @@
+.live__track__back__btn {
+  position: absolute;
+  z-index: 500;
+  top: 20px;
+  right: 20px;
+}

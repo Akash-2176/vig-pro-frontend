@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
-import API_BASE_URL from "../../../apiConfig";
+import { API_BASE_URL } from "../../../apiConfig";
 import Loading from "../loading/Loading";
 import SPListDashboard from "../SP/SPListDashboard";
 import SPMainDashboard from "../SP/SPMainDashboard";
 import SPMapView from "../SP/SPMapView";
 import HomeDashboard from "../HomeDashboard/HomeDashboard";
+// import Tracking from "../LiveTracker/Tracking";
 import "./SPDashboard_style.css";
+import Tracking from "../LiveTracker/Tracking";
 
 export default function SPDashboard() {
   const navigate = useNavigate();
@@ -73,6 +75,10 @@ export default function SPDashboard() {
         );
       case "dashboardmap":
         return <SPMapView SP={SP} onBackNav={handleHomeDashboard} />; // Placeholder for dashboardmap case
+
+      case "dashboardtracking":
+        return <Tracking onBackNav={handleHomeDashboard} />;
+
       case "dashstatslist":
         return <SPMainDashboard SP={SP} onBackNav={handleHomeDashboard} />;
 

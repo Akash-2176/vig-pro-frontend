@@ -5,24 +5,24 @@ export const IdolPopup = ({ idolData, onClose }) => {
 
   return (
     <div className="idol-form-popup-container">
-      <div className="idol-form-popup-box px-5 py-4">
+      <div className="idol-form-popup-box">
         <div className="idol-popup-close-btn h1" onClick={onClose}>
           &times;
         </div>
-        <p className="h1 text-center mb-5 mt-4 text-success">
+        <p className="idol-form-title-for-print h1 text-center text-success">
           Applicant & Idol Details
         </p>
 
-        <div className="my-4 mt-5">
-          <p className="h3 mb-4">Applicant Details</p>
+        <div className="idol-form-content-container">
+          <p className="h3 idol-form-content-container-title">Applicant Details</p>
           <div className="idol-form-content-box">
             <img
               src={idolData.applicantImage}
-              className="idol-form-img img-fluid border"
+              className="idol-form-img"
               alt="User Icon"
             />
-            <div className="idol-form-content-innerbox ms-5 w-100">
-              <table className="table table-bordered">
+            <div className="table-responsive-xl idol-form-content-innerbox mx-5">
+              <table className="table  table-hover table-bordered border-secondary">
                 <tbody className="text-center align-middle">
                   <tr>
                     <td className="h5">Name :</td>
@@ -42,46 +42,47 @@ export const IdolPopup = ({ idolData, onClose }) => {
           </div>
         </div>
 
-        <div className="my-4">
-          <p className="h3 mb-4">Idol Details</p>
+        <div className="idol-form-content-container">
+          <p className="h3 idol-form-content-container-title">Idol Details</p>
           <div className="idol-form-content-box">
             <img
-              className="idol-form-img img-fluid border"
+              className="idol-form-img"
               src={idolData.idolImage}
               alt="Idol Icon"
-            />
-            <table className="ms-3 table table-bordered my-2">
+            /><div className="table-responsive-lg idol-form-content-innerbox mx-5 w-100">
+            <table className="table  table-hover table-bordered border-secondary">
               <tbody className="text-center align-middle">
                 <tr>
-                  <td className="h5">Idol ID :</td>
+                  <td className="h5">Idol ID:</td>
                   <td>{idolData.idol_id}</td>
                 </tr>
 
                 <tr>
-                  <td className="h5">Station Name : </td>
+                  <td className="h5">Station Name: </td>
                   <td> {idolData.stationName}</td>
                 </tr>
 
                 <tr>
-                  <td className="h5">Mother Village : </td>
+                  <td className="h5">Mother Village: </td>
                   <td>{idolData.motherVillage}</td>
                 </tr>
 
                 <tr>
-                  <td className="h5">Hamlet Village : </td>
+                  <td className="h5">Hamlet Village: </td>
                   <td> {idolData.hamletVillage}</td>
                 </tr>
 
                 <tr>
-                  <td className="h5">Location of Idol : </td>
+                  <td className="h5">Location of Idol: </td>
                   <td> {idolData.placeOfInstallation}</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
         </div>
 
-        <table className="table table-bordered">
+        <div className="table-responsive-lg idol-form-content-innerbox">
+        <table className="table   table-hover table-bordered border-secondary">
           <tbody className="text-center align-center">
             <tr>
               <td className="h5 pe-5">Type Of Installer :</td>
@@ -106,11 +107,11 @@ export const IdolPopup = ({ idolData, onClose }) => {
               <td> {new Date(idolData.immersionDate).toLocaleDateString()}</td>
             </tr>
           </tbody>
-        </table>
+        </table></div>
 
         <div className="idol-form-content-table my-5">
           <p className="h3 my-3">Place/Properties</p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr className="text-center">
                 <td className="h5">Type</td>
@@ -126,7 +127,7 @@ export const IdolPopup = ({ idolData, onClose }) => {
 
         <div className="idol-form-content-table my-5">
           <p className="h3 my-3">Shed Type</p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr>
                 <td className="h5">Type</td>
@@ -142,7 +143,7 @@ export const IdolPopup = ({ idolData, onClose }) => {
         </div>
         <div className="idol-form-content-table my-5">
           <p className="h3 my-3">License/Permissions/Facility</p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr>
                 <td className="h5">License</td>
@@ -182,10 +183,10 @@ export const IdolPopup = ({ idolData, onClose }) => {
           </table>
         </div>
 
-        <div className="idol-form-content-table my-5">
+        <div className="idol-form-content-table idol-form-content-table-volunteer-for-print">
           <p className="h3 my-3">Volunteer Details</p>
           <div className="table-responsive-lg">
-            <table className="table table-light table-striped table-bordered my-4">
+            <table className="table table-hover table-light table-striped table-bordered my-4">
               <thead>
                 <tr className="text-center">
                   <th>Volunteer No</th>
@@ -208,9 +209,9 @@ export const IdolPopup = ({ idolData, onClose }) => {
           </div>
         </div>
 
-        <div className="idol-form-content-table my-5">
+        <div className="idol-form-content-table my-3">
           <p className="h3 my-3">Transportation Details</p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr>
                 <td className="h5">Driver Name</td>
@@ -242,7 +243,7 @@ export const IdolPopup = ({ idolData, onClose }) => {
 
         <div className="idol-form-content-table my-5">
           <p className="h3 my-3">Sensitivity </p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr>
                 <td className="h5">Route Sensitivity</td>
@@ -261,7 +262,7 @@ export const IdolPopup = ({ idolData, onClose }) => {
 
         <div className="idol-form-content-table my-5">
           <p className="h3 my-3">Route </p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr>
                 <td className="h5">Starting Point</td>
@@ -290,7 +291,7 @@ export const IdolPopup = ({ idolData, onClose }) => {
 
         <div className="idol-form-content-table my-5">
           <p className="h3 my-3">Immersion-Safety Measures</p>
-          <table className="table table-light table-striped table-bordered my-4">
+          <table className="table table-hover table-light table-striped table-bordered my-4">
             <tbody className="align-middle text-center">
               <tr>
                 <td className="h5">Barricade</td>

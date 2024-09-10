@@ -6,7 +6,7 @@ import axios from "axios";
 import { IdolPopup } from "../idolPopup/IdolPopup";
 import EditPopup from "../EditForm/EditPopup";
 import StatusBarList from "../stats/statustablelist/StatusBarList";
-import API_BASE_URL from "../../../apiConfig";
+import { API_BASE_URL } from "../../../apiConfig";
 
 function StationIdolList({ station, setStation }) {
   const [filterStatus, setFilterStatus] = useState("all");

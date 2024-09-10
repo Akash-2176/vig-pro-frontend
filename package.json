@@ -19,9 +19,11 @@
     "leaflet-routing-machine": "^3.2.12",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.26.1",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss": "^3.4.10"
+    "tailwindcss": "^3.4.10",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

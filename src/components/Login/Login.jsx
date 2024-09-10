@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./login_style.css";
 import axios from "axios";
 import Loading from "../loading/Loading";
-import API_BASE_URL from "../../../apiConfig";
+import { API_BASE_URL } from "../../../apiConfig";
 
 function Login({ loginUser }) {
   const [username, setUsername] = useState("");
@@ -81,7 +81,7 @@ function Login({ loginUser }) {
     <div className="login-container">
       {showLoading && <Loading />}
       <div className=" login-box p-4  my-4">
-        <p className="h1 mt-4 mb-5 text-center">{loginUser}  LOGIN</p>
+        <p className="h1 mt-4 mb-5 text-center">{loginUser} LOGIN</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-4">
             <label htmlFor="username" className="form-label h5">
