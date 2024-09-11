@@ -8,9 +8,9 @@ body {
 }
 .main {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  min-height: 100vh;
+  height: 600vh;
 }
 .form-group {
   margin: 1%;
@@ -129,15 +129,15 @@ body {
   text-decoration: underline;
 }
 
-.g-2{
+.g-2 {
   width: 100%;
   display: flex;
-  gap: 10%!important;
+  gap: 10% !important;
 }
-.prevBtn{
-  width: 80%!important;
+.prevBtn {
+  width: 80% !important;
 }
 
-.nextBtn{
-  width: 80%!important;
+.nextBtn {
+  width: 80% !important;
 }

@@ -589,7 +589,7 @@ const Form = ({ stationId, onClose, onAddIdol, station }) => {
   }, [updatedFormData]);
 
   return (
-    <div className="main my-5">
+    <div className="main  my-5">
       {showLoading && <Loading />}
       <div className="form-container">
         <div className="form__close__btn btn" onClick={onClose}>
