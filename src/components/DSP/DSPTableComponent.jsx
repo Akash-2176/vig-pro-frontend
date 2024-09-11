@@ -170,12 +170,24 @@ const DSPTableComponent = ({ DSP }) => {
   console.log(filteredData);
 
   const handleOpenIdolInfo = (idol) => {
+    const scrollPosition = window.scrollY || document.documentElement.scrollTop;
     setIdolData(idol);
     setShowIdolPopup(true);
+    sessionStorage.setItem("scrollPosition", scrollPosition.toString());
   };
 
   const handleCloseIdolPopup = () => {
+    document.documentElement.style.scrollBehavior = "auto";
     setShowIdolPopup(false);
+    const scrollPosition = sessionStorage.getItem("scrollPosition");
+    console.log(scrollPosition);
+
+    if (scrollPosition) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(scrollPosition, 10));
+        document.documentElement.style.scrollBehavior = "";
+      }, 0);
+    }
   };
   const uniqueDates = [
     ...new Set(
@@ -185,192 +197,201 @@ const DSPTableComponent = ({ DSP }) => {
   return (
     <div className="mx-5 my-2 viewDiv">
       <StatusBarList data={StatusDataArray} />
-      {showIdolPopup && (
-        <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
-      )}
+      {showIdolPopup ? (
+        <div>
+          <IdolPopup idolData={idolData} onClose={handleCloseIdolPopup} />
+        </div>
+      ) : (
+        <>
+          <div className="btn-Div">
+            <div className="row mb-5" id="dsp-filters">
+              <div className="col-lg-3 my-2">
+                <label htmlFor="subPlaceSelect" className="me-sm-2 mb-2">
+                  Police Station:
+                </label>
+                <select
+                  id="subPlaceSelect"
+                  className="form-select"
+                  value={filters.stationLocation}
+                  onChange={(e) =>
+                    setFilters(() => ({
+                      ...filters,
+                      stationLocation: e.target.value,
+                    }))
+                  }
+                >
+                  <option value="">Select Police Station</option>
+                  {DSP.stationIds.map((station, i) => (
+                    <option key={i} value={station.stationLocation}>
+                      {station.stationLocation}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-      <div className="btn-Div">
-        <div className="row mb-5" id="dsp-filters">
-          <div className="col-lg-3 my-2">
-            <label htmlFor="subPlaceSelect" className="me-sm-2 mb-2">
-              Police Station:
-            </label>
-            <select
-              id="subPlaceSelect"
-              className="form-select"
-              value={filters.stationLocation}
-              onChange={(e) =>
-                setFilters(() => ({
-                  ...filters,
-                  stationLocation: e.target.value,
-                }))
-              }
-            >
-              <option value="">Select Police Station</option>
-              {DSP.stationIds.map((station, i) => (
-                <option key={i} value={station.stationLocation}>
-                  {station.stationLocation}
-                </option>
-              ))}
-            </select>
-          </div>
+              <div className="col-lg-2 my-2">
+                <label htmlFor="typeSelect" className="me-sm-2 mb-2">
+                  Type:
+                </label>
+                <select
+                  id="typeSelect"
+                  className="form-select"
+                  value={filters.type}
+                  onChange={(e) =>
+                    setFilters(() => ({ ...filters, type: e.target.value }))
+                  }
+                >
+                  <option value="">All</option>
+                  <option value="private">Private</option>
+                  <option value="public">Public</option>
+                  <option value="organization">Organization</option>
+                </select>
+              </div>
+              <div className="col-lg-2 my-2">
+                <label htmlFor="organizationSelect" className="me-sm-2 mb-2">
+                  Organization :
+                </label>
+                <select
+                  id="organizationSelect"
+                  className="form-select"
+                  value={filters.organizationName}
+                  onChange={(e) =>
+                    setFilters(() => ({
+                      ...filters,
+                      organizationName: e.target.value,
+                    }))
+                  }
+                >
+                  <option value="">Select Organization</option>
+                  {DSP.stationIds[0].defaultOrganization &&
+                    DSP.stationIds[0].defaultOrganization.map((org) => (
+                      <option key={org}>{org}</option>
+                    ))}
+                </select>
+              </div>
+              <div className="col-lg-3 my-2">
+                <label htmlFor="sensitiveSelect" className="me-sm-2 mb-2">
+                  Sensitivity:
+                </label>
+                <select
+                  className="form-select"
+                  id="sensitivity"
+                  name="sensitivity"
+                  value={filters.sensitivity}
+                  onChange={(e) =>
+                    setFilters(() => ({
+                      ...filters,
+                      sensitivity: e.target.value,
+                    }))
+                  }
+                >
+                  <option value="">Select Option</option>
+                  <option value="Nonsensitive">Nonsensitive</option>
+                  <option value="Sensitive">Sensitive</option>
+                  <option value="Hyper-Sensitive">Hyper-Sensitive</option>
+                </select>
+              </div>
 
-          <div className="col-lg-2 my-2">
-            <label htmlFor="typeSelect" className="me-sm-2 mb-2">
-              Type:
-            </label>
-            <select
-              id="typeSelect"
-              className="form-select"
-              value={filters.type}
-              onChange={(e) =>
-                setFilters(() => ({ ...filters, type: e.target.value }))
-              }
-            >
-              <option value="">All</option>
-              <option value="private">Private</option>
-              <option value="public">Public</option>
-              <option value="organization">Organization</option>
-            </select>
-          </div>
-          <div className="col-lg-2 my-2">
-            <label htmlFor="organizationSelect" className="me-sm-2 mb-2">
-              Organization :
-            </label>
-            <select
-              id="organizationSelect"
-              className="form-select"
-              value={filters.organizationName}
-              onChange={(e) =>
-                setFilters(() => ({
-                  ...filters,
-                  organizationName: e.target.value,
-                }))
-              }
-            >
-              <option value="">Select Organization</option>
-              {DSP.stationIds[0].defaultOrganization &&
-                DSP.stationIds[0].defaultOrganization.map((org) => (
-                  <option key={org}>{org}</option>
-                ))}
-            </select>
-          </div>
-          <div className="col-lg-3 my-2">
-            <label htmlFor="sensitiveSelect" className="me-sm-2 mb-2">
-              Sensitivity:
-            </label>
-            <select
-              className="form-select"
-              id="sensitivity"
-              name="sensitivity"
-              value={filters.sensitivity}
-              onChange={(e) =>
-                setFilters(() => ({ ...filters, sensitivity: e.target.value }))
-              }
-            >
-              <option value="">Select Option</option>
-              <option value="Nonsensitive">Nonsensitive</option>
-              <option value="Sensitive">Sensitive</option>
-              <option value="Hyper-Sensitive">Hyper-Sensitive</option>
-            </select>
-          </div>
+              <div className="col-lg-2 my-2">
+                <label htmlFor="statusSelect" className="me-sm-2 mb-2">
+                  Status:
+                </label>
+                <select
+                  id="statusSelect"
+                  className="form-select"
+                  value={filters.immpersionState}
+                  onChange={(e) =>
+                    setFilters(() => ({
+                      ...filters,
+                      immpersionState: e.target.value,
+                    }))
+                  }
+                >
+                  <option value="">All</option>
+                  <option value="Complete">Complete</option>
+                  <option value="Incomplete">Incomplete</option>
+                </select>
+              </div>
 
-          <div className="col-lg-2 my-2">
-            <label htmlFor="statusSelect" className="me-sm-2 mb-2">
-              Status:
-            </label>
-            <select
-              id="statusSelect"
-              className="form-select"
-              value={filters.immpersionState}
-              onChange={(e) =>
-                setFilters(() => ({
-                  ...filters,
-                  immpersionState: e.target.value,
-                }))
-              }
-            >
-              <option value="">All</option>
-              <option value="Complete">Complete</option>
-              <option value="Incomplete">Incomplete</option>
-            </select>
-          </div>
-
-          <div className="col-lg-2 my-2">
-            <label htmlFor="dateInput" className="me-sm-2 mb-2">
-              Date:
-            </label>
-            {/* <input
+              <div className="col-lg-2 my-2">
+                <label htmlFor="dateInput" className="me-sm-2 mb-2">
+                  Date:
+                </label>
+                {/* <input
               id="dateInput"
               type="date"
               className="form-control"
               value={selectedDate}
               onChange={handleDateSelect}
             /> */}
-            <select
-              id="dateInput"
-              className="form-select"
-              value={filters.dateOfImmersion}
-              onChange={(e) =>
-                setFilters(() => ({
-                  ...filters,
-                  dateOfImmersion: e.target.value,
-                }))
-              }
-            >
-              <option value="">Select date</option>
-              {uniqueDates.map((date, i) => (
-                <option value={date} key={i}>
-                  {date}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="tableDiv table-responsive-xxl my-5">
-        <table className="table dsp-table table-light table-striped table-hover">
-          <thead>
-            <tr>
-              <th>S.No</th>
-              <th>Idol ID</th>
-              <th>Location of Installation</th>
-              <th>Place of Immersion</th>
-              <th>Date of Immersion</th>
-              <th>Type</th>
-              <th>Sensitive</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody className="align-middle">
-            {filteredData.length > 0 ? (
-              filteredData.map((item, index) => (
-                <tr
-                  key={index}
-                  style={{ borderBottom: "1px solid #ddd" }}
-                  onClick={() => handleOpenIdolInfo(item)}
+                <select
+                  id="dateInput"
+                  className="form-select"
+                  value={filters.dateOfImmersion}
+                  onChange={(e) =>
+                    setFilters(() => ({
+                      ...filters,
+                      dateOfImmersion: e.target.value,
+                    }))
+                  }
                 >
-                  <td>{index + 1}</td>
-                  <td>{item.idol_id}</td>
-                  <td>{item.placeOfInstallation}</td>
-                  <td>{item.placeOfImmersion}</td>
-                  <td>{new Date(item.immersionDate).toLocaleDateString()}</td>
-                  <td>{item.typeOfInstaller}</td>
-                  <td>{item.sensitivity}</td>
-                  <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
+                  <option value="">Select date</option>
+                  {uniqueDates.map((date, i) => (
+                    <option value={date} key={i}>
+                      {date}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div className="tableDiv table-responsive-xxl my-5">
+            <table className="table dsp-table table-light table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Idol ID</th>
+                  <th>Location of Installation</th>
+                  <th>Place of Immersion</th>
+                  <th>Date of Immersion</th>
+                  <th>Type</th>
+                  <th>Sensitive</th>
+                  <th>Status</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="fs-3 py-3" colSpan={"8"}>
-                  No idols available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+              </thead>
+              <tbody className="align-middle">
+                {filteredData.length > 0 ? (
+                  filteredData.map((item, index) => (
+                    <tr
+                      key={index}
+                      style={{ borderBottom: "1px solid #ddd" }}
+                      onClick={() => handleOpenIdolInfo(item)}
+                    >
+                      <td>{index + 1}</td>
+                      <td>{item.idol_id}</td>
+                      <td>{item.placeOfInstallation}</td>
+                      <td>{item.placeOfImmersion}</td>
+                      <td>
+                        {new Date(item.immersionDate).toLocaleDateString()}
+                      </td>
+                      <td>{item.typeOfInstaller}</td>
+                      <td>{item.sensitivity}</td>
+                      <td>{item.isImmersed ? "Complete" : "Incomplete"}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td className="fs-3 py-3" colSpan={"8"}>
+                      No idols available
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 };

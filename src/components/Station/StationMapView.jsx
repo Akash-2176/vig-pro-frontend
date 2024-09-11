@@ -67,6 +67,7 @@ const StationMapView = ({ station, onBackNav }) => {
     sensitivity: "",
     dateOfImmersion: "",
     organizationName: "",
+    immpersionState: "Incomplete",
   });
 
   const filtersRef = useRef(filters);
@@ -441,13 +442,19 @@ const StationMapView = ({ station, onBackNav }) => {
         const matchesOrganization = currentFilters.organizationName
           ? data.organizationName === currentFilters.organizationName
           : true;
+        const filterStatus =
+          data.isImmersed === true ? "Complete" : "Incomplete";
+        const matchesStatus = filters.immpersionState
+          ? filterStatus === filters.immpersionState
+          : true;
         if (
           matchesType &&
           matchesSensitivity &&
           matchesDate &&
           matchesOrganization &&
           matchesStation &&
-          matchesDivision
+          matchesDivision &&
+          matchesStatus
         ) {
           marker.addTo(mapInstance.current); // Show marker
         }
@@ -513,11 +520,16 @@ const StationMapView = ({ station, onBackNav }) => {
       const matchesOrganization = filters.organizationName
         ? data.organizationName === filters.organizationName
         : true;
+      const filterStatus = data.isImmersed === true ? "Complete" : "Incomplete";
+      const matchesStatus = filters.immpersionState
+        ? filterStatus === filters.immpersionState
+        : true;
       if (
         matchesType &&
         matchesSensitivity &&
         matchesDate &&
-        matchesOrganization
+        matchesOrganization &&
+        matchesStatus
       ) {
         marker.addTo(mapInstance.current); // Show marker
       } else {
@@ -569,7 +581,7 @@ const StationMapView = ({ station, onBackNav }) => {
                 </select>
               )}
             </div>
-            <div className=" col-md-4  map-select-div">
+            <div className=" col-md-3  map-select-div">
               <select
                 value={filters.sensitivity}
                 onChange={(e) =>
@@ -583,7 +595,25 @@ const StationMapView = ({ station, onBackNav }) => {
                 <option value="Nonsensitive">NonSensitive</option>
               </select>
             </div>
-            <div className="col-md-5 map-select-div">
+
+            <div className="col-md-3 my-2">
+              <select
+                id="statusSelect"
+                className="form-select"
+                value={filters.immpersionState}
+                onChange={(e) =>
+                  setFilters(() => ({
+                    ...filters,
+                    immpersionState: e.target.value,
+                  }))
+                }
+              >
+                <option value="">All</option>
+                <option value="Complete">Immersion Complete</option>
+                <option value="Incomplete">Immersion Incomplete</option>
+              </select>
+            </div>
+            <div className="col-md-3 map-select-div">
               <select
                 value={filters.dateOfImmersion}
                 onChange={(e) =>
