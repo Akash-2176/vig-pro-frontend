@@ -2,7 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "./map_style.css";
-
+import liveMarker from "/pinimg2.png";
 // Custom Icons
 // import icon1Image from "./icons/icon1.png"; // Replace with your own image paths
 // import icon2Image from "./icons/icon2.png";
@@ -22,12 +22,13 @@ import "./map_style.css";
 //   popupAnchor: [0, -32],
 // });
 
-import markerIcon from "leaflet/dist/images/marker-icon.png";
+// import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 let DefaultIcon = L.icon({
-  iconUrl: markerIcon,
+  iconUrl: liveMarker,
   shadowUrl: markerShadow,
+  iconSize: [54, 54],
   iconAnchor: [16, 32],
 });
 
